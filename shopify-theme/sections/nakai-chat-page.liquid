@@ -1,0 +1,362 @@
+{{ 'nakai-chat-widget.css' | asset_url | stylesheet_tag }}
+
+<style>
+  .nakai-chat-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 70vh;
+  }
+
+  .nakai-chat-page__container {
+    border: 1px solid rgba(61, 97, 66, .07);
+    border-radius: 28px;
+    overflow: hidden;
+    height: calc(100vh - var(--header-height, 80px) - 12rem);
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 0 .5px rgba(0,0,0,.03), 0 24px 80px -16px rgba(61,97,66,.13), 0 8px 24px -12px rgba(0,0,0,.05);
+  }
+
+  .nakai-chat-page__header {
+    padding: 22px 28px;
+    background: linear-gradient(180deg, #436E48 0%, #3D6142 100%);
+    color: rgba(255, 255, 255, .92);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .06);
+  }
+
+  .nakai-chat-page__header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, .08);
+  }
+
+  .nakai-chat-page__header-logo {
+    height: 24px;
+    width: auto;
+    opacity: .9;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .12));
+  }
+
+  .nakai-chat-page__header-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255, 255, 255, .1);
+  }
+
+  .nakai-chat-page__header-info {
+    flex: 1;
+  }
+
+  .nakai-chat-page__header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nakai-chat-page__header h1 {
+    font-family: var(--font-body-family, 'Work Sans', sans-serif);
+    font-weight: 400;
+    font-size: 1.5rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin: 0;
+    opacity: .85;
+  }
+
+  .nakai-chat-page__ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 9999px;
+    padding: 3px 8px 3px 6px;
+    font-size: .9rem;
+    font-weight: 450;
+    letter-spacing: .08em;
+    color: rgba(255, 255, 255, .7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .nakai-chat-page__ai-badge svg {
+    width: 10px;
+    height: 10px;
+    opacity: .8;
+  }
+
+  .nakai-chat-page__header p {
+    font-weight: 300;
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, .38);
+    margin: 4px 0 0;
+    letter-spacing: .06em;
+  }
+
+  .nakai-chat-page__header-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nakai-chat-page__header-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: #7ED67E;
+    box-shadow: 0 0 6px rgba(126, 214, 126, .4);
+    animation: nakaiPulse 3s ease-in-out infinite;
+  }
+
+  .nakai-chat-page__header-online {
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, .38);
+    letter-spacing: .06em;
+  }
+
+  .nakai-chat-page .nakai-chat__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: var(--font-body-family, 'Work Sans', sans-serif);
+    font-size: 1.4rem;
+    line-height: 1.72;
+    background: #FFFFFF;
+    scroll-behavior: smooth;
+  }
+
+  .nakai-chat-page .nakai-chat__messages::-webkit-scrollbar {
+    width: 0;
+  }
+
+  .nakai-chat-page .nakai-chat__input-area {
+    padding: 14px 24px 18px;
+    background: #FFFFFF;
+    position: relative;
+  }
+
+  .nakai-chat-page .nakai-chat__input-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 28px;
+    right: 28px;
+    height: 1px;
+    background: rgba(61, 97, 66, .07);
+  }
+
+  .nakai-chat-page .nakai-chat__form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FAFAF6;
+    border: 1px solid rgba(61, 97, 66, .07);
+    border-radius: 9999px;
+    padding: 5px 5px 5px 20px;
+    transition: all .4s cubic-bezier(.22, 1, .36, 1);
+  }
+
+  .nakai-chat-page .nakai-chat__form:focus-within {
+    border-color: rgba(123, 160, 109, .35);
+    box-shadow: 0 0 0 4px rgba(61, 97, 66, .04);
+    background: #FFFFFF;
+  }
+
+  .nakai-chat-page .nakai-chat__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 2px 0 14px;
+    background: #FFFFFF;
+  }
+
+  .nakai-chat-page .nakai-chat__footer svg {
+    width: 9px;
+    height: 9px;
+    color: #B0AAA0;
+    opacity: .3;
+  }
+
+  .nakai-chat-page .nakai-chat__footer span {
+    font-size: .85rem;
+    font-weight: 300;
+    color: #B0AAA0;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    opacity: .3;
+  }
+
+  /* Dark mode */
+  [data-scheme="dark"] .nakai-chat-page__container {
+    border-color: rgba(255, 255, 255, .04);
+    box-shadow: 0 0 0 .5px rgba(255, 255, 255, .03), 0 24px 80px -16px rgba(0, 0, 0, .7);
+  }
+
+  [data-scheme="dark"] .nakai-chat-page__header {
+    background: linear-gradient(180deg, #1C201C, #151815);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .03);
+  }
+
+  [data-scheme="dark"] .nakai-chat-page__header::before {
+    background: rgba(255, 255, 255, .04);
+  }
+
+  [data-scheme="dark"] .nakai-chat-page__header-logo {
+    filter: brightness(2.2) drop-shadow(0 1px 3px rgba(0, 0, 0, .3));
+  }
+
+  [data-scheme="dark"] .nakai-chat-page__ai-badge {
+    background: rgba(255, 255, 255, .06);
+    border-color: rgba(255, 255, 255, .05);
+  }
+
+  [data-scheme="dark"] .nakai-chat-page .nakai-chat__messages {
+    background: #181B18;
+  }
+
+  [data-scheme="dark"] .nakai-chat-page .nakai-chat__input-area {
+    background: #181B18;
+  }
+
+  [data-scheme="dark"] .nakai-chat-page .nakai-chat__input-area::before {
+    background: rgba(255, 255, 255, .04);
+  }
+
+  [data-scheme="dark"] .nakai-chat-page .nakai-chat__form {
+    background: #131513;
+    border-color: rgba(255, 255, 255, .04);
+  }
+
+  [data-scheme="dark"] .nakai-chat-page .nakai-chat__footer {
+    background: #181B18;
+  }
+
+  @media screen and (max-width: 749px) {
+    .nakai-chat-page {
+      padding: 1rem;
+    }
+    .nakai-chat-page__container {
+      border-radius: 16px;
+      height: calc(100vh - var(--header-height, 60px) - 8rem);
+    }
+    .nakai-chat-page__header {
+      padding: 18px 20px;
+    }
+    .nakai-chat-page .nakai-chat__messages {
+      padding: 18px 20px;
+    }
+    .nakai-chat-page .nakai-chat__input-area {
+      padding: 12px 16px 16px;
+    }
+  }
+</style>
+
+<section class="nakai-chat-page">
+  <div id="nakai-chatpage-container" class="nakai-chat-page__container" data-lang="{{ request.locale.iso_code }}">
+    <div class="nakai-chat-page__header">
+      <img
+        class="nakai-chat-page__header-logo"
+        src="{{ 'nakai-logo-white.png' | asset_url }}"
+        alt="NAKAI"
+        height="24"
+        loading="lazy"
+      >
+      <div class="nakai-chat-page__header-divider"></div>
+      <div class="nakai-chat-page__header-info">
+        <div class="nakai-chat-page__header-title">
+          <h1>{{ page.title | default: 'Matcha Concierge' }}</h1>
+          <span class="nakai-chat-page__ai-badge">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+            AI
+          </span>
+        </div>
+        <p>{{ 'nakai.chat.page_subtitle' | t | default: 'Ask us anything about matcha' }}</p>
+      </div>
+      <div class="nakai-chat-page__header-status">
+        <span class="nakai-chat-page__header-dot"></span>
+        <span class="nakai-chat-page__header-online">Online</span>
+      </div>
+    </div>
+
+    <div id="nakai-chatpage-messages" class="nakai-chat__messages">
+      <!-- AI Intro banner -->
+      <div class="nakai-chat__ai-intro">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+        <span>{{ 'nakai.chat.ai_intro_full' | t | default: 'AI answers based on our product knowledge, tea ceremony traditions, and brewing expertise' }}</span>
+      </div>
+
+      <div class="nakai-chat__message nakai-chat__message--bot">
+        <div class="nakai-chat__message-row">
+          <div class="nakai-chat__avatar">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+          </div>
+          <div class="nakai-chat__message-content">
+            {{ 'nakai.chat.welcome_full' | t | default: 'Welcome to NAKAI Matcha. I can help you learn about our products, Japanese tea ceremony, brewing techniques, and more. What would you like to know?' }}
+          </div>
+        </div>
+        <div class="nakai-chat__quick-actions">
+          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_recommend' | t | default: 'Recommend a matcha' }}">
+            <span>{{ 'nakai.chat.quick_recommend' | t | default: 'Recommend a matcha' }}</span>
+          </button>
+          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_shipping' | t | default: 'Shipping info' }}">
+            <span>{{ 'nakai.chat.quick_shipping' | t | default: 'Shipping info' }}</span>
+          </button>
+          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_brewing' | t | default: 'How to brew' }}">
+            <span>{{ 'nakai.chat.quick_brewing' | t | default: 'How to brew' }}</span>
+          </button>
+          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_ceremony' | t | default: 'Tea ceremony' }}">
+            <span>{{ 'nakai.chat.quick_ceremony' | t | default: 'Tea ceremony' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nakai-chat__input-area">
+      <form id="nakai-chatpage-form" class="nakai-chat__form">
+        <input
+          type="text"
+          id="nakai-chatpage-input"
+          class="nakai-chat__input"
+          placeholder="{{ 'nakai.chat.placeholder_ai' | t | default: 'Ask AI about our matcha...' }}"
+          autocomplete="off"
+          maxlength="500"
+        />
+        <button type="submit" class="nakai-chat__send" aria-label="{{ 'nakai.chat.send' | t | default: 'Send' }}">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+    <div class="nakai-chat__footer">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+      <span>AI by NAKAI</span>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'nakai-chat-widget.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "NAKAI Chat Page",
+  "tag": "section",
+  "class": "section-nakai-chat",
+  "settings": []
+}
+{% endschema %}

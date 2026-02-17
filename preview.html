@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAKAI — AI Concierge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,200;0,250;0,300;0,350;0,400;0,450;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --g1:#3D6142;--g2:#7BA06D;--g3:#5B8A52;
+      --tp:#9E8471;--sd:#ECDDC7;--pm:#F5EDE1;
+      --bg:#F4ECE2;--s0:#FAFAF6;--s1:#FFFFFF;--s2:rgba(61,97,66,.028);
+      --tx:#161614;--t2:#7A766D;--t3:#B0AAA0;
+      --ln:rgba(61,97,66,.07);--ln2:rgba(61,97,66,.12);
+      --sh:0 0 0 .5px rgba(0,0,0,.03),0 24px 80px -16px rgba(61,97,66,.13),0 8px 24px -12px rgba(0,0,0,.05);
+      --sh2:0 0 0 .5px rgba(0,0,0,.02),0 1px 4px rgba(61,97,66,.04);
+      --rr:9999px;
+      --e:cubic-bezier(.22,1,.36,1);--es:cubic-bezier(.34,1.4,.64,1);--eo:cubic-bezier(.16,1,.3,1)
+    }
+    [data-scheme="dark"]{
+      --bg:#0C0E0C;--s0:#131513;--s1:#181B18;--s2:rgba(123,160,109,.04);
+      --tx:#E4E5E0;--t2:#7D807A;--t3:#4E514A;
+      --ln:rgba(255,255,255,.04);--ln2:rgba(255,255,255,.07);
+      --sh:0 0 0 .5px rgba(255,255,255,.03),0 24px 80px -16px rgba(0,0,0,.7);--sh2:0 1px 4px rgba(0,0,0,.3)
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{font-size:16px}
+    body{font-family:'Work Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+
+    /* ——— Store mock ——— */
+    .s{max-width:1060px;margin:0 auto;padding:0 52px}
+    .s__n{display:flex;align-items:center;justify-content:space-between;padding:32px 0;position:relative}
+    .s__n::after{content:'';position:absolute;left:52px;right:52px;bottom:0;height:1px;background:var(--ln)}
+    .s__li{height:18px;width:auto;opacity:.8;transition:opacity .4s var(--e)}.s__li:hover{opacity:1}
+    [data-scheme="dark"] .s__li--l{display:none}[data-scheme="dark"] .s__li--d{display:block}.s__li--d{display:none}
+    .s__nl{display:flex;gap:40px;list-style:none}
+    .s__nl a{font-size:11px;font-weight:400;color:var(--t3);text-decoration:none;letter-spacing:.12em;text-transform:uppercase;transition:color .4s var(--e)}
+    .s__nl a:hover{color:var(--tx)}
+    .s__h{text-align:center;padding:88px 0 64px}
+    .s__h h1{font-weight:200;font-size:44px;letter-spacing:-.025em;line-height:1.12}
+    .s__h p{font-weight:350;font-size:11.5px;color:var(--t3);margin-top:20px;letter-spacing:.14em;text-transform:uppercase}
+    .s__g{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-bottom:160px}
+    .pc{background:var(--s1);border-radius:16px;overflow:hidden;transition:transform .6s var(--e),box-shadow .6s var(--e);cursor:pointer;border:1px solid var(--ln)}
+    .pc:hover{transform:translateY(-5px);box-shadow:var(--sh2);border-color:var(--ln2)}
+    .pc__i{aspect-ratio:4/5;position:relative}
+    .pc__i::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.03) 100%)}
+    .pc__b{padding:16px 20px 20px}
+    .pc__t{font-weight:400;font-size:12.5px;letter-spacing:.02em}
+    .pc__p{font-weight:300;font-size:11.5px;color:var(--t3);margin-top:4px;letter-spacing:.03em}
+    .dt{position:fixed;top:28px;left:28px;width:30px;height:30px;border-radius:var(--rr);border:1px solid var(--ln);background:rgba(255,255,255,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10000;transition:all .4s var(--e)}
+    .dt:hover{transform:scale(1.1);box-shadow:var(--sh2);border-color:var(--ln2)}
+    .dt svg{width:13px;height:13px;color:var(--t3)}
+    [data-scheme="dark"] .dt{background:rgba(24,27,24,.6)}
+
+    /* ===== CHAT ===== */
+    .nc{position:fixed;bottom:32px;right:32px;z-index:9990;font-family:'Work Sans',-apple-system,sans-serif}
+
+    /* FAB — Branded Pill */
+    .nc__fab{
+      height:48px;border-radius:var(--rr);border:none;cursor:pointer;
+      display:flex;align-items:center;gap:0;
+      background:linear-gradient(145deg,#4A7350 0%,var(--g1) 50%,#325238 100%);
+      color:rgba(255,255,255,.92);
+      box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.1);
+      transition:all .5s var(--es);position:relative;overflow:hidden;
+      padding:0;
+      touch-action:manipulation;-webkit-tap-highlight-color:transparent
+    }
+    .nc__fab::before{content:'';position:absolute;top:-30%;left:-10%;width:50%;height:60%;background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 70%);pointer-events:none}
+    .nc__fab::after{content:'';position:absolute;inset:0;border-radius:var(--rr);box-shadow:inset 0 -2px 4px rgba(0,0,0,.08);pointer-events:none}
+    .nc:not(.nc--open) .nc__fab{animation:breathe 4s ease-in-out infinite}
+    @keyframes breathe{0%,100%{box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.1)}50%{box-shadow:0 0 0 .5px rgba(0,0,0,.03),0 28px 88px -16px rgba(61,97,66,.18),0 10px 28px -12px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.1)}}
+    .nc__fab:hover{transform:translateY(-2px);box-shadow:0 0 0 .5px rgba(0,0,0,.03),0 28px 88px -12px rgba(61,97,66,.22),0 12px 32px -8px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.1)}
+    .nc__fab:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+
+    /* FAB inner layout */
+    .nc__fab-body{
+      display:flex;align-items:center;gap:12px;
+      padding:0 20px 0 16px;height:100%;
+      position:relative;z-index:1
+    }
+    .nc__fab-icon{
+      width:20px;height:20px;flex-shrink:0;
+      opacity:.85;filter:drop-shadow(0 1px 2px rgba(0,0,0,.1))
+    }
+    .nc__fab-text{
+      display:flex;align-items:center;gap:8px;
+      font-family:'Work Sans',sans-serif;line-height:1;white-space:nowrap
+    }
+    .nc__fab-label{
+      font-size:10.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;
+      opacity:.88
+    }
+    .nc__fab-sep{
+      width:1px;height:16px;background:rgba(255,255,255,.12);flex-shrink:0
+    }
+    .nc__fab-ai{
+      display:inline-flex;align-items:center;gap:3px;
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--rr);
+      padding:3px 8px 3px 6px;
+      font-size:9px;font-weight:450;letter-spacing:.08em;
+      color:rgba(255,255,255,.75);
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)
+    }
+    .nc__fab-ai svg{width:9px;height:9px;opacity:.8}
+    .nc__fab-dot{
+      width:5px;height:5px;border-radius:var(--rr);
+      background:#7ED67E;box-shadow:0 0 6px rgba(126,214,126,.5);
+      flex-shrink:0;
+      animation:pulse 3s ease-in-out infinite
+    }
+
+    /* FAB close state — compact circle */
+    .nc__fab-close{
+      display:none;
+      width:48px;height:48px;
+      align-items:center;justify-content:center
+    }
+    .nc__fab-close svg{width:14px;height:14px;stroke-width:2}
+    .nc--open .nc__fab-body{display:none}
+    .nc--open .nc__fab-close{display:flex}
+    .nc--open .nc__fab{width:48px;padding:0}
+
+    /* Panel */
+    .nc__p{
+      position:absolute;bottom:calc(48px + 16px);right:0;
+      width:380px;height:620px;
+      background:var(--s1);
+      border:1px solid var(--ln);
+      border-radius:28px;
+      box-shadow:var(--sh);
+      display:flex;flex-direction:column;overflow:hidden;
+      opacity:0;transform:translateY(12px) scale(.92);pointer-events:none;
+      transition:opacity .45s var(--eo),transform .55s var(--es)
+    }
+    .nc--open .nc__p{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+
+    /* Header */
+    .nc__hd{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:18px 22px;
+      background:linear-gradient(180deg,#436E48 0%,var(--g1) 100%);
+      color:rgba(255,255,255,.92);flex-shrink:0;
+      position:relative;
+      box-shadow:0 1px 0 rgba(0,0,0,.06)
+    }
+    .nc__hd::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:rgba(255,255,255,.08)}
+    .nc__hl{display:flex;align-items:center;gap:12px}
+    .nc__logo{height:22px;width:auto;opacity:.9;filter:drop-shadow(0 1px 3px rgba(0,0,0,.12))}
+    .nc__sep{width:1px;height:22px;background:rgba(255,255,255,.1)}
+    .nc__hi{display:flex;flex-direction:column;gap:3px}
+    .nc__ht{display:flex;align-items:center;gap:6px;font-weight:400;font-size:11px;letter-spacing:.1em;text-transform:uppercase;line-height:1;opacity:.88}
+    .nc__ai-badge{
+      display:inline-flex;align-items:center;gap:3px;
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--rr);
+      padding:2px 7px 2px 5px;
+      font-size:8.5px;font-weight:450;letter-spacing:.08em;
+      color:rgba(255,255,255,.7);
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)
+    }
+    .nc__ai-badge svg{width:9px;height:9px;opacity:.8}
+    .nc__hs{display:flex;align-items:center;gap:5px}
+    .nc__dot{width:5px;height:5px;border-radius:var(--rr);background:#7ED67E;box-shadow:0 0 6px rgba(126,214,126,.4);animation:pulse 3s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px rgba(126,214,126,.4)}50%{opacity:.65;box-shadow:0 0 12px rgba(126,214,126,.15)}}
+    .nc__hsub{font-weight:300;font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.06em;line-height:1}
+    .nc__xb{width:24px;height:24px;border-radius:var(--rr);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s var(--e)}
+    .nc__xb:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.08)}
+    .nc__xb svg{width:11px;height:11px;stroke-width:2.5}
+
+    /* Messages */
+    .nc__ms{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth;background:var(--s1)}
+    .nc__ms::-webkit-scrollbar{width:0}
+
+    /* AI Intro banner */
+    .nc__ai-intro{
+      display:flex;align-items:center;justify-content:center;gap:6px;
+      padding:8px 14px;margin:0 0 14px;
+      background:linear-gradient(135deg,rgba(61,97,66,.04),rgba(123,160,109,.04));
+      border:1px solid var(--ln);
+      border-radius:12px;
+      font-size:10.5px;font-weight:400;color:var(--t2);
+      letter-spacing:.02em;line-height:1.4
+    }
+    .nc__ai-intro svg{width:14px;height:14px;color:var(--g2);flex-shrink:0;opacity:.7}
+
+    /* Message row */
+    .nc__mg{display:flex;flex-direction:column}
+    .nc__mg--b{align-items:flex-start;padding-right:40px}
+    .nc__mg--u{align-items:flex-end;padding-left:40px;margin-top:6px}
+    .nc__mg--b+.nc__mg--b{margin-top:2px}
+    .nc__mg--u+.nc__mg--u{margin-top:2px}
+    .nc__mg--b+.nc__mg--u,.nc__mg--u+.nc__mg--b{margin-top:14px}
+
+    /* Bot message — with avatar row */
+    .nc__mg--b .nc__mr{display:flex;align-items:flex-start;gap:10px}
+    .nc__av{
+      width:26px;height:26px;border-radius:10px;flex-shrink:0;margin-top:1px;
+      background:linear-gradient(145deg,rgba(61,97,66,.08),rgba(123,160,109,.06));
+      border:1px solid var(--ln);
+      display:flex;align-items:center;justify-content:center
+    }
+    .nc__av svg{width:12px;height:12px;color:var(--g2);opacity:.75}
+
+    /* Bot bubble */
+    .nc__mg--b .nc__mc{
+      background:var(--s2);color:var(--tx);
+      border-radius:4px 20px 20px 20px;
+      padding:13px 16px;font-size:13.5px;font-weight:400;line-height:1.72;letter-spacing:.008em
+    }
+
+    /* User bubble */
+    .nc__mg--u .nc__mc{
+      background:linear-gradient(145deg,#4A7350,var(--g1));
+      color:rgba(255,255,255,.94);
+      border-radius:20px 20px 4px 20px;
+      padding:13px 16px;font-size:13.5px;font-weight:400;line-height:1.72;letter-spacing:.008em;
+      box-shadow:0 2px 12px rgba(61,97,66,.1),inset 0 1px 0 rgba(255,255,255,.06)
+    }
+
+    .nc__mc a{color:var(--g3);text-decoration:none;font-weight:450;
+      background:linear-gradient(to right,var(--g2),var(--g2)) no-repeat 0 100%/100% 1px;
+      transition:all .3s var(--e);padding-bottom:1px}
+    .nc__mc a:hover{color:var(--g1);background-size:100% 1.5px}
+    .nc__mg--u .nc__mc a{color:rgba(255,255,255,.88);background-image:linear-gradient(to right,rgba(255,255,255,.3),rgba(255,255,255,.3))}
+    .nc__mc strong{font-weight:500}
+
+    /* Timestamp + AI label */
+    .nc__meta{display:flex;align-items:center;gap:6px;margin-top:5px;padding:0 0 0 36px}
+    .nc__ts{font-size:9px;font-weight:350;color:var(--t3);letter-spacing:.06em}
+    .nc__ai-tag{
+      font-size:8px;font-weight:450;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--g2);opacity:.6
+    }
+
+    /* Typing — enhanced with label */
+    .nc__ty .nc__mr{display:flex;align-items:flex-start;gap:10px}
+    .nc__ty-body{display:flex;flex-direction:column;gap:6px}
+    .nc__ty .nc__mc{padding:14px 18px!important}
+    .nc__dots{display:flex;gap:6px;align-items:center;height:12px}
+    .nc__dots span{width:4px;height:4px;background:var(--g2);border-radius:var(--rr);animation:wave 1.6s ease-in-out infinite}
+    .nc__dots span:nth-child(1){animation-delay:0s}
+    .nc__dots span:nth-child(2){animation-delay:.15s}
+    .nc__dots span:nth-child(3){animation-delay:.3s}
+    @keyframes wave{0%,60%,100%{opacity:.15;transform:translateY(0)}30%{opacity:.8;transform:translateY(-4px)}}
+    .nc__ty-label{
+      font-size:9.5px;font-weight:350;color:var(--t3);letter-spacing:.04em;
+      padding-left:2px;
+      animation:fadeInUp .4s var(--eo) both
+    }
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Quick Actions */
+    .nc__qa{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-left:36px}
+    .nc__qb{
+      font-family:'Work Sans',sans-serif;font-size:11px;font-weight:400;
+      color:var(--g1);background:var(--s1);
+      border:1px solid var(--ln2);border-radius:var(--rr);
+      padding:7px 14px;cursor:pointer;letter-spacing:.03em;
+      transition:all .35s var(--e);position:relative;overflow:hidden;
+      touch-action:manipulation;-webkit-tap-highlight-color:transparent
+    }
+    .nc__qb::before{content:'';position:absolute;inset:0;background:var(--g1);border-radius:var(--rr);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--e)}
+    .nc__qb:hover{border-color:var(--g1);color:rgba(255,255,255,.94);transform:translateY(-1px);box-shadow:0 4px 12px rgba(61,97,66,.12)}
+    .nc__qb:hover::before{transform:scaleX(1)}
+    .nc__qb span{position:relative;z-index:1}
+
+    /* Input area */
+    .nc__ia{padding:14px 20px 18px;background:var(--s1);flex-shrink:0;position:relative}
+    .nc__ia::before{content:'';position:absolute;top:0;left:22px;right:22px;height:1px;background:var(--ln)}
+    .nc__fr{
+      display:flex;align-items:center;gap:8px;
+      background:var(--s0);border:1px solid var(--ln);border-radius:var(--rr);
+      padding:5px 5px 5px 18px;
+      transition:all .4s var(--e)
+    }
+    .nc__fr:focus-within{border-color:rgba(123,160,109,.35);box-shadow:0 0 0 4px rgba(61,97,66,.04);background:var(--s1)}
+    .nc__inp{flex:1;border:none;background:transparent;color:var(--tx);font-family:'Work Sans',sans-serif;font-size:13px;font-weight:350;letter-spacing:.015em;outline:none;padding:6px 0}
+    .nc__inp::placeholder{color:var(--t3);font-weight:300;letter-spacing:.03em}
+    .nc__sb{touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+      width:34px;height:34px;border-radius:var(--rr);border:none;
+      background:linear-gradient(145deg,#4A7350,var(--g1));
+      color:rgba(255,255,255,.88);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      transition:all .3s var(--e);position:relative;overflow:hidden;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08)
+    }
+    .nc__sb::before{content:'';position:absolute;top:-10%;left:-10%;width:50%;height:50%;background:radial-gradient(circle,rgba(255,255,255,.2) 0%,transparent 70%);pointer-events:none}
+    .nc__sb:hover{transform:scale(1.1);box-shadow:0 2px 8px rgba(61,97,66,.15),inset 0 1px 0 rgba(255,255,255,.08)}
+    .nc__sb:active{transform:scale(.92)}
+    .nc__sb svg{width:13px;height:13px;margin-left:1px}
+
+    /* Footer */
+    .nc__ft{
+      display:flex;align-items:center;justify-content:center;gap:5px;
+      padding:2px 0 13px;background:var(--s1)
+    }
+    .nc__ft svg{width:9px;height:9px;color:var(--t3);opacity:.3}
+    .nc__ft span{font-size:8.5px;font-weight:300;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;opacity:.3}
+
+    /* ——— Dark ——— */
+    [data-scheme="dark"] .nc__fab{background:linear-gradient(145deg,#8FB87C,var(--g2),#6A9960);color:#0C0E0C;box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.12)}
+    [data-scheme="dark"] .nc__fab-ai{background:rgba(0,0,0,.15);border-color:rgba(0,0,0,.1);color:rgba(12,14,12,.65)}
+    [data-scheme="dark"] .nc__fab-sep{background:rgba(0,0,0,.1)}
+    [data-scheme="dark"] .nc__fab-dot{background:#2D5A2D;box-shadow:0 0 6px rgba(45,90,45,.4)}
+    [data-scheme="dark"] .nc__hd{background:linear-gradient(180deg,#1C201C,#151815);box-shadow:0 1px 0 rgba(255,255,255,.03)}
+    [data-scheme="dark"] .nc__hd::before{background:rgba(255,255,255,.04)}
+    [data-scheme="dark"] .nc__logo{filter:brightness(2.2) drop-shadow(0 1px 3px rgba(0,0,0,.3))}
+    [data-scheme="dark"] .nc__ai-badge{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.05)}
+    [data-scheme="dark"] .nc__ai-intro{background:linear-gradient(135deg,rgba(123,160,109,.06),rgba(123,160,109,.03));border-color:var(--ln)}
+    [data-scheme="dark"] .nc__ai-intro svg{color:var(--g2)}
+    [data-scheme="dark"] .nc__av{background:linear-gradient(145deg,rgba(123,160,109,.1),rgba(123,160,109,.05));border-color:var(--ln)}
+    [data-scheme="dark"] .nc__av svg{color:var(--g2)}
+    [data-scheme="dark"] .nc__mg--u .nc__mc{background:linear-gradient(145deg,#8FB87C,var(--g2));color:#0C0E0C;box-shadow:0 2px 12px rgba(123,160,109,.08),inset 0 1px 0 rgba(255,255,255,.1)}
+    [data-scheme="dark"] .nc__sb{background:linear-gradient(145deg,#8FB87C,var(--g2));color:#0C0E0C}
+    [data-scheme="dark"] .nc__qb{color:var(--g2);border-color:rgba(123,160,109,.15)}
+    [data-scheme="dark"] .nc__qb::before{background:var(--g2)}
+    [data-scheme="dark"] .nc__qb:hover{color:#0C0E0C;border-color:var(--g2)}
+    [data-scheme="dark"] .nc__mc a{color:var(--g2);background-image:linear-gradient(to right,rgba(123,160,109,.35),rgba(123,160,109,.35))}
+    [data-scheme="dark"] .nc__dot{background:#7ED67E;box-shadow:0 0 8px rgba(126,214,126,.3)}
+
+    @media(max-width:749px){
+      .s__g{grid-template-columns:repeat(2,1fr);gap:10px}.s__h h1{font-size:28px}.s{padding:0 24px}
+      .s__nl{display:none}.s__n::after{left:24px;right:24px}
+      .nc{bottom:20px;right:16px}
+      .nc__fab-label{font-size:9.5px;letter-spacing:.12em}
+      .nc__p{position:fixed;inset:0;width:100%;height:100%;border-radius:0;border:none;
+        transform:translateY(100%);opacity:1}
+      .nc--open .nc__p{transform:translateY(0)}
+      .nc--open .nc__fab{display:none}
+      .nc__inp{font-size:16px}
+      .nc__xb{width:32px;height:32px}
+      .nc__xb svg{width:14px;height:14px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="s">
+    <nav class="s__n">
+      <a href="#">
+        <img class="s__li s__li--l" src="logo-wordmark-black.png" alt="NAKAI" height="18">
+        <img class="s__li s__li--d" src="logo-wordmark-white.png" alt="NAKAI" height="18">
+      </a>
+      <ul class="s__nl">
+        <li><a href="#">Shop</a></li>
+        <li><a href="#">Our Story</a></li>
+        <li><a href="#">Journal</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="s__h">
+      <h1>Grounded in nature,<br>elevated in ritual.</h1>
+      <p>Organic matcha &middot; Uji, Kyoto</p>
+    </div>
+    <div class="s__g">
+      <div class="pc"><div class="pc__i" style="background:linear-gradient(165deg,#96B887 0%,#6A9A5E 40%,#3D6142 100%)"></div><div class="pc__b"><div class="pc__t">Ceremonial Matcha</div><div class="pc__p">From ¥4,800</div></div></div>
+      <div class="pc"><div class="pc__i" style="background:linear-gradient(165deg,#B5D4A0 0%,#81A370 45%,#5A7E55 100%)"></div><div class="pc__b"><div class="pc__t">Daily Organic Blend</div><div class="pc__p">¥2,400</div></div></div>
+      <div class="pc"><div class="pc__i" style="background:linear-gradient(165deg,#E8D9C5 0%,#C4AE96 45%,#9E8471 100%)"></div><div class="pc__b"><div class="pc__t">Chasen Set</div><div class="pc__p">¥8,500</div></div></div>
+      <div class="pc"><div class="pc__i" style="background:linear-gradient(165deg,#C3D8AE 0%,#8FB87C 45%,#5E8A5A 100%)"></div><div class="pc__b"><div class="pc__t">Matcha Latte Mix</div><div class="pc__p">¥1,800</div></div></div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div id="w" class="nc nc--open" data-lang="ja">
+    <button id="t" class="nc__fab" aria-expanded="true" aria-label="NAKAI Concierge AI">
+      <div class="nc__fab-body">
+        <span class="nc__fab-dot"></span>
+        <svg class="nc__fab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div class="nc__fab-text">
+          <span class="nc__fab-label">Nakai Concierge</span>
+          <span class="nc__fab-sep"></span>
+          <span class="nc__fab-ai">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+            AI
+          </span>
+        </div>
+      </div>
+      <div class="nc__fab-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+    </button>
+
+    <div id="p" class="nc__p" aria-hidden="false">
+      <div class="nc__hd">
+        <div class="nc__hl">
+          <img class="nc__logo" src="logo-white.png" alt="NAKAI">
+          <div class="nc__sep"></div>
+          <div class="nc__hi">
+            <span class="nc__ht">
+              Concierge
+              <span class="nc__ai-badge">
+                <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+                AI
+              </span>
+            </span>
+            <div class="nc__hs"><span class="nc__dot"></span><span class="nc__hsub">Online</span></div>
+          </div>
+        </div>
+        <button id="x" class="nc__xb" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+
+      <div id="m" class="nc__ms">
+        <!-- AI Intro banner -->
+        <div class="nc__ai-intro">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+          <span>AIが商品情報・茶道の知識をもとにお答えします</span>
+        </div>
+
+        <!-- Welcome message -->
+        <div class="nc__mg nc__mg--b">
+          <div class="nc__mr">
+            <div class="nc__av">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+            </div>
+            <div class="nc__mc">こんにちは。NAKAI AI Conciergeです。<br>抹茶のことなら何でもお気軽にどうぞ。商品選び、点て方、茶道の知識まで、AIがお手伝いします。</div>
+          </div>
+          <div class="nc__qa">
+            <button class="nc__qb"><span>おすすめを教えて</span></button>
+            <button class="nc__qb"><span>送料について</span></button>
+            <button class="nc__qb"><span>抹茶の点て方</span></button>
+          </div>
+        </div>
+
+        <!-- User message -->
+        <div class="nc__mg nc__mg--u"><div class="nc__mc">初めて抹茶を買うのですが、おすすめはありますか？</div></div>
+
+        <!-- AI response -->
+        <div class="nc__mg nc__mg--b">
+          <div class="nc__mr">
+            <div class="nc__av">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+            </div>
+            <div class="nc__mc">はじめての一杯でしたら、<a href="#">Daily Organic Blend</a> をおすすめします。まろやかな甘みと深い旨みのバランスが良く、どなたにも飲みやすい味わいです。<br><br>茶道に興味がおありでしたら、<a href="#">Ceremonial Matcha</a> もぜひお試しください。石臼で丁寧に挽いた、宇治産の最上級グレードです。</div>
+          </div>
+          <div class="nc__meta">
+            <span class="nc__ts">15:23</span>
+            <span class="nc__ai-tag">AI</span>
+          </div>
+        </div>
+
+        <!-- User follow-up -->
+        <div class="nc__mg nc__mg--u"><div class="nc__mc">送料はいくらですか？</div></div>
+
+        <!-- AI typing -->
+        <div class="nc__mg nc__mg--b nc__ty">
+          <div class="nc__mr">
+            <div class="nc__av">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+            </div>
+            <div class="nc__ty-body">
+              <div class="nc__mc"><div class="nc__dots"><span></span><span></span><span></span></div></div>
+              <span class="nc__ty-label">AIが回答を作成中...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nc__ia">
+        <form id="f" class="nc__fr" onsubmit="return false">
+          <input type="text" id="i" class="nc__inp" placeholder="AIに質問する..." autocomplete="off">
+          <button type="submit" class="nc__sb" aria-label="Send"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405z"/></svg></button>
+        </form>
+      </div>
+      <div class="nc__ft">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+        <span>AI by NAKAI</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('t').addEventListener('click',function(){document.getElementById('w').classList.toggle('nc--open')});
+    document.getElementById('x').addEventListener('click',function(){document.getElementById('w').classList.remove('nc--open')});
+    document.querySelectorAll('.nc__qb').forEach(function(b){b.addEventListener('click',function(){document.getElementById('i').value=this.querySelector('span').textContent;document.getElementById('i').focus()})});
+    function toggleDark(){var h=document.documentElement;h.getAttribute('data-scheme')==='dark'?h.removeAttribute('data-scheme'):h.setAttribute('data-scheme','dark')}
+  </script>
+</body>
+</html>

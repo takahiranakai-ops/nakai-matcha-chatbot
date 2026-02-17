@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "nakai-chat-page",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

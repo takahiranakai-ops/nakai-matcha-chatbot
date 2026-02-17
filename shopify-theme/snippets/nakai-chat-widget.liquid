@@ -1,0 +1,124 @@
+{% comment %}
+  NAKAI AI Concierge — Floating Chat Widget
+  Renders a floating chat bubble + expandable panel on all pages.
+  Inject this in theme.liquid before </body> via: {% render 'nakai-chat-widget' %}
+{% endcomment %}
+
+<div id="nakai-chat-widget" class="nakai-chat" data-lang="{{ request.locale.iso_code }}">
+  <!-- FAB Toggle — Branded Pill -->
+  <button
+    id="nakai-chat-toggle"
+    class="nakai-chat__toggle"
+    aria-label="{{ 'nakai.chat.open' | t | default: 'NAKAI Concierge AI' }}"
+    aria-expanded="false"
+  >
+    <div class="nakai-chat__toggle-body">
+      <span class="nakai-chat__toggle-dot"></span>
+      <svg class="nakai-chat__toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+      </svg>
+      <div class="nakai-chat__toggle-text">
+        <span class="nakai-chat__toggle-label">Nakai Concierge</span>
+        <span class="nakai-chat__toggle-sep"></span>
+        <span class="nakai-chat__toggle-ai">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+          AI
+        </span>
+      </div>
+    </div>
+    <div class="nakai-chat__toggle-close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </div>
+  </button>
+
+  <!-- Chat Panel -->
+  <div id="nakai-chat-panel" class="nakai-chat__panel" aria-hidden="true">
+    <div class="nakai-chat__header">
+      <div class="nakai-chat__header-left">
+        <img
+          class="nakai-chat__header-logo"
+          src="{{ 'nakai-logo-white.png' | asset_url }}"
+          alt="NAKAI"
+          height="22"
+          loading="lazy"
+        >
+        <div class="nakai-chat__header-divider"></div>
+        <div class="nakai-chat__header-info">
+          <span class="nakai-chat__header-title">
+            Concierge
+            <span class="nakai-chat__ai-badge">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+              AI
+            </span>
+          </span>
+          <div class="nakai-chat__header-status">
+            <span class="nakai-chat__header-dot"></span>
+            <span class="nakai-chat__header-subtitle">Online</span>
+          </div>
+        </div>
+      </div>
+      <button id="nakai-chat-close" class="nakai-chat__header-close" aria-label="{{ 'nakai.chat.close' | t | default: 'Close chat' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="nakai-chat-messages" class="nakai-chat__messages">
+      <!-- AI Intro banner -->
+      <div class="nakai-chat__ai-intro">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+        <span>{{ 'nakai.chat.ai_intro' | t | default: 'AI answers based on our product knowledge' }}</span>
+      </div>
+
+      <div class="nakai-chat__message nakai-chat__message--bot">
+        <div class="nakai-chat__message-row">
+          <div class="nakai-chat__avatar">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+          </div>
+          <div class="nakai-chat__message-content">
+            {{ 'nakai.chat.welcome' | t | default: 'Welcome to NAKAI. How can I help you find your perfect matcha today?' }}
+          </div>
+        </div>
+        <div class="nakai-chat__quick-actions">
+          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_recommend' | t | default: 'Recommend a matcha' }}">
+            <span>{{ 'nakai.chat.quick_recommend' | t | default: 'Recommend a matcha' }}</span>
+          </button>
+          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_shipping' | t | default: 'Shipping info' }}">
+            <span>{{ 'nakai.chat.quick_shipping' | t | default: 'Shipping info' }}</span>
+          </button>
+          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_brewing' | t | default: 'How to brew' }}">
+            <span>{{ 'nakai.chat.quick_brewing' | t | default: 'How to brew' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nakai-chat__input-area">
+      <form id="nakai-chat-form" class="nakai-chat__form">
+        <input
+          type="text"
+          id="nakai-chat-input"
+          class="nakai-chat__input"
+          placeholder="{{ 'nakai.chat.placeholder_ai' | t | default: 'Ask AI about our matcha...' }}"
+          autocomplete="off"
+          maxlength="500"
+        />
+        <button type="submit" class="nakai-chat__send" aria-label="{{ 'nakai.chat.send' | t | default: 'Send' }}">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+    <div class="nakai-chat__footer">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
+      <span>AI by NAKAI</span>
+    </div>
+  </div>
+</div>
+
+{{ 'nakai-chat-widget.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'nakai-chat-widget.js' | asset_url }}" defer="defer"></script>
