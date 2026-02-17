@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: nakai-matcha-chat
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: NGC_API_KEY
+        sync: false
+      - key: SHOPIFY_STORE_URL
+        sync: false
+      - key: SHOPIFY_STOREFRONT_TOKEN
+        sync: false
+      - key: SHOPIFY_ADMIN_TOKEN
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: REFRESH_SECRET
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.11.11"
