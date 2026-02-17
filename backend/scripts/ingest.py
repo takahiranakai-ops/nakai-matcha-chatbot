@@ -5,12 +5,15 @@ import sys
 
 from services import shopify_client
 from services.nvidia_client import get_embeddings
+from pathlib import Path
+
 from services.data_processor import (
     process_product,
     process_collection,
     process_page,
     process_article,
     process_policy,
+    process_knowledge_file,
 )
 from services.vector_store import VectorStore
 from config import settings
@@ -60,11 +63,20 @@ async def run_ingestion(vector_store: VectorStore) -> int:
         all_documents.extend(process_policy(policy))
     print(f"  -> {len(policies)} policies -> {len(all_documents) - before} chunks")
 
+    # 6. Custom knowledge base files
+    knowledge_dir = Path(__file__).resolve().parent.parent / "knowledge"
+    if knowledge_dir.exists():
+        print("Loading custom knowledge base...")
+        before = len(all_documents)
+        for txt_file in sorted(knowledge_dir.glob("*.txt")):
+            all_documents.extend(process_knowledge_file(str(txt_file)))
+        print(f"  -> {len(all_documents) - before} chunks from knowledge base")
+
     if not all_documents:
         print("No documents to ingest!")
         return 0
 
-    # 6. Embed and store in batches
+    # 7. Embed and store in batches
     print(f"\nEmbedding {len(all_documents)} document chunks...")
     batch_size = 50
     for i in range(0, len(all_documents), batch_size):

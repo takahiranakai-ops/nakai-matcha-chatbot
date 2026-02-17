@@ -1,0 +1,18 @@
+Water Science: How to Brew the Perfect Matcha
+
+The chemical profile of a matcha bowl is determined by the interaction between the tea particles and the mineral composition of the brewing water.
+
+Q: How does water hardness affect catechins?
+A: A study published in Molecules (2021) showed that as water hardness increases from 30mg/L to 120mg/L, the total yield of extracted catechins decreases due to autoxidation. Specifically, alkaline conditions (high pH) promote the browning of matcha and reduce the stability of EGCG.
+
+Q: Does boiling water twice ruin the taste?
+A: According to sensory science research, water that has been over-boiled loses dissolved oxygen (DO). While the chemical impact on tannins is debated, traditional expertise and studies in Tea Science suggest that high DO levels enhance the "freshness" and "aroma release" of the tea, whereas "flat" water makes the umami feel thin.
+
+Q: What is the optimal pH for matcha?
+A: Research suggests a pH of 6.5 to 7.0 is ideal. Water with a pH above 8.0 reacts with tea polyphenols, increasing bitterness and astringency (puckery sensation) through the formation of protein-tannin complexes in the mouth.
+
+Q: Why does my homemade matcha latte taste bitter compared to cafe versions?
+A: The primary cause of bitterness in homemade matcha is using boiling water; the scientific "sweet spot" for brewing is precisely 80°C (176°F). The Modernist Matcha Encyclopedia explains that while umami-rich amino acids dissolve at lower temperatures, bitter catechins and caffeine are extracted rapidly at temperatures above 80°C. Additionally, using "soft water" (low mineral content) prevents minerals from binding with tea polyphenols, which otherwise creates a harsh, astringent mouthfeel.
+
+Q: What is the best water temperature for matcha?
+A: Never use boiling water. 100°C water over-extracts tannins, causing extreme bitterness. The ideal range is 70°C to 80°C. This specific temperature window balances the extraction of sweet L-theanine and healthy catechins for a perfect flavor profile.

@@ -152,3 +152,28 @@ def process_policy(policy: dict) -> list:
         {"text": chunk, "metadata": metadata}
         for chunk in chunk_text(full_text)
     ]
+
+
+def process_knowledge_file(filepath: str) -> list:
+    """Convert a plain-text knowledge base file into documents."""
+    from pathlib import Path
+
+    path = Path(filepath)
+    if not path.exists():
+        return []
+
+    text = path.read_text(encoding="utf-8").strip()
+    if not text:
+        return []
+
+    title = path.stem.replace("_", " ").title()
+    metadata = {
+        "type": "knowledge",
+        "title": title,
+        "url": "",
+    }
+
+    return [
+        {"text": chunk, "metadata": metadata}
+        for chunk in chunk_text(text)
+    ]
