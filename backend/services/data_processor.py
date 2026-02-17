@@ -8,7 +8,7 @@ def _strip_html(html: str) -> str:
     return re.sub(r"<[^>]+>", "", html)
 
 
-def chunk_text(text: str, chunk_size: int = None, overlap: int = None) -> list[str]:
+def chunk_text(text: str, chunk_size: int = None, overlap: int = None) -> list:
     """Split text into overlapping word-based chunks."""
     chunk_size = chunk_size or settings.chunk_size
     overlap = overlap or settings.chunk_overlap
@@ -23,37 +23,29 @@ def chunk_text(text: str, chunk_size: int = None, overlap: int = None) -> list[s
     return chunks
 
 
-def process_product(product: dict) -> list[dict]:
-    """Convert a Shopify product into documents with metadata."""
+def process_product(product: dict) -> list:
+    """Convert a Shopify product (public JSON format) into documents."""
     parts = [
         f"Product: {product['title']}",
     ]
-    if product.get("productType"):
-        parts.append(f"Type: {product['productType']}")
+    if product.get("product_type"):
+        parts.append(f"Type: {product['product_type']}")
     if product.get("vendor"):
         parts.append(f"Brand: {product['vendor']}")
     if product.get("tags"):
-        tags = product["tags"] if isinstance(product["tags"], list) else [product["tags"]]
+        tags = product["tags"]
+        if isinstance(tags, str):
+            tags = [t.strip() for t in tags.split(",")]
         parts.append(f"Tags: {', '.join(tags)}")
-    if product.get("description"):
-        parts.append(f"Description: {_strip_html(product['description'])}")
+    if product.get("body_html"):
+        parts.append(f"Description: {_strip_html(product['body_html'])}")
 
-    price_range = product.get("priceRange", {})
-    min_price = price_range.get("minVariantPrice", {})
-    if min_price.get("amount"):
-        parts.append(f"Price: {min_price['amount']} {min_price.get('currencyCode', '')}")
-
-    for edge in product.get("variants", {}).get("edges", []):
-        v = edge["node"]
-        status = "Available" if v.get("availableForSale") else "Sold Out"
-        options = ", ".join(
-            f"{o['name']}: {o['value']}" for o in v.get("selectedOptions", [])
-        )
-        price = v.get("price", {})
-        parts.append(
-            f"Variant: {v.get('title', '')} - {status} - "
-            f"{price.get('amount', '')} {price.get('currencyCode', '')} ({options})"
-        )
+    # Variants from public JSON format
+    for v in product.get("variants", []):
+        status = "Available" if v.get("available") else "Sold Out"
+        price = v.get("price", "")
+        title = v.get("title", "Default")
+        parts.append(f"Variant: {title} - {status} - ${price}")
 
     full_text = "\n".join(parts)
     handle = product.get("handle", "")
@@ -70,16 +62,11 @@ def process_product(product: dict) -> list[dict]:
     ]
 
 
-def process_collection(collection: dict) -> list[dict]:
-    """Convert a Shopify collection into documents."""
+def process_collection(collection: dict) -> list:
+    """Convert a Shopify collection (public JSON format) into documents."""
     parts = [f"Collection: {collection['title']}"]
-    if collection.get("description"):
-        parts.append(f"Description: {_strip_html(collection['description'])}")
-
-    product_edges = collection.get("products", {}).get("edges", [])
-    if product_edges:
-        product_names = [e["node"]["title"] for e in product_edges]
-        parts.append(f"Products in collection: {', '.join(product_names)}")
+    if collection.get("body_html"):
+        parts.append(f"Description: {_strip_html(collection['body_html'])}")
 
     full_text = "\n".join(parts)
     handle = collection.get("handle", "")
@@ -96,7 +83,7 @@ def process_collection(collection: dict) -> list[dict]:
     ]
 
 
-def process_page(page: dict) -> list[dict]:
+def process_page(page: dict) -> list:
     """Convert a Shopify page into documents."""
     title = page.get("title", "")
     body = _strip_html(page.get("body_html", ""))
@@ -118,7 +105,7 @@ def process_page(page: dict) -> list[dict]:
     ]
 
 
-def process_article(article: dict) -> list[dict]:
+def process_article(article: dict) -> list:
     """Convert a blog article into documents."""
     title = article.get("title", "")
     body = _strip_html(article.get("body_html", ""))
@@ -145,7 +132,7 @@ def process_article(article: dict) -> list[dict]:
     ]
 
 
-def process_policy(policy: dict) -> list[dict]:
+def process_policy(policy: dict) -> list:
     """Convert a store policy into documents."""
     title = policy.get("title", "")
     body = _strip_html(policy.get("body", ""))
