@@ -58,7 +58,7 @@ async def health():
 
 
 @router.post("/refresh", response_model=RefreshResponse)
-@limiter.limit("1/hour")
+@limiter.limit("5/hour")
 async def refresh(
     request: Request,
     x_refresh_secret: str = Header(...),
