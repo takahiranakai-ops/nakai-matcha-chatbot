@@ -3,9 +3,11 @@ import re
 from config import settings
 
 
-def _strip_html(html: str) -> str:
+def _strip_html(html) -> str:
     """Remove HTML tags from a string."""
-    return re.sub(r"<[^>]+>", "", html)
+    if not html:
+        return ""
+    return re.sub(r"<[^>]+>", "", str(html))
 
 
 def chunk_text(text: str, chunk_size: int = None, overlap: int = None) -> list:
