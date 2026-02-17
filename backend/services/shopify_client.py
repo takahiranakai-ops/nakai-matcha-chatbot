@@ -1,3 +1,4 @@
+import re
 import httpx
 
 from config import settings
@@ -14,6 +15,17 @@ async def _public_get(path: str) -> dict:
         )
         response.raise_for_status()
         return response.json()
+
+
+async def _public_get_text(path: str) -> str:
+    """Fetch raw HTML from a public Shopify page."""
+    async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+        response = await client.get(
+            f"{BASE_URL}{path}",
+            headers={"Accept": "text/html"},
+        )
+        response.raise_for_status()
+        return response.text
 
 
 async def _admin_get(endpoint: str) -> dict:
@@ -53,31 +65,103 @@ async def fetch_collections() -> list:
 
 
 async def fetch_pages() -> list:
-    """Fetch all pages via Admin API (requires token)."""
-    if not settings.shopify_admin_token:
-        return []
-    data = await _admin_get("/pages.json")
+    """Fetch all pages via public JSON endpoint."""
+    data = await _public_get("/pages.json?limit=250")
     return data.get("pages", [])
 
 
 async def fetch_blog_articles() -> list:
-    """Fetch all blog articles via Admin API (requires token)."""
-    if not settings.shopify_admin_token:
-        return []
-    blogs_data = await _admin_get("/blogs.json")
-    blogs = blogs_data.get("blogs", [])
+    """Fetch blog articles by scraping the sitemap for article URLs."""
     articles = []
-    for blog in blogs:
-        articles_data = await _admin_get(
-            f"/blogs/{blog['id']}/articles.json"
-        )
-        articles.extend(articles_data.get("articles", []))
+    try:
+        # Get sitemap to find blog URLs
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+            resp = await client.get(f"{BASE_URL}/sitemap.xml")
+            sitemap_text = resp.text
+
+        # Find blog sitemaps
+        blog_sitemaps = re.findall(r'<loc>(.*?sitemap_blogs.*?)</loc>', sitemap_text)
+        for sitemap_url in blog_sitemaps:
+            async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+                resp = await client.get(sitemap_url)
+                blog_sitemap = resp.text
+
+            # Find article URLs (with /blogs/ in path, containing a second path segment)
+            article_urls = re.findall(r'<loc>(.*?/blogs/[^<]+/[^<]+)</loc>', blog_sitemap)
+
+            for url in article_urls:
+                try:
+                    # Fetch the article page and extract content
+                    path = url.replace(f"https://{settings.shopify_store_url}", "").replace("https://nakaimatcha.com", "")
+                    html = await _public_get_text(path)
+
+                    # Extract title from <title> tag
+                    title_match = re.search(r'<title[^>]*>(.*?)</title>', html, re.DOTALL)
+                    title = title_match.group(1).strip() if title_match else ""
+                    # Clean up title (remove " – NAKAI" suffix)
+                    title = re.sub(r'\s*[–—-]\s*NAKAI.*$', '', title)
+
+                    # Extract article body from <article> or main content
+                    body = ""
+                    article_match = re.search(r'<article[^>]*>(.*?)</article>', html, re.DOTALL)
+                    if article_match:
+                        body = article_match.group(1)
+                    else:
+                        # Try rte (rich text editor) class
+                        rte_match = re.search(r'class="[^"]*rte[^"]*"[^>]*>(.*?)</div>', html, re.DOTALL)
+                        if rte_match:
+                            body = rte_match.group(1)
+
+                    if title or body:
+                        articles.append({
+                            "title": title,
+                            "body_html": body,
+                            "handle": path.split("/")[-1],
+                            "url": path,
+                        })
+                except Exception:
+                    continue
+
+    except Exception:
+        pass
+
     return articles
 
 
 async def fetch_policies() -> list:
-    """Fetch store policies via Admin API (requires token)."""
-    if not settings.shopify_admin_token:
-        return []
-    data = await _admin_get("/policies.json")
-    return data.get("policies", [])
+    """Fetch store policies by scraping common policy pages."""
+    policies = []
+    policy_paths = [
+        "/policies/refund-policy",
+        "/policies/privacy-policy",
+        "/policies/terms-of-service",
+        "/policies/shipping-policy",
+    ]
+
+    for path in policy_paths:
+        try:
+            html = await _public_get_text(path)
+            title_match = re.search(r'<title[^>]*>(.*?)</title>', html, re.DOTALL)
+            title = title_match.group(1).strip() if title_match else path.split("/")[-1].replace("-", " ").title()
+            title = re.sub(r'\s*[–—-]\s*NAKAI.*$', '', title)
+
+            # Extract policy body
+            body = ""
+            content_match = re.search(r'class="[^"]*policy[^"]*"[^>]*>(.*?)</div>', html, re.DOTALL)
+            if content_match:
+                body = content_match.group(1)
+            else:
+                rte_match = re.search(r'class="[^"]*rte[^"]*"[^>]*>(.*?)</div>', html, re.DOTALL)
+                if rte_match:
+                    body = rte_match.group(1)
+
+            if body:
+                policies.append({
+                    "title": title,
+                    "body": body,
+                    "url": path,
+                })
+        except Exception:
+            continue
+
+    return policies

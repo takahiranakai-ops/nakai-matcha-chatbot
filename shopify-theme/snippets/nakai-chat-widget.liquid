@@ -9,7 +9,7 @@
   <button
     id="nakai-chat-toggle"
     class="nakai-chat__toggle"
-    aria-label="{{ 'nakai.chat.open' | t | default: 'NAKAI Concierge AI' }}"
+    aria-label="NAKAI Concierge AI"
     aria-expanded="false"
   >
     <div class="nakai-chat__toggle-body">
@@ -59,7 +59,7 @@
           </div>
         </div>
       </div>
-      <button id="nakai-chat-close" class="nakai-chat__header-close" aria-label="{{ 'nakai.chat.close' | t | default: 'Close chat' }}">
+      <button id="nakai-chat-close" class="nakai-chat__header-close" aria-label="Close chat">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
           <path d="M18 6L6 18M6 6l12 12"/>
         </svg>
@@ -70,7 +70,7 @@
       <!-- AI Intro banner -->
       <div class="nakai-chat__ai-intro">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
-        <span>{{ 'nakai.chat.ai_intro' | t | default: 'AI answers based on our product knowledge' }}</span>
+        <span>AI answers based on our product knowledge</span>
       </div>
 
       <div class="nakai-chat__message nakai-chat__message--bot">
@@ -79,18 +79,21 @@
             <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>
           </div>
           <div class="nakai-chat__message-content">
-            {{ 'nakai.chat.welcome' | t | default: 'Welcome to NAKAI. How can I help you find your perfect matcha today?' }}
+            Hello! I can help you find the perfect product for you. Feel free to ask me anything — from recipes to everything about matcha.
           </div>
         </div>
         <div class="nakai-chat__quick-actions">
-          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_recommend' | t | default: 'Recommend a matcha' }}">
-            <span>{{ 'nakai.chat.quick_recommend' | t | default: 'Recommend a matcha' }}</span>
+          <button class="nakai-chat__quick-btn" data-message="Help me find the perfect matcha">
+            <span>Find your perfect matcha</span>
           </button>
-          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_shipping' | t | default: 'Shipping info' }}">
-            <span>{{ 'nakai.chat.quick_shipping' | t | default: 'Shipping info' }}</span>
+          <button class="nakai-chat__quick-btn" data-message="Tell me about free shipping">
+            <span>Free shipping info</span>
           </button>
-          <button class="nakai-chat__quick-btn" data-message="{{ 'nakai.chat.quick_brewing' | t | default: 'How to brew' }}">
-            <span>{{ 'nakai.chat.quick_brewing' | t | default: 'How to brew' }}</span>
+          <button class="nakai-chat__quick-btn" data-message="What products do you recommend?">
+            <span>Recommended products</span>
+          </button>
+          <button class="nakai-chat__quick-btn" data-message="What is your free returns policy?">
+            <span>Free returns policy</span>
           </button>
         </div>
       </div>
@@ -102,11 +105,11 @@
           type="text"
           id="nakai-chat-input"
           class="nakai-chat__input"
-          placeholder="{{ 'nakai.chat.placeholder_ai' | t | default: 'Ask AI about our matcha...' }}"
+          placeholder="Ask AI about our matcha..."
           autocomplete="off"
           maxlength="500"
         />
-        <button type="submit" class="nakai-chat__send" aria-label="{{ 'nakai.chat.send' | t | default: 'Send' }}">
+        <button type="submit" class="nakai-chat__send" aria-label="Send">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405z"/>
           </svg>
