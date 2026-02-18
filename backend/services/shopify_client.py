@@ -147,9 +147,9 @@ async def fetch_policies() -> list:
 
             # Extract policy body
             body = ""
-            content_match = re.search(r'class="[^"]*policy[^"]*"[^>]*>(.*?)</div>', html, re.DOTALL)
-            if content_match:
-                body = content_match.group(1)
+            body_match = re.search(r'class="shopify-policy__body"[^>]*>(.*?)</div>\s*</div>', html, re.DOTALL)
+            if body_match:
+                body = body_match.group(1)
             else:
                 rte_match = re.search(r'class="[^"]*rte[^"]*"[^>]*>(.*?)</div>', html, re.DOTALL)
                 if rte_match:
