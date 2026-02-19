@@ -36,6 +36,9 @@ async def _auto_ingest():
 
 app = FastAPI(title="NAKAI Matcha Chatbot API", version="1.0.0", lifespan=lifespan)
 
+logging.basicConfig(level=logging.INFO)
+logger.info("NAKAI Matcha Chatbot starting up...")
+
 origins = [origin.strip() for origin in settings.allowed_origins.split(",")]
 app.add_middleware(
     CORSMiddleware,
@@ -52,3 +55,8 @@ app.include_router(admin_api_router)
 app.include_router(admin_page_router)
 app.include_router(widget_router)
 app.include_router(pwa_router)
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
