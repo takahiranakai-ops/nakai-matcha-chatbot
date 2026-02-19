@@ -672,7 +672,11 @@ html,body{{
     $('nc-form').addEventListener('submit',function(e){{e.preventDefault();sendMessage()}});
     $('nc-lang').addEventListener('click',function(){{setLang(lang==='en'?'ja':'en')}});
     loadHistory();
-    if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');
+    if('serviceWorker' in navigator){{
+      navigator.serviceWorker.register('/sw.js').then(function(reg){{
+        reg.addEventListener('controllerchange',function(){{window.location.reload()}});
+      }});
+    }}
     if(window.innerWidth>899)$('nc-input').focus();
   }}
 
@@ -688,7 +692,7 @@ html,body{{
 async def serve_app():
     return HTMLResponse(
         content=APP_HTML,
-        headers={"Cache-Control": "public, max-age=300"},
+        headers={"Cache-Control": "no-cache"},
     )
 
 
