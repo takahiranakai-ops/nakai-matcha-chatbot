@@ -177,3 +177,26 @@ def process_knowledge_file(filepath: str) -> list:
         {"text": chunk, "metadata": metadata}
         for chunk in chunk_text(text)
     ]
+
+
+def process_knowledge_article(article: dict) -> list:
+    """Convert a Supabase knowledge article into documents for embedding."""
+    title = article.get("title", "")
+    content = article.get("content", "").strip()
+    if not content:
+        return []
+
+    full_text = f"{title}\n{content}" if title else content
+    metadata = {
+        "type": "knowledge",
+        "title": title,
+        "url": "",
+        "source": "supabase",
+        "category": article.get("category", "general"),
+        "language": article.get("language", "en"),
+    }
+
+    return [
+        {"text": chunk, "metadata": metadata}
+        for chunk in chunk_text(full_text)
+    ]

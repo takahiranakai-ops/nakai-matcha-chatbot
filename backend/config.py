@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     max_context_chunks: int = 5
     chunk_size: int = 500
     chunk_overlap: int = 50
+    supabase_url: str = ""
+    supabase_service_key: str = ""
+    admin_password: str = "change-me-admin"
 
     class Config:
         env_file = ".env"

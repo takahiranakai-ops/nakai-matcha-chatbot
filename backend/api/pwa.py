@@ -341,6 +341,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
   var MAX_H=20;
   var chatHistory=[];
   var loading=false;
+  var SESSION_ID=(function(){{var id=localStorage.getItem('nakai_session_id');if(!id){{id=crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){{var r=Math.random()*16|0;return(c==='x'?r:(r&0x3|0x8)).toString(16)}});localStorage.setItem('nakai_session_id',id)}}return id}})();
 
   var i18n={{
     en:{{
@@ -474,7 +475,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
     if(!msg||loading)return;inp.value='';
     addMsg('user',msg);chatHistory.push({{role:'user',content:msg}});
     showTyping();loading=true;
-    fetch('/api/chat',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang}})}})
+    fetch('/api/chat',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang,session_id:SESSION_ID,source:'pwa'}})}})
     .then(function(r){{if(!r.ok)throw new Error('err');return r.json()}})
     .then(function(d){{removeTyping();addMsg('bot',d.response,d.sources||[]);chatHistory.push({{role:'assistant',content:d.response}});saveHistory()}})
     .catch(function(){{removeTyping();addMsg('bot',t('error'))}})

@@ -8,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routes import router, vector_store, rag_engine
 from api.widget import widget_router
 from api.pwa import pwa_router
+from api.admin_routes import admin_api_router
+from api.admin_page import admin_page_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -39,12 +41,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=False,
-    allow_methods=["POST", "GET"],
-    allow_headers=["Content-Type", "X-Refresh-Secret"],
+    allow_methods=["POST", "GET", "PATCH", "DELETE"],
+    allow_headers=["Content-Type", "X-Refresh-Secret", "X-Admin-Password"],
 )
 
 setup_rate_limiting(app)
 
 app.include_router(router, prefix="/api")
+app.include_router(admin_api_router)
+app.include_router(admin_page_router)
 app.include_router(widget_router)
 app.include_router(pwa_router)

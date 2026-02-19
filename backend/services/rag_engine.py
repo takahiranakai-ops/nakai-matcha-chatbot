@@ -65,7 +65,7 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(messages, temperature=0.5, max_tokens=256)
-            return {"response": response, "sources": []}
+            return {"response": response, "sources": [], "context_chunks": 0}
 
         # 1. Build enriched search query using conversation context
         search_query = self._build_search_query(msg_stripped, conversation_history)
@@ -115,4 +115,5 @@ class RAGEngine:
         return {
             "response": response,
             "sources": list(source_urls),
+            "context_chunks": len(context_texts),
         }

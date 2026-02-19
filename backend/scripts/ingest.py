@@ -14,6 +14,7 @@ from services.data_processor import (
     process_article,
     process_policy,
     process_knowledge_file,
+    process_knowledge_article,
 )
 from services.vector_store import VectorStore
 from config import settings
@@ -72,11 +73,24 @@ async def run_ingestion(vector_store: VectorStore) -> int:
             all_documents.extend(process_knowledge_file(str(txt_file)))
         print(f"  -> {len(all_documents) - before} chunks from knowledge base")
 
+    # 7. Supabase knowledge articles
+    try:
+        from services.supabase_client import list_articles, _is_configured
+        if _is_configured():
+            print("Loading Supabase knowledge articles...")
+            before = len(all_documents)
+            sb_articles = await list_articles(active_only=True)
+            for sb_article in sb_articles:
+                all_documents.extend(process_knowledge_article(sb_article))
+            print(f"  -> {len(sb_articles)} articles -> {len(all_documents) - before} chunks from Supabase")
+    except Exception as e:
+        print(f"  -> Supabase knowledge fetch skipped: {e}")
+
     if not all_documents:
         print("No documents to ingest!")
         return 0
 
-    # 7. Embed and store in batches
+    # 8. Embed and store in batches
     print(f"\nEmbedding {len(all_documents)} document chunks...")
     batch_size = 50
     for i in range(0, len(all_documents), batch_size):
