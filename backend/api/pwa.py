@@ -143,8 +143,35 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 .nc-home__chip:hover{{background:var(--g05);border-color:var(--g20)}}
 .nc-home__chip:active{{background:var(--g10);transform:scale(.96)}}
 
+/* Home Sections */
+.nc-home__section{{width:100%;max-width:520px;margin-top:max(28px,3vh)}}
+.nc-home__section:first-of-type{{animation:ncUp .5s .3s var(--ease) both}}
+.nc-home__section:last-of-type{{animation:ncUp .5s .36s var(--ease) both}}
+.nc-home__section-title{{font-family:'Shippori Mincho','Work Sans',sans-serif;font-weight:400;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g60);margin-bottom:14px;padding-left:2px}}
+.nc-home__card-row{{display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:8px;margin:0 -24px;padding-left:24px;padding-right:24px;scrollbar-width:none}}
+.nc-home__card-row::-webkit-scrollbar{{display:none}}
+
+/* Product Card */
+.nc-pcard{{flex-shrink:0;width:160px;scroll-snap-align:start;background:var(--white);border:1px solid var(--g10);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent}}
+.nc-pcard:hover{{border-color:var(--g20);transform:translateY(-2px);box-shadow:0 4px 12px rgba(64,101,70,.08)}}
+.nc-pcard:active{{transform:scale(.97)}}
+.nc-pcard__img{{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}}
+.nc-pcard__badge{{position:absolute;top:8px;left:8px;font-size:.56rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;background:rgba(64,101,70,.85);color:var(--cream);padding:3px 8px;border-radius:6px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}}
+.nc-pcard__body{{padding:12px 14px 14px}}
+.nc-pcard__name{{font-weight:500;font-size:.82rem;color:var(--green);letter-spacing:.01em}}
+.nc-pcard__desc{{font-weight:300;font-size:.7rem;color:var(--g60);margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.nc-pcard__price{{font-weight:400;font-size:.68rem;color:var(--g40);margin-top:8px;letter-spacing:.03em}}
+
+/* Recipe Card */
+.nc-rcard{{flex-shrink:0;width:140px;scroll-snap-align:start;background:var(--white);border:1px solid var(--g10);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .25s var(--ease);padding:16px 14px;display:flex;flex-direction:column;gap:8px;-webkit-tap-highlight-color:transparent}}
+.nc-rcard:hover{{border-color:var(--g20);transform:translateY(-2px);box-shadow:0 4px 12px rgba(64,101,70,.08)}}
+.nc-rcard:active{{transform:scale(.97)}}
+.nc-rcard__icon{{width:36px;height:36px;border-radius:10px;background:var(--g05);border:1px solid var(--g10);display:flex;align-items:center;justify-content:center;font-size:1.1rem}}
+.nc-rcard__name{{font-weight:500;font-size:.78rem;color:var(--green);letter-spacing:.01em}}
+.nc-rcard__desc{{font-weight:300;font-size:.66rem;color:var(--g60);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+
 /* Home footer */
-.nc-home__links{{display:flex;align-items:center;gap:20px;margin-top:24px;animation:ncUp .5s .3s var(--ease) both}}
+.nc-home__links{{display:flex;align-items:center;gap:20px;margin-top:24px;animation:ncUp .5s .42s var(--ease) both}}
 .nc-home__link{{font-size:.68rem;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--g40);text-decoration:none}}
 .nc-home__link:active{{color:var(--green)}}
 .nc-home__dot{{width:3px;height:3px;border-radius:50%;background:var(--g20)}}
@@ -240,6 +267,8 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
   .nc-form{{padding:3px 3px 3px 16px}}.nc-input{{font-size:16px;padding:12px 0;min-height:44px}}.nc-send{{width:36px;height:36px}}
   .nc-footer{{padding:3px 14px max(6px,env(safe-area-inset-bottom))}}
   .nc-home__scroll{{padding:max(16px,3vh) 20px 32px}}.nc-home__logo{{width:120px}}
+  .nc-home__card-row{{margin:0 -20px;padding-left:20px;padding-right:20px}}
+  .nc-pcard{{width:150px}}.nc-rcard{{width:130px}}
 }}
 @media(max-width:430px){{
   .nc-messages{{padding:12px 10px 6px}}
@@ -248,6 +277,9 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
   .nc-footer{{padding:2px 10px max(4px,env(safe-area-inset-bottom))}}
   .nc-home__scroll{{padding:max(12px,2vh) 16px 24px}}.nc-home__logo{{width:110px}}
   .nc-home__greeting{{font-size:1.3rem}}
+  .nc-home__card-row{{margin:0 -16px;padding-left:16px;padding-right:16px;gap:10px}}
+  .nc-pcard{{width:140px}}.nc-rcard{{width:120px;padding:14px 12px}}
+  .nc-home__section{{margin-top:max(20px,2vh)}}.nc-home__section-title{{font-size:.76rem}}
 }}
 </style>
 </head>
@@ -287,6 +319,14 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
           <button class="nc-home__chip" data-chat-msg="product" id="nc-c-product">NAKAI Matcha Product Recipes</button>
           <button class="nc-home__chip" data-chat-msg="faq" id="nc-c-faq">Learn about Matcha</button>
           <button class="nc-home__chip" data-chat-msg="find" id="nc-c-find">Find My Matcha</button>
+        </div>
+        <div class="nc-home__section">
+          <h2 class="nc-home__section-title" id="nc-sec-products">Our Matcha</h2>
+          <div class="nc-home__card-row" id="nc-product-cards"></div>
+        </div>
+        <div class="nc-home__section">
+          <h2 class="nc-home__section-title" id="nc-sec-recipes">Recipes &amp; Guides</h2>
+          <div class="nc-home__card-row" id="nc-recipe-cards"></div>
         </div>
         <div class="nc-home__links">
           <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-home__link" id="nc-h-shop">Shop</a>
@@ -361,6 +401,16 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
       productMsg:'Tell me about NAKAI matcha products. What grades do you offer and what makes each one special?',
       faqMsg:'What are the most common customer questions about matcha? Give me quick answers I can use as a barista.',
       findMsg:'Help me find the perfect matcha. Ask me about my taste preferences, how I plan to use it, and my experience level with matcha.',
+      secProducts:'Our Matcha',secRecipes:'Recipes & Guides',
+      pRevi:'REVI',pReviGrade:'SS Grade Plus',pReviDesc:'Our finest. Creamy, elegant, rich in umami.',pReviPrice:'From Dhs. 259',pReviMsg:'Tell me about REVI matcha. What makes it special and how should I use it?',
+      pIkigai:'IKIGAI',pIkigaiGrade:'SS Grade',pIkigaiDesc:'Daily premium. Vibrant, balanced, versatile.',pIkigaiPrice:'Dhs. 296',pIkigaiMsg:'Tell me about IKIGAI matcha. What is it best for and how does it compare to REVI?',
+      pSet:'The Exquisite Set',pSetGrade:'REVI + IKIGAI',pSetDesc:'The complete NAKAI experience. A perfect gift.',pSetPrice:'Dhs. 525',pSetMsg:'Tell me about The Exquisite Matcha Set. What does it include and who is it for?',
+      rUsucha:'Usucha',rUsuchaDesc:'Traditional thin tea, light and frothy',rUsuchaMsg:'How do I make usucha (thin matcha tea)? Give me step-by-step instructions.',
+      rKoicha:'Koicha',rKoichaDesc:'Thick tea, intense and full-bodied',rKoichaMsg:'How do I make koicha (thick matcha tea)? Give me step-by-step instructions.',
+      rLatte:'Matcha Latte',rLatteDesc:'Hot or iced, the perfect everyday drink',rLatteMsg:'How do I make the perfect matcha latte? Include hot and iced variations.',
+      rIced:'Iced Matcha',rIcedDesc:'Refreshing, bright, and easy to make',rIcedMsg:'How do I make iced matcha? Step by step please.',
+      rAffogato:'Affogato',rAffogatoDesc:'Matcha meets vanilla ice cream',rAffogatoMsg:'How do I make a matcha affogato?',
+      rBarista:'Barista Tips',rBaristaDesc:'Water temp, whisking, milk pairing',rBaristaMsg:'What are the essential barista tips for working with matcha? Cover water temperature, whisking technique, and milk pairing.',
     }},
     ja:{{
       greeting:'ようこそ！AI抹茶コンシェルジュです。何かお手伝いできることはありますか？',
@@ -379,6 +429,16 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
       productMsg:'NAKAIの抹茶商品について教えてください。どんなグレードがあり、それぞれの特徴は何ですか？',
       faqMsg:'抹茶に関するお客様からのよくある質問は何ですか？バリスタとして使える簡潔な回答をお願いします。',
       findMsg:'自分に合った抹茶を見つけたいです。好みの味、使い方、抹茶の経験レベルを聞いてください。',
+      secProducts:'\u62b9\u8336\u30b3\u30ec\u30af\u30b7\u30e7\u30f3',secRecipes:'\u30ec\u30b7\u30d4 & \u30ac\u30a4\u30c9',
+      pRevi:'REVI',pReviGrade:'SS Grade Plus',pReviDesc:'\u6700\u9ad8\u54c1\u8cea\u3002\u30af\u30ea\u30fc\u30df\u30fc\u3067\u6df1\u3044\u3046\u307e\u307f\u3002',pReviPrice:'Dhs. 259\u301c',pReviMsg:'REVI\u629c\u8336\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u4f55\u304c\u7279\u5225\u3067\u3001\u3069\u3046\u4f7f\u3046\u306e\u304c\u826f\u3044\u3067\u3059\u304b\uff1f',
+      pIkigai:'IKIGAI',pIkigaiGrade:'SS Grade',pIkigaiDesc:'\u6bce\u65e5\u306e\u30d7\u30ec\u30df\u30a2\u30e0\u3002\u9bae\u3084\u304b\u3067\u30d0\u30e9\u30f3\u30b9\u306e\u826f\u3044\u5473\u308f\u3044\u3002',pIkigaiPrice:'Dhs. 296',pIkigaiMsg:'IKIGAI\u629c\u8336\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u4f55\u306b\u6700\u9069\u3067\u3001REVI\u3068\u306e\u9055\u3044\u306f\uff1f',
+      pSet:'The Exquisite Set',pSetGrade:'REVI + IKIGAI',pSetDesc:'NAKAI\u306e\u5168\u3066\u3092\u4f53\u9a13\u3002\u30ae\u30d5\u30c8\u306b\u6700\u9069\u3002',pSetPrice:'Dhs. 525',pSetMsg:'The Exquisite Matcha Set\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u4f55\u304c\u542b\u307e\u308c\u3066\u3044\u3066\u3001\u8ab0\u5411\u3051\u3067\u3059\u304b\uff1f',
+      rUsucha:'\u8584\u8336',rUsuchaDesc:'\u4f1d\u7d71\u7684\u306a\u8584\u8336\u3001\u8efd\u3084\u304b\u3067\u6ce1\u7acb\u3061\u8c4a\u304b',rUsuchaMsg:'\u8584\u8336\u306e\u70b9\u3066\u65b9\u3092\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u3067\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
+      rKoicha:'\u6fc3\u8336',rKoichaDesc:'\u6fc3\u539a\u3067\u6df1\u3044\u5473\u308f\u3044\u306e\u4e00\u676f',rKoichaMsg:'\u6fc3\u8336\u306e\u70b9\u3066\u65b9\u3092\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u3067\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
+      rLatte:'\u629c\u8336\u30e9\u30c6',rLatteDesc:'\u30db\u30c3\u30c8\u3067\u3082\u30a2\u30a4\u30b9\u3067\u3082\u3002\u6bce\u65e5\u306e\u4e00\u676f\u306b',rLatteMsg:'\u7f8e\u5473\u3057\u3044\u629c\u8336\u30e9\u30c6\u306e\u4f5c\u308a\u65b9\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u30db\u30c3\u30c8\u3068\u30a2\u30a4\u30b9\u306e\u4e21\u65b9\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002',
+      rIced:'\u30a2\u30a4\u30b9\u629c\u8336',rIcedDesc:'\u723d\u3084\u304b\u3067\u4f5c\u308a\u3084\u3059\u3044',rIcedMsg:'\u30a2\u30a4\u30b9\u629c\u8336\u306e\u4f5c\u308a\u65b9\u3092\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u3067\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
+      rAffogato:'\u30a2\u30d5\u30a9\u30ac\u30fc\u30c8',rAffogatoDesc:'\u629c\u8336\u3068\u30d0\u30cb\u30e9\u30a2\u30a4\u30b9\u306e\u30cf\u30fc\u30e2\u30cb\u30fc',rAffogatoMsg:'\u629c\u8336\u30a2\u30d5\u30a9\u30ac\u30fc\u30c8\u306e\u4f5c\u308a\u65b9\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
+      rBarista:'\u30d0\u30ea\u30b9\u30bf Tips',rBaristaDesc:'\u6c34\u6e29\u3001\u8336\u7b45\u306e\u4f7f\u3044\u65b9\u3001\u30df\u30eb\u30af\u9078\u3073',rBaristaMsg:'\u629c\u8336\u3092\u6271\u3046\u30d0\u30ea\u30b9\u30bf\u306e\u5fc5\u9808\u30c6\u30af\u30cb\u30c3\u30af\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u6c34\u6e29\u3001\u8336\u7b45\u306e\u4f7f\u3044\u65b9\u3001\u30df\u30eb\u30af\u306e\u76f8\u6027\u3092\u30ab\u30d0\u30fc\u3057\u3066\u304f\u3060\u3055\u3044\u3002',
     }}
   }};
 
@@ -413,6 +473,10 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
     $('nc-f-shop').textContent=t('hShop');
     $('nc-f-ws').textContent=t('hWs');
     buildQuickActions();
+    buildProductCards();
+    buildRecipeCards();
+    var sp=$('nc-sec-products');if(sp)sp.textContent=t('secProducts');
+    var sr=$('nc-sec-recipes');if(sr)sr.textContent=t('secRecipes');
   }}
 
   function showHome(){{
@@ -424,6 +488,40 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
     $('nc-chat').classList.remove('nc-hidden');
     if(autoMsg){{$('nc-input').value=autoMsg;setTimeout(function(){{sendMessage()}},200)}}
     if(window.innerWidth>899)$('nc-input').focus();
+  }}
+
+  var products=[
+    {{id:'Revi',gradient:'linear-gradient(165deg,#5A8A52 0%,#3A6B40 40%,#2D5432 100%)',url:SHOP+'/products/revi-organic-matcha-20g-ss-grade-plus'}},
+    {{id:'Ikigai',gradient:'linear-gradient(165deg,#7BA06D 0%,#5A8A52 40%,#4A7350 100%)',url:SHOP+'/products/ikigai-organic-matcha-40g-ss-grade'}},
+    {{id:'Set',gradient:'linear-gradient(165deg,#6A9A5E 0%,#406546 40%,#C4A875 100%)',url:SHOP+'/products/the-exquisite-matcha-set-limited-edition'}}
+  ];
+  var recipes=[
+    {{id:'Usucha',icon:'\uD83C\uDF75'}},
+    {{id:'Koicha',icon:'\uD83C\uDF43'}},
+    {{id:'Latte',icon:'\u2615'}},
+    {{id:'Iced',icon:'\uD83E\uDDCA'}},
+    {{id:'Affogato',icon:'\uD83C\uDF68'}},
+    {{id:'Barista',icon:'\uD83D\uDCA1'}}
+  ];
+
+  function buildProductCards(){{
+    var c=$('nc-product-cards');if(!c)return;c.innerHTML='';
+    products.forEach(function(p){{
+      var k='p'+p.id;var card=document.createElement('div');card.className='nc-pcard';
+      card.innerHTML='<div class="nc-pcard__img" style="background:'+p.gradient+'"><span class="nc-pcard__badge">'+escapeHtml(t(k+'Grade'))+'</span></div><div class="nc-pcard__body"><div class="nc-pcard__name">'+escapeHtml(t(k))+'</div><div class="nc-pcard__desc">'+escapeHtml(t(k+'Desc'))+'</div><div class="nc-pcard__price">'+escapeHtml(t(k+'Price'))+'</div></div>';
+      card.addEventListener('click',function(){{showChat(t(k+'Msg'))}});
+      c.appendChild(card);
+    }});
+  }}
+
+  function buildRecipeCards(){{
+    var c=$('nc-recipe-cards');if(!c)return;c.innerHTML='';
+    recipes.forEach(function(r){{
+      var k='r'+r.id;var card=document.createElement('div');card.className='nc-rcard';
+      card.innerHTML='<div class="nc-rcard__icon">'+r.icon+'</div><div class="nc-rcard__name">'+escapeHtml(t(k))+'</div><div class="nc-rcard__desc">'+escapeHtml(t(k+'Desc'))+'</div>';
+      card.addEventListener('click',function(){{showChat(t(k+'Msg'))}});
+      c.appendChild(card);
+    }});
   }}
 
   function buildQuickActions(){{
