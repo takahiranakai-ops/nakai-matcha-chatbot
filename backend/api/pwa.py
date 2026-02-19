@@ -42,15 +42,13 @@ MANIFEST_JSON = """{
 
 # ---- Service Worker ----
 SW_JS = """
-var CACHE='nakai-v2';
-var SHELL=['/app'];
+var CACHE='nakai-v3';
 self.addEventListener('install',function(e){
-  e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(SHELL)}));
   self.skipWaiting();
 });
 self.addEventListener('activate',function(e){
   e.waitUntil(caches.keys().then(function(ks){
-    return Promise.all(ks.filter(function(k){return k!==CACHE}).map(function(k){return caches.delete(k)}));
+    return Promise.all(ks.map(function(k){return caches.delete(k)}));
   }));
   self.clients.claim();
 });
@@ -63,12 +61,12 @@ self.addEventListener('fetch',function(e){
     }));
     return;
   }
-  e.respondWith(caches.match(e.request).then(function(r){
-    return r||fetch(e.request).then(function(resp){
-      var cl=resp.clone();
-      caches.open(CACHE).then(function(c){c.put(e.request,cl)});
-      return resp;
-    });
+  e.respondWith(fetch(e.request).then(function(resp){
+    var cl=resp.clone();
+    caches.open(CACHE).then(function(c){c.put(e.request,cl)});
+    return resp;
+  }).catch(function(){
+    return caches.match(e.request);
   }));
 });
 """
@@ -581,7 +579,7 @@ html,body{{
       .replace(/\[(.*?)\]\(\/(.*?)\)/g,'<a href="'+SHOP+'/$2" target="_blank" rel="noopener">$1</a>')
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
       .replace(/^- (.*?)$/gm,'<li>$1</li>')
-      .replace(/(<li>.*<\/li>)/gs,'<ul>$1</ul>')
+      .replace(/((?:<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>')
       .replace(/\n/g,'<br>');
   }}
 
