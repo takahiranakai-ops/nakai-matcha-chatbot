@@ -64,8 +64,11 @@ def build_rag_prompt(context: str, question: str) -> str:
 {question}
 
 ## Instructions
-- Answer ONLY the customer's question. Ignore store data that is not relevant to the question
-- If the data answers the question, use the relevant parts. If not, say so briefly
-- Do NOT dump all retrieved data into the answer — be selective and focused
-- Use ONLY links/URLs that appear in the data — never fabricate URLs
-- Keep answers natural and conversational, like a knowledgeable barista would speak"""
+- Answer ONLY the customer's question using relevant parts of the store data above
+- Ignore any store data that is NOT related to what the customer asked
+- Do NOT list or dump all retrieved data — pick only the pieces that answer the question
+- If the data does not contain the answer, say so briefly
+- Use ONLY links/URLs that appear in the store data — never fabricate URLs
+- Keep answers natural and conversational, like a knowledgeable barista
+- When explaining recipes or preparation steps, use clear numbered steps
+- When comparing products, highlight the key differences concisely"""
