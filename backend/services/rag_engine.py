@@ -15,7 +15,7 @@ _GREETING_RE = re.compile(
 )
 
 # Cosine distance threshold — higher distance = less relevant
-_RELEVANCE_THRESHOLD = 0.65
+_RELEVANCE_THRESHOLD = 0.75
 
 
 class RAGEngine:

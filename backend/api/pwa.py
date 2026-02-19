@@ -286,6 +286,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
           <button class="nc-home__chip" data-chat-msg="brew" id="nc-c-brew">Barista Guide</button>
           <button class="nc-home__chip" data-chat-msg="product" id="nc-c-product">NAKAI Matcha Product Recipes</button>
           <button class="nc-home__chip" data-chat-msg="faq" id="nc-c-faq">Learn about Matcha</button>
+          <button class="nc-home__chip" data-chat-msg="find" id="nc-c-find">Find My Matcha</button>
         </div>
         <div class="nc-home__links">
           <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-home__link" id="nc-h-shop">Shop</a>
@@ -353,11 +354,12 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
       q4:'Recommend',q4m:'What matcha products do you recommend?',
       error:"Connection issue. Please try again.",
       sub:'AI Matcha Concierge',homeGreeting:'What can I help you with?',
-      mBrew:'Barista Guide',mProduct:'NAKAI Matcha Product Recipes',mFaq:'Learn about Matcha',
+      mBrew:'Barista Guide',mProduct:'NAKAI Matcha Product Recipes',mFaq:'Learn about Matcha',mFind:'Find My Matcha',
       hShop:'Shop',hWs:'Wholesale',
       brewMsg:'How do I brew the perfect cup of matcha? Please include water temperature, matcha-to-water ratio, and whisking technique.',
       productMsg:'Tell me about NAKAI matcha products. What grades do you offer and what makes each one special?',
       faqMsg:'What are the most common customer questions about matcha? Give me quick answers I can use as a barista.',
+      findMsg:'Help me find the perfect matcha. Ask me about my taste preferences, how I plan to use it, and my experience level with matcha.',
     }},
     ja:{{
       greeting:'ようこそ！AI抹茶コンシェルジュです。何かお手伝いできることはありますか？',
@@ -370,11 +372,12 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
       q4:'おすすめ',q4m:'おすすめの抹茶商品を教えてください',
       error:'接続に問題が発生しました。もう一度お試しください。',
       sub:'AI 抹茶コンシェルジュ',homeGreeting:'何をお手伝いしましょうか？',
-      mBrew:'バリスタガイド',mProduct:'NAKAI Matcha プロダクトレシピ',mFaq:'抹茶について学ぶ',
+      mBrew:'バリスタガイド',mProduct:'NAKAI Matcha プロダクトレシピ',mFaq:'抹茶について学ぶ',mFind:'自分に合った抹茶を探す',
       hShop:'ショップ',hWs:'卸売',
       brewMsg:'美味しい抹茶の点て方を教えてください。水温、抹茶と水の割合、茶筅の使い方を含めてください。',
       productMsg:'NAKAIの抹茶商品について教えてください。どんなグレードがあり、それぞれの特徴は何ですか？',
       faqMsg:'抹茶に関するお客様からのよくある質問は何ですか？バリスタとして使える簡潔な回答をお願いします。',
+      findMsg:'自分に合った抹茶を見つけたいです。好みの味、使い方、抹茶の経験レベルを聞いてください。',
     }}
   }};
 
@@ -403,6 +406,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
     $('nc-c-brew').textContent=t('mBrew');
     $('nc-c-product').textContent=t('mProduct');
     $('nc-c-faq').textContent=t('mFaq');
+    $('nc-c-find').textContent=t('mFind');
     $('nc-h-shop').textContent=t('hShop');
     $('nc-h-ws').textContent=t('hWs');
     $('nc-f-shop').textContent=t('hShop');
