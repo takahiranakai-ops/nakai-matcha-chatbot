@@ -42,32 +42,20 @@ MANIFEST_JSON = """{
 
 # ---- Service Worker ----
 SW_JS = """
-var CACHE='nakai-v3';
-self.addEventListener('install',function(e){
-  self.skipWaiting();
-});
+// v4: Self-unregistering service worker — clears all caches and removes itself
+self.addEventListener('install',function(){self.skipWaiting()});
 self.addEventListener('activate',function(e){
-  e.waitUntil(caches.keys().then(function(ks){
-    return Promise.all(ks.map(function(k){return caches.delete(k)}));
-  }));
+  e.waitUntil(
+    caches.keys().then(function(ks){
+      return Promise.all(ks.map(function(k){return caches.delete(k)}));
+    }).then(function(){
+      return self.registration.unregister();
+    })
+  );
   self.clients.claim();
 });
 self.addEventListener('fetch',function(e){
-  var u=new URL(e.request.url);
-  if(u.pathname.startsWith('/api/')){
-    e.respondWith(fetch(e.request).catch(function(){
-      return new Response(JSON.stringify({response:'You appear to be offline.',sources:[]}),
-        {headers:{'Content-Type':'application/json'}});
-    }));
-    return;
-  }
-  e.respondWith(fetch(e.request).then(function(resp){
-    var cl=resp.clone();
-    caches.open(CACHE).then(function(c){c.put(e.request,cl)});
-    return resp;
-  }).catch(function(){
-    return caches.match(e.request);
-  }));
+  e.respondWith(fetch(e.request));
 });
 """
 
@@ -673,9 +661,10 @@ html,body{{
     $('nc-lang').addEventListener('click',function(){{setLang(lang==='en'?'ja':'en')}});
     loadHistory();
     if('serviceWorker' in navigator){{
-      navigator.serviceWorker.register('/sw.js').then(function(reg){{
-        reg.addEventListener('controllerchange',function(){{window.location.reload()}});
+      navigator.serviceWorker.getRegistrations().then(function(regs){{
+        regs.forEach(function(r){{r.unregister()}});
       }});
+      caches.keys().then(function(ks){{ks.forEach(function(k){{caches.delete(k)}}) }});
     }}
     if(window.innerWidth>899)$('nc-input').focus();
   }}
@@ -781,7 +770,7 @@ log('Page loaded');
 async def serve_app():
     return HTMLResponse(
         content=APP_HTML,
-        headers={"Cache-Control": "no-cache"},
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"},
     )
 
 
