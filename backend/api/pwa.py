@@ -21,6 +21,12 @@ _ICON_BYTES = (_REPO_ROOT / "logo-green-icon.png").read_bytes()
 _LOGO_WHITE_B64 = base64.b64encode(
     (_REPO_ROOT / "nakai-logo-white.png").read_bytes()
 ).decode()
+_LOGO_WM_BLACK_B64 = base64.b64encode(
+    (_REPO_ROOT / "logo-wordmark-black.png").read_bytes()
+).decode()
+_LOGO_ICON_BLACK_B64 = base64.b64encode(
+    (_REPO_ROOT / "logo-black-icon.png").read_bytes()
+).decode()
 _ICON_B64 = base64.b64encode(_ICON_BYTES).decode()
 
 # ---- PWA Manifest ----
@@ -30,8 +36,8 @@ MANIFEST_JSON = """{
   "description": "Your personal AI matcha expert",
   "start_url": "/app",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#F9F0E2",
+  "theme_color": "#406546",
   "orientation": "portrait",
   "icons": [
     {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
@@ -65,9 +71,9 @@ APP_HTML = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#406546">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="NAKAI">
 <meta name="description" content="NAKAI Matcha Concierge — Your personal AI matcha expert">
 <title>NAKAI Matcha Concierge</title>
@@ -76,22 +82,24 @@ APP_HTML = f"""<!DOCTYPE html>
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Work+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
-  --black:#000;--surface:#1C1C1E;--surface-glass:rgba(28,28,30,.72);
-  --elevated:#2C2C2E;--fill:#3A3A3C;
-  --separator:rgba(84,84,88,.34);--separator-light:rgba(84,84,88,.18);
-  --matcha:#7BA06D;--matcha-dim:rgba(123,160,109,.65);
-  --matcha-bg:rgba(123,160,109,.1);--matcha-bg2:rgba(123,160,109,.06);
-  --matcha-deep:#4A7A3E;
-  --text-1:#F5F5F7;--text-2:#86868B;--text-3:#48484A;
+  --bg:#F9F0E2;--bg-warm:#F8F8E3;--surface:#FFFFFF;
+  --green-deep:#406546;--green:#81A370;--green-light:rgba(129,163,112,.12);--green-lighter:rgba(129,163,112,.06);
+  --beige:#ECDDC7;--beige-light:rgba(236,221,199,.4);
+  --brown:#9E8471;--brown-light:rgba(158,132,113,.5);
+  --red:#F5361E;
+  --text-1:#406546;--text-2:#9E8471;--text-3:#C4B5A5;
+  --separator:rgba(158,132,113,.18);--separator-light:rgba(158,132,113,.1);
   --ease:cubic-bezier(.25,1,.5,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
-  --blur:saturate(180%) blur(20px);
+  --shadow-sm:0 1px 3px rgba(64,101,70,.06);
+  --shadow-md:0 4px 16px rgba(64,101,70,.08);
+  --shadow-lg:0 8px 32px rgba(64,101,70,.1);
 }}
 html,body{{
-  height:100%;overflow:hidden;background:var(--black);color:var(--text-1);
+  height:100%;overflow:hidden;background:var(--bg);color:var(--text-1);
   font-family:'Work Sans',-apple-system,BlinkMacSystemFont,sans-serif;
   -webkit-font-smoothing:antialiased;
 }}
@@ -99,15 +107,15 @@ html,body{{
 
 /* ===== Brand Panel (desktop) ===== */
 .nc-brand{{
-  width:380px;flex-shrink:0;background:var(--black);
+  width:380px;flex-shrink:0;background:var(--green-deep);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:64px 48px;border-right:1px solid var(--separator-light);
+  padding:64px 48px;
 }}
-.nc-brand__logo{{width:140px;opacity:.8;margin-bottom:56px;animation:ncUp .7s var(--ease) both}}
-.nc-brand__tagline{{font-weight:200;font-size:1.4rem;line-height:1.7;text-align:center;color:var(--text-1);opacity:.6;margin-bottom:12px;animation:ncUp .7s .1s var(--ease) both}}
-.nc-brand__sub{{font-weight:400;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3);animation:ncUp .7s .18s var(--ease) both}}
-.nc-brand__sep{{width:32px;height:1px;background:var(--separator-light);margin:40px 0;animation:ncUp .7s .25s var(--ease) both}}
-.nc-brand__powered{{font-weight:300;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);opacity:.5;margin-bottom:36px;animation:ncUp .7s .32s var(--ease) both}}
+.nc-brand__logo{{width:140px;opacity:.9;margin-bottom:56px;animation:ncUp .7s var(--ease) both}}
+.nc-brand__tagline{{font-weight:200;font-size:1.4rem;line-height:1.7;text-align:center;color:rgba(249,240,226,.85);margin-bottom:12px;animation:ncUp .7s .1s var(--ease) both}}
+.nc-brand__sub{{font-weight:400;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(249,240,226,.4);animation:ncUp .7s .18s var(--ease) both}}
+.nc-brand__sep{{width:32px;height:1px;background:rgba(249,240,226,.15);margin:40px 0;animation:ncUp .7s .25s var(--ease) both}}
+.nc-brand__powered{{font-weight:300;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(249,240,226,.3);margin-bottom:36px;animation:ncUp .7s .32s var(--ease) both}}
 .nc-brand__ctas{{display:flex;flex-direction:column;gap:10px;width:100%;max-width:220px;animation:ncUp .7s .38s var(--ease) both}}
 
 /* ===== Shared CTA Button ===== */
@@ -117,15 +125,17 @@ html,body{{
   text-decoration:none;padding:13px 24px;border-radius:12px;cursor:pointer;
   transition:all .3s var(--ease);-webkit-tap-highlight-color:transparent;
 }}
-.nc-cta--primary{{background:var(--matcha);color:#fff;border:none}}
-.nc-cta--primary:hover{{background:#8BB47C;transform:scale(1.02);box-shadow:0 4px 20px rgba(123,160,109,.2)}}
+.nc-cta--primary{{background:var(--green);color:#fff;border:none}}
+.nc-cta--primary:hover{{background:#8BB47C;transform:scale(1.02);box-shadow:0 4px 20px rgba(129,163,112,.25)}}
 .nc-cta--primary:active{{transform:scale(.96)}}
-.nc-cta--secondary{{background:transparent;color:var(--text-2);border:1px solid var(--separator)}}
-.nc-cta--secondary:hover{{background:var(--elevated);color:var(--text-1)}}
+.nc-cta--secondary{{background:transparent;color:var(--text-2);border:1px solid var(--beige)}}
+.nc-cta--secondary:hover{{background:var(--beige-light);color:var(--text-1)}}
 .nc-cta--secondary:active{{transform:scale(.96)}}
+.nc-cta--brand-secondary{{background:transparent;color:rgba(249,240,226,.7);border:1px solid rgba(249,240,226,.2)}}
+.nc-cta--brand-secondary:hover{{background:rgba(249,240,226,.1);color:rgba(249,240,226,.9)}}
 
 /* ===== Main Content (right side) ===== */
-.nc-main{{flex:1;display:flex;flex-direction:column;background:var(--black);min-width:0;position:relative;overflow:hidden}}
+.nc-main{{flex:1;display:flex;flex-direction:column;background:var(--bg);min-width:0;position:relative;overflow:hidden}}
 
 /* ===== HOME VIEW ===== */
 .nc-home{{
@@ -137,157 +147,146 @@ html,body{{
 .nc-home.nc-hidden{{opacity:0;transform:translateX(-20px);pointer-events:none}}
 .nc-home__scroll{{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:max(60px,12vh) 24px 40px;
+  padding:max(60px,10vh) 24px 40px;
 }}
-.nc-home__logo{{width:100px;opacity:.85;margin-bottom:32px;animation:ncUp .6s var(--ease) both}}
+.nc-home__symbol{{width:56px;opacity:.7;margin-bottom:20px;animation:ncUp .6s var(--ease) both}}
+.nc-home__logo{{width:160px;opacity:.9;margin-bottom:8px;animation:ncUp .6s .06s var(--ease) both}}
 .nc-home__title{{
-  font-weight:200;font-size:1.6rem;letter-spacing:.02em;text-align:center;
-  color:var(--text-1);opacity:.8;margin-bottom:6px;animation:ncUp .6s .08s var(--ease) both;
-}}
-.nc-home__subtitle{{
-  font-weight:400;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--text-3);margin-bottom:40px;animation:ncUp .6s .14s var(--ease) both;
+  font-weight:300;font-size:1rem;letter-spacing:.14em;text-transform:uppercase;text-align:center;
+  color:var(--text-2);margin-bottom:40px;animation:ncUp .6s .12s var(--ease) both;
 }}
 
 /* Cards Grid */
 .nc-cards{{
   display:grid;grid-template-columns:1fr 1fr;gap:12px;
   width:100%;max-width:400px;margin-bottom:32px;
-  animation:ncUp .6s .2s var(--ease) both;
+  animation:ncUp .6s .18s var(--ease) both;
 }}
 .nc-card{{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;padding:24px 16px;border-radius:16px;
-  background:rgba(28,28,30,.6);border:1px solid rgba(255,255,255,.05);
+  background:var(--surface);border:1px solid var(--separator-light);
   cursor:pointer;text-decoration:none;color:var(--text-1);
   transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent;
+  box-shadow:var(--shadow-sm);
 }}
-.nc-card:hover{{background:rgba(44,44,46,.6);transform:translateY(-2px)}}
-.nc-card:active{{transform:scale(.96)}}
+.nc-card:hover{{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--green-light)}}
+.nc-card:active{{transform:scale(.97)}}
 .nc-card__icon{{
-  width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
 }}
-.nc-card__icon--brew{{background:rgba(123,160,109,.15)}}
-.nc-card__icon--product{{background:rgba(88,166,255,.1)}}
-.nc-card__icon--faq{{background:rgba(255,159,67,.1)}}
-.nc-card__icon--shop{{background:rgba(255,255,255,.06)}}
-.nc-card__label{{font-size:.78rem;font-weight:400;letter-spacing:.02em;text-align:center}}
-.nc-card__desc{{font-size:.62rem;color:var(--text-3);text-align:center;line-height:1.5}}
+.nc-card__icon--brew{{background:rgba(64,101,70,.08)}}
+.nc-card__icon--product{{background:rgba(129,163,112,.1)}}
+.nc-card__icon--faq{{background:rgba(158,132,113,.1)}}
+.nc-card__icon--shop{{background:rgba(236,221,199,.5)}}
+.nc-card__label{{font-size:.78rem;font-weight:500;letter-spacing:.02em;text-align:center;color:var(--text-1)}}
+.nc-card__desc{{font-size:.62rem;color:var(--text-2);text-align:center;line-height:1.5}}
 
 /* Home CTAs */
 .nc-home__ctas{{
   display:flex;flex-direction:column;gap:10px;width:100%;max-width:400px;
-  animation:ncUp .6s .28s var(--ease) both;
+  animation:ncUp .6s .24s var(--ease) both;
 }}
-.nc-home__cta-main{{
-  padding:15px 24px;border-radius:14px;font-size:.82rem;
-}}
+.nc-home__cta-main{{padding:16px 24px;border-radius:14px;font-size:.82rem}}
 .nc-home__footer{{
-  display:flex;flex-direction:column;align-items:center;gap:12px;
-  margin-top:28px;animation:ncUp .6s .34s var(--ease) both;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  margin-top:32px;animation:ncUp .6s .3s var(--ease) both;
 }}
-.nc-home__ws{{
-  font-size:.7rem;font-weight:400;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text-3);text-decoration:none;padding:8px 16px;
-  transition:color .2s;
-}}
-.nc-home__ws:hover{{color:var(--text-2)}}
-.nc-home__ws:active{{color:var(--matcha)}}
-.nc-home__powered{{font-size:.55rem;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);opacity:.4}}
+.nc-home__powered{{font-size:.55rem;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);opacity:.6}}
 
 /* ===== CHAT VIEW ===== */
 .nc-chat{{
   position:absolute;inset:0;display:flex;flex-direction:column;
   transition:opacity .35s var(--ease),transform .35s var(--ease);
-  z-index:4;
+  z-index:4;background:var(--bg-warm);
 }}
 .nc-chat.nc-hidden{{opacity:0;transform:translateX(20px);pointer-events:none}}
 
 /* Header */
 .nc-header{{
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 24px;background:var(--surface-glass);
-  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  padding:14px 24px;background:rgba(255,255,255,.8);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
   border-bottom:1px solid var(--separator-light);flex-shrink:0;z-index:10;
 }}
 .nc-header__left{{display:flex;align-items:center;gap:10px}}
 .nc-back{{
   display:none;background:none;border:none;color:var(--text-2);
-  font-size:1.1rem;cursor:pointer;padding:4px 8px 4px 0;
+  font-size:1.2rem;cursor:pointer;padding:4px 8px 4px 0;
   -webkit-tap-highlight-color:transparent;transition:color .2s;
 }}
 .nc-back:active{{color:var(--text-1)}}
-.nc-header__logo-m{{height:18px;opacity:.7;display:none}}
+.nc-header__logo-m{{height:18px;opacity:.85;display:none}}
 .nc-header__title{{font-weight:500;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)}}
 .nc-header__badge{{
-  display:inline-flex;align-items:center;gap:4px;background:var(--matcha-bg);
+  display:inline-flex;align-items:center;gap:4px;background:var(--green-light);
   border-radius:100px;padding:3px 10px 3px 7px;font-size:.65rem;font-weight:500;
-  letter-spacing:.06em;color:var(--matcha);
+  letter-spacing:.06em;color:var(--green-deep);
 }}
-.nc-header__badge-dot{{width:5px;height:5px;border-radius:50%;background:var(--matcha);animation:ncPulse 3s ease-in-out infinite}}
+.nc-header__badge-dot{{width:5px;height:5px;border-radius:50%;background:var(--green);animation:ncPulse 3s ease-in-out infinite}}
 @keyframes ncPulse{{0%,100%{{opacity:1}}50%{{opacity:.35}}}}
 .nc-header__right{{display:flex;align-items:center;gap:10px}}
 .nc-lang{{
-  background:var(--elevated);border:none;border-radius:8px;padding:6px 12px;
-  color:var(--text-2);font-family:inherit;font-size:.7rem;font-weight:500;letter-spacing:.1em;
+  background:var(--green-lighter);border:none;border-radius:8px;padding:6px 12px;
+  color:var(--green-deep);font-family:inherit;font-size:.7rem;font-weight:500;letter-spacing:.1em;
   cursor:pointer;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent;
 }}
-.nc-lang:hover{{background:var(--fill);color:var(--text-1)}}
+.nc-lang:hover{{background:var(--green-light);color:var(--green-deep)}}
 
 /* Messages */
 .nc-messages{{flex:1;overflow-y:auto;padding:24px 24px 16px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth}}
 .nc-messages::-webkit-scrollbar{{width:0;display:none}}
-.nc-banner{{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;margin:0 auto 20px;background:var(--matcha-bg2);border-radius:12px;font-size:.72rem;color:var(--text-2);max-width:400px}}
-.nc-banner__dot{{width:4px;height:4px;border-radius:50%;background:var(--matcha-dim)}}
+.nc-banner{{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;margin:0 auto 20px;background:var(--green-lighter);border-radius:12px;font-size:.72rem;color:var(--text-2);max-width:400px}}
+.nc-banner__dot{{width:4px;height:4px;border-radius:50%;background:var(--green)}}
 .nc-msg{{display:flex;flex-direction:column;animation:ncMsgIn .4s var(--ease) both}}
 @keyframes ncMsgIn{{from{{opacity:0;transform:translateY(8px)}}to{{opacity:1;transform:translateY(0)}}}}
 .nc-msg--bot{{align-items:flex-start;padding-right:48px;position:relative;padding-left:40px}}
 .nc-msg--bot::before{{
   content:'';position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;
-  background:linear-gradient(135deg,var(--matcha),var(--matcha-deep));
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.71c.59.35 1.27.71 2.06.71 2.02 0 4.5-1.98 4.69-4.34C14.65 14.39 17 12.5 17 8z' opacity='.9'/%3E%3C/svg%3E");
+  background:var(--green-deep);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F9F0E2'%3E%3Cpath d='M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.71c.59.35 1.27.71 2.06.71 2.02 0 4.5-1.98 4.69-4.34C14.65 14.39 17 12.5 17 8z' opacity='.9'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:center;background-size:16px;
 }}
-.nc-msg--bot .nc-msg__bubble{{background:var(--surface);border-radius:20px 20px 20px 6px;padding:14px 18px;font-size:.9rem;font-weight:350;line-height:1.8;color:var(--text-1)}}
-.nc-msg__bubble a{{color:var(--matcha);text-decoration:none;transition:opacity .2s}}
+.nc-msg--bot .nc-msg__bubble{{background:var(--surface);border:1px solid var(--separator-light);border-radius:20px 20px 20px 6px;padding:14px 18px;font-size:.9rem;font-weight:350;line-height:1.8;color:var(--text-1);box-shadow:var(--shadow-sm)}}
+.nc-msg__bubble a{{color:var(--green);text-decoration:none;font-weight:500;transition:opacity .2s}}
 .nc-msg__bubble a:hover{{opacity:.7}}
-.nc-msg__bubble strong{{font-weight:500}}
+.nc-msg__bubble strong{{font-weight:600;color:var(--green-deep)}}
 .nc-msg__bubble ul,.nc-msg__bubble ol{{margin:8px 0;padding-left:20px}}
 .nc-msg__bubble li{{margin:4px 0}}
 .nc-msg--user{{align-items:flex-end;padding-left:48px;margin-top:4px}}
-.nc-msg--user .nc-msg__bubble{{background:linear-gradient(135deg,var(--matcha),#6B9460);color:rgba(255,255,255,.95);border-radius:20px 20px 6px 20px;padding:12px 18px;font-size:.9rem;font-weight:400;line-height:1.72}}
+.nc-msg--user .nc-msg__bubble{{background:var(--green-deep);color:rgba(249,240,226,.95);border-radius:20px 20px 6px 20px;padding:12px 18px;font-size:.9rem;font-weight:400;line-height:1.72;box-shadow:var(--shadow-md)}}
 .nc-msg--bot+.nc-msg--user,.nc-msg--user+.nc-msg--bot{{margin-top:12px}}
 .nc-msg__meta{{display:flex;align-items:center;gap:6px;margin-top:6px;padding-left:4px}}
 .nc-msg__time{{font-size:.62rem;color:var(--text-3)}}
 .nc-msg__sources{{margin-top:8px;padding-left:4px;display:flex;flex-wrap:wrap;gap:6px}}
-.nc-msg__source{{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;color:var(--matcha);text-decoration:none;background:var(--matcha-bg2);border-radius:10px;padding:8px 14px;min-height:36px;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent}}
-.nc-msg__source:hover{{background:var(--matcha-bg)}}
+.nc-msg__source{{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;color:var(--green-deep);text-decoration:none;background:var(--green-lighter);border:1px solid var(--green-light);border-radius:10px;padding:8px 14px;min-height:36px;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent}}
+.nc-msg__source:hover{{background:var(--green-light)}}
 .nc-msg__source:active{{transform:scale(.95)}}
 .nc-typing .nc-msg__bubble{{display:flex;gap:5px;align-items:center;padding:16px 20px!important;min-height:44px}}
-.nc-typing .nc-msg__bubble span{{width:5px;height:5px;background:var(--text-3);border-radius:50%;display:inline-block;animation:ncWave 1.4s ease-in-out infinite}}
+.nc-typing .nc-msg__bubble span{{width:5px;height:5px;background:var(--beige);border-radius:50%;display:inline-block;animation:ncWave 1.4s ease-in-out infinite}}
 .nc-typing .nc-msg__bubble span:nth-child(2){{animation-delay:.15s}}
 .nc-typing .nc-msg__bubble span:nth-child(3){{animation-delay:.3s}}
-@keyframes ncWave{{0%,60%,100%{{opacity:.15;transform:translateY(0)}}30%{{opacity:.6;transform:translateY(-3px)}}}}
+@keyframes ncWave{{0%,60%,100%{{opacity:.3;transform:translateY(0)}}30%{{opacity:1;transform:translateY(-3px)}}}}
 .nc-typing__label{{font-size:.65rem;color:var(--text-3);padding-left:4px;margin-top:4px}}
 .nc-quick{{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}}
-.nc-quick__btn{{font-family:inherit;font-size:.78rem;font-weight:400;color:var(--text-1);background:var(--surface);border:none;border-radius:14px;padding:10px 18px;cursor:pointer;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent}}
-.nc-quick__btn:hover{{background:var(--elevated);transform:translateY(-1px)}}
-.nc-quick__btn:active{{transform:scale(.95);background:var(--fill)}}
+.nc-quick__btn{{font-family:inherit;font-size:.78rem;font-weight:400;color:var(--text-1);background:var(--surface);border:1px solid var(--separator);border-radius:14px;padding:10px 18px;cursor:pointer;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent;box-shadow:var(--shadow-sm)}}
+.nc-quick__btn:hover{{background:var(--green-lighter);border-color:var(--green-light);transform:translateY(-1px)}}
+.nc-quick__btn:active{{transform:scale(.95)}}
 
 /* Input */
 .nc-input-area{{padding:12px 24px 16px;flex-shrink:0}}
-.nc-form{{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--separator-light);border-radius:24px;padding:4px 4px 4px 20px;transition:all .3s var(--ease)}}
-.nc-form:focus-within{{border-color:rgba(123,160,109,.25);background:var(--elevated)}}
+.nc-form{{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--separator);border-radius:24px;padding:4px 4px 4px 20px;transition:all .3s var(--ease);box-shadow:var(--shadow-sm)}}
+.nc-form:focus-within{{border-color:var(--green-light);box-shadow:0 0 0 3px rgba(129,163,112,.1)}}
 .nc-input{{flex:1;border:none;background:transparent;color:var(--text-1);font-family:inherit;font-size:.88rem;font-weight:350;outline:none;padding:10px 0}}
 .nc-input::placeholder{{color:var(--text-3);font-weight:300}}
-.nc-send{{width:36px;height:36px;border-radius:50%;border:none;background:var(--matcha);color:rgba(255,255,255,.9);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s var(--ease);-webkit-tap-highlight-color:transparent}}
+.nc-send{{width:36px;height:36px;border-radius:50%;border:none;background:var(--green-deep);color:rgba(249,240,226,.9);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s var(--ease);-webkit-tap-highlight-color:transparent}}
 .nc-send:hover{{opacity:.85;transform:scale(1.05)}}
 .nc-send:active{{transform:scale(.9)}}
 .nc-send svg{{width:14px;height:14px}}
 
 /* Chat Footer */
-.nc-footer{{display:flex;align-items:center;justify-content:center;gap:16px;padding:6px 24px max(10px,env(safe-area-inset-bottom));flex-shrink:0}}
+.nc-footer{{display:flex;align-items:center;justify-content:center;gap:16px;padding:6px 24px max(10px,env(safe-area-inset-bottom));flex-shrink:0;background:var(--bg-warm)}}
 .nc-footer__link{{font-size:.65rem;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);text-decoration:none;transition:color .2s}}
 .nc-footer__link:hover{{color:var(--text-2)}}
 .nc-footer__sep{{width:1px;height:10px;background:var(--separator-light)}}
@@ -306,35 +305,36 @@ html,body{{
   .nc-brand{{display:none}}
   #nc-app{{height:100vh;height:100dvh;height:-webkit-fill-available}}
   .nc-back{{display:block}}
-  .nc-header__logo-m{{display:block;height:20px;opacity:.85}}
-  .nc-header{{padding:max(12px,env(safe-area-inset-top)) 16px 10px;background:rgba(0,0,0,.85);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border-bottom:1px solid rgba(255,255,255,.06)}}
+  .nc-header__logo-m{{display:block}}
+  .nc-header{{padding:max(12px,env(safe-area-inset-top)) 16px 10px;background:rgba(249,240,226,.9);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border-bottom:1px solid var(--separator-light)}}
   .nc-header__title{{font-size:.72rem;letter-spacing:.12em}}
   .nc-header__badge{{font-size:.6rem;padding:2px 8px 2px 5px}}
   .nc-header__badge-dot{{width:4px;height:4px}}
-  .nc-lang{{padding:5px 10px;font-size:.65rem;border-radius:6px;background:rgba(255,255,255,.08)}}
+  .nc-lang{{padding:5px 10px;font-size:.65rem;border-radius:6px}}
   .nc-lang:active{{transform:scale(.92)}}
   .nc-messages{{padding:16px 14px 8px;-webkit-overflow-scrolling:touch}}
   .nc-msg--bot{{padding-right:16px;padding-left:36px}}
   .nc-msg--bot::before{{width:24px;height:24px;background-size:13px}}
   .nc-msg--user{{padding-left:40px}}
-  .nc-msg--bot .nc-msg__bubble{{font-size:.92rem;padding:12px 16px;line-height:1.75;border-radius:22px 22px 22px 6px;background:rgba(28,28,30,.8)}}
+  .nc-msg--bot .nc-msg__bubble{{font-size:.92rem;padding:12px 16px;line-height:1.75;border-radius:22px 22px 22px 6px}}
   .nc-msg--user .nc-msg__bubble{{font-size:.92rem;padding:12px 16px;line-height:1.7;border-radius:22px 22px 6px 22px}}
   .nc-msg--bot+.nc-msg--user,.nc-msg--user+.nc-msg--bot{{margin-top:10px}}
-  .nc-banner{{font-size:.66rem;padding:7px 12px;margin-bottom:14px;border-radius:10px;background:rgba(123,160,109,.06)}}
+  .nc-banner{{font-size:.66rem;padding:7px 12px;margin-bottom:14px;border-radius:10px}}
   .nc-quick{{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 6px;margin-top:14px;scrollbar-width:none}}
   .nc-quick::-webkit-scrollbar{{display:none}}
-  .nc-quick__btn{{font-size:.8rem;padding:10px 18px;border-radius:20px;white-space:nowrap;flex-shrink:0;background:rgba(28,28,30,.7);border:1px solid rgba(255,255,255,.06)}}
-  .nc-input-area{{padding:8px 14px 4px;background:rgba(0,0,0,.9);-webkit-backdrop-filter:saturate(150%) blur(20px);backdrop-filter:saturate(150%) blur(20px);border-top:1px solid rgba(255,255,255,.04)}}
-  .nc-form{{padding:4px 4px 4px 18px;border-radius:22px;background:rgba(28,28,30,.9);border:1px solid rgba(255,255,255,.06)}}
+  .nc-quick__btn{{font-size:.8rem;padding:10px 18px;border-radius:20px;white-space:nowrap;flex-shrink:0}}
+  .nc-input-area{{padding:8px 14px 4px;background:rgba(248,248,227,.85);-webkit-backdrop-filter:saturate(150%) blur(20px);backdrop-filter:saturate(150%) blur(20px);border-top:1px solid var(--separator-light)}}
+  .nc-form{{padding:4px 4px 4px 18px;border-radius:22px}}
   .nc-input{{font-size:16px;padding:12px 0;min-height:44px}}
   .nc-send{{width:38px;height:38px;transition:all .15s var(--ease)}}
   .nc-send:active{{transform:scale(.85)}}
-  .nc-footer{{padding:4px 16px max(6px,env(safe-area-inset-bottom));gap:12px;background:rgba(0,0,0,.9)}}
+  .nc-footer{{padding:4px 16px max(6px,env(safe-area-inset-bottom));gap:12px}}
   .nc-footer__link{{font-size:.58rem}}
   .nc-footer__powered{{font-size:.52rem;opacity:.3}}
   .nc-home__scroll{{padding:max(40px,8vh) 20px 32px}}
-  .nc-home__logo{{width:80px;margin-bottom:24px}}
-  .nc-home__title{{font-size:1.35rem}}
+  .nc-home__symbol{{width:48px;margin-bottom:16px}}
+  .nc-home__logo{{width:130px}}
+  .nc-home__title{{font-size:.88rem}}
   .nc-cards{{max-width:100%;gap:10px}}
   .nc-card{{padding:20px 14px;border-radius:14px}}
 }}
@@ -352,8 +352,11 @@ html,body{{
   .nc-home__scroll{{padding:max(32px,6vh) 16px 24px}}
   .nc-cards{{gap:8px}}
   .nc-card{{padding:18px 12px;gap:8px}}
-  .nc-card__icon{{width:38px;height:38px;font-size:1.1rem}}
+  .nc-card__icon{{width:40px;height:40px;font-size:1.2rem}}
   .nc-card__label{{font-size:.74rem}}
+}}
+@media(hover:none){{
+  .nc-card:hover,.nc-cta--primary:hover,.nc-cta--secondary:hover,.nc-quick__btn:hover{{transform:none;box-shadow:var(--shadow-sm)}}
 }}
 </style>
 </head>
@@ -368,7 +371,7 @@ html,body{{
     <p class="nc-brand__powered">Powered by NAKAI</p>
     <div class="nc-brand__ctas">
       <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-cta nc-cta--primary">Shop NAKAI</a>
-      <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-cta nc-cta--secondary">Wholesale Inquiry</a>
+      <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-cta nc-cta--brand-secondary">Wholesale Inquiry</a>
     </div>
   </aside>
 
@@ -378,9 +381,9 @@ html,body{{
     <!-- HOME VIEW -->
     <div class="nc-home" id="nc-home">
       <div class="nc-home__scroll">
-        <img class="nc-home__logo" src="data:image/png;base64,{_LOGO_WHITE_B64}" alt="NAKAI" />
+        <img class="nc-home__symbol" src="data:image/png;base64,{_LOGO_ICON_BLACK_B64}" alt="" />
+        <img class="nc-home__logo" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" />
         <h1 class="nc-home__title" id="nc-home-title">AI Matcha Concierge</h1>
-        <p class="nc-home__subtitle" id="nc-home-sub">Powered by NAKAI</p>
 
         <div class="nc-cards">
           <div class="nc-card" data-chat-msg="brew">
@@ -426,7 +429,7 @@ html,body{{
       <header class="nc-header">
         <div class="nc-header__left">
           <button class="nc-back" id="nc-back" aria-label="Back">&#8249;</button>
-          <img class="nc-header__logo-m" src="data:image/png;base64,{_LOGO_WHITE_B64}" alt="NAKAI" />
+          <img class="nc-header__logo-m" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" />
           <span class="nc-header__title" id="nc-title">Concierge</span>
           <span class="nc-header__badge">
             <span class="nc-header__badge-dot"></span>
@@ -491,7 +494,7 @@ html,body{{
       q4:'Recommend a product',q4m:'What matcha products do you recommend?',
       error:"Connection issue. Please try again in a moment.",
       shop:'Shop NAKAI',wholesale:'Wholesale',
-      homeTitle:'AI Matcha Concierge',homeSub:'Powered by NAKAI',
+      homeTitle:'AI Matcha Concierge',
       startChat:'Start Chat',wsLabel:'Wholesale Inquiry',
       cardBrew:'Brewing Guide',cardBrewD:'Temperature, ratio, technique',
       cardProduct:'Product Knowledge',cardProductD:'Grades, origins, tasting notes',
@@ -513,7 +516,7 @@ html,body{{
       q4:'おすすめ商品',q4m:'おすすめの抹茶商品を教えてください',
       error:'接続に問題が発生しました。もう一度お試しください。',
       shop:'ショップ',wholesale:'卸売',
-      homeTitle:'AI 抹茶コンシェルジュ',homeSub:'Powered by NAKAI',
+      homeTitle:'AI 抹茶コンシェルジュ',
       startChat:'チャットを始める',wsLabel:'卸売のお問い合わせ',
       cardBrew:'点て方ガイド',cardBrewD:'水温・分量・点て方のコツ',
       cardProduct:'商品知識',cardProductD:'グレード・産地・味わい',
@@ -564,7 +567,6 @@ html,body{{
     $('nc-footer-shop').textContent=t('shop');
     $('nc-footer-ws').textContent=t('wholesale');
     $('nc-home-title').textContent=t('homeTitle');
-    $('nc-home-sub').textContent=t('homeSub');
     $('nc-start-label').textContent=t('startChat');
     $('nc-ws-label').textContent=t('wsLabel');
     $('nc-card-brew').textContent=t('cardBrew');
