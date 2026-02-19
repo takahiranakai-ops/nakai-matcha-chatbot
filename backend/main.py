@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.routes import router, vector_store, rag_engine
 from api.widget import widget_router
+from api.pwa import pwa_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -46,3 +47,4 @@ setup_rate_limiting(app)
 
 app.include_router(router, prefix="/api")
 app.include_router(widget_router)
+app.include_router(pwa_router)
