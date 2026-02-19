@@ -122,32 +122,29 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 .nc-home__logo{{width:140px;margin-bottom:10px;animation:ncUp .5s var(--ease) both}}
 .nc-home__sub{{font-weight:400;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--g40);margin-bottom:max(36px,5vh);animation:ncUp .5s .06s var(--ease) both}}
 
-/* Menu */
-.nc-menu{{width:100%;max-width:400px;animation:ncUp .5s .12s var(--ease) both}}
-.nc-menu__item{{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 0;border-bottom:1px solid var(--g10);
-  cursor:pointer;text-decoration:none;color:var(--green);
-  transition:opacity .2s;-webkit-tap-highlight-color:transparent;
-}}
-.nc-menu__item:first-child{{border-top:1px solid var(--g10)}}
-.nc-menu__item:active{{opacity:.5}}
-.nc-menu__label{{font-size:.88rem;font-weight:400}}
-.nc-menu__arrow{{font-size:.8rem;color:var(--g40);font-weight:300}}
+/* Greeting */
+.nc-home__greeting{{font-size:1.5rem;font-weight:300;color:var(--green);text-align:center;line-height:1.5;margin-bottom:max(24px,3vh);max-width:420px;animation:ncUp .5s .12s var(--ease) both}}
 
-/* Home CTA */
-.nc-home__cta{{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;max-width:400px;margin-top:max(28px,4vh);padding:16px 24px;
-  background:var(--green);color:var(--cream);border:none;border-radius:12px;
-  font-family:inherit;font-size:.82rem;font-weight:500;letter-spacing:.06em;
-  cursor:pointer;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent;
-  animation:ncUp .5s .18s var(--ease) both;
+/* Home Input */
+.nc-home__input-wrap{{width:100%;max-width:480px;animation:ncUp .5s .18s var(--ease) both}}
+.nc-home__form{{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--g20);border-radius:24px;padding:4px 4px 4px 18px;transition:all .2s;box-shadow:0 2px 8px rgba(64,101,70,.06)}}
+.nc-home__form:focus-within{{border-color:var(--g40);box-shadow:0 2px 12px rgba(64,101,70,.1)}}
+.nc-home__input{{flex:1;border:none;background:transparent;color:var(--green);font-family:inherit;font-size:16px;font-weight:400;outline:none;padding:12px 0}}
+.nc-home__input::placeholder{{color:var(--g40);font-weight:300}}
+
+/* Chips */
+.nc-home__chips{{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:480px;margin-top:16px;animation:ncUp .5s .24s var(--ease) both}}
+.nc-home__chip{{
+  font-family:inherit;font-size:.78rem;font-weight:400;color:var(--green);
+  background:var(--white);border:1px solid var(--g10);border-radius:20px;
+  padding:10px 18px;cursor:pointer;transition:all .2s var(--ease);
+  -webkit-tap-highlight-color:transparent;
 }}
-.nc-home__cta:active{{transform:scale(.97);opacity:.85}}
+.nc-home__chip:hover{{background:var(--g05);border-color:var(--g20)}}
+.nc-home__chip:active{{background:var(--g10);transform:scale(.96)}}
 
 /* Home footer */
-.nc-home__links{{display:flex;align-items:center;gap:20px;margin-top:24px;animation:ncUp .5s .24s var(--ease) both}}
+.nc-home__links{{display:flex;align-items:center;gap:20px;margin-top:24px;animation:ncUp .5s .3s var(--ease) both}}
 .nc-home__link{{font-size:.68rem;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--g40);text-decoration:none}}
 .nc-home__link:active{{color:var(--green)}}
 .nc-home__dot{{width:3px;height:3px;border-radius:50%;background:var(--g20)}}
@@ -250,7 +247,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
   .nc-input-area{{padding:6px 10px 2px}}.nc-send{{width:34px;height:34px}}
   .nc-footer{{padding:2px 10px max(4px,env(safe-area-inset-bottom))}}
   .nc-home__scroll{{padding:max(12px,2vh) 16px 24px}}.nc-home__logo{{width:110px}}
-  .nc-menu__item{{padding:16px 0}}
+  .nc-home__greeting{{font-size:1.3rem}}
 }}
 </style>
 </head>
@@ -276,23 +273,20 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
       <div class="nc-home__scroll">
         <img class="nc-home__logo" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" />
         <p class="nc-home__sub" id="nc-home-sub">Matcha Concierge</p>
-        <nav class="nc-menu">
-          <div class="nc-menu__item" data-chat-msg="brew">
-            <span class="nc-menu__label" id="nc-m-brew">Brewing Guide</span>
-            <span class="nc-menu__arrow">&rsaquo;</span>
-          </div>
-          <div class="nc-menu__item" data-chat-msg="product">
-            <span class="nc-menu__label" id="nc-m-product">Product Knowledge</span>
-            <span class="nc-menu__arrow">&rsaquo;</span>
-          </div>
-          <div class="nc-menu__item" data-chat-msg="faq">
-            <span class="nc-menu__label" id="nc-m-faq">Customer FAQ</span>
-            <span class="nc-menu__arrow">&rsaquo;</span>
-          </div>
-        </nav>
-        <button class="nc-home__cta" id="nc-start-chat">
-          <span id="nc-start-label">Start Chat</span>
-        </button>
+        <h1 class="nc-home__greeting" id="nc-home-greeting">What can I help you with?</h1>
+        <div class="nc-home__input-wrap">
+          <form class="nc-home__form" id="nc-home-form">
+            <input type="text" class="nc-home__input" id="nc-home-input" autocomplete="off" maxlength="500" />
+            <button type="submit" class="nc-send" aria-label="Send">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405z"/></svg>
+            </button>
+          </form>
+        </div>
+        <div class="nc-home__chips">
+          <button class="nc-home__chip" data-chat-msg="brew" id="nc-c-brew">Barista Guide</button>
+          <button class="nc-home__chip" data-chat-msg="product" id="nc-c-product">NAKAI Matcha Product Recipes</button>
+          <button class="nc-home__chip" data-chat-msg="faq" id="nc-c-faq">Learn about Matcha</button>
+        </div>
         <div class="nc-home__links">
           <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-home__link" id="nc-h-shop">Shop</a>
           <span class="nc-home__dot"></span>
@@ -358,8 +352,8 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
       q3:'Matcha vs coffee',q3m:'How does matcha compare to coffee?',
       q4:'Recommend',q4m:'What matcha products do you recommend?',
       error:"Connection issue. Please try again.",
-      sub:'Matcha Concierge',startChat:'Start Chat',
-      mBrew:'Brewing Guide',mProduct:'Product Knowledge',mFaq:'Customer FAQ',
+      sub:'AI Matcha Concierge',homeGreeting:'What can I help you with?',
+      mBrew:'Barista Guide',mProduct:'NAKAI Matcha Product Recipes',mFaq:'Learn about Matcha',
       hShop:'Shop',hWs:'Wholesale',
       brewMsg:'How do I brew the perfect cup of matcha? Please include water temperature, matcha-to-water ratio, and whisking technique.',
       productMsg:'Tell me about NAKAI matcha products. What grades do you offer and what makes each one special?',
@@ -375,8 +369,8 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
       q3:'抹茶 vs コーヒー',q3m:'抹茶とコーヒーの違いを教えてください',
       q4:'おすすめ',q4m:'おすすめの抹茶商品を教えてください',
       error:'接続に問題が発生しました。もう一度お試しください。',
-      sub:'抹茶コンシェルジュ',startChat:'チャットを始める',
-      mBrew:'点て方ガイド',mProduct:'商品知識',mFaq:'お客様FAQ',
+      sub:'AI 抹茶コンシェルジュ',homeGreeting:'何をお手伝いしましょうか？',
+      mBrew:'バリスタガイド',mProduct:'NAKAI Matcha プロダクトレシピ',mFaq:'抹茶について学ぶ',
       hShop:'ショップ',hWs:'卸売',
       brewMsg:'美味しい抹茶の点て方を教えてください。水温、抹茶と水の割合、茶筅の使い方を含めてください。',
       productMsg:'NAKAIの抹茶商品について教えてください。どんなグレードがあり、それぞれの特徴は何ですか？',
@@ -404,10 +398,11 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
     $('nc-banner-text').textContent=t('banner');
     $('nc-greeting').innerHTML=t('greeting');
     $('nc-home-sub').textContent=t('sub');
-    $('nc-start-label').textContent=t('startChat');
-    $('nc-m-brew').textContent=t('mBrew');
-    $('nc-m-product').textContent=t('mProduct');
-    $('nc-m-faq').textContent=t('mFaq');
+    $('nc-home-greeting').textContent=t('homeGreeting');
+    $('nc-home-input').placeholder=t('placeholder');
+    $('nc-c-brew').textContent=t('mBrew');
+    $('nc-c-product').textContent=t('mProduct');
+    $('nc-c-faq').textContent=t('mFaq');
     $('nc-h-shop').textContent=t('hShop');
     $('nc-h-ws').textContent=t('hWs');
     $('nc-f-shop').textContent=t('hShop');
@@ -489,11 +484,11 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
     setLang(lang);
     $('nc-form').addEventListener('submit',function(e){{e.preventDefault();sendMessage()}});
     $('nc-back').addEventListener('click',showHome);
-    $('nc-start-chat').addEventListener('click',function(){{showChat()}});
+    $('nc-home-form').addEventListener('submit',function(e){{e.preventDefault();var v=$('nc-home-input').value.trim();if(v)showChat(v)}});
     document.querySelectorAll('.nc-lang-btn').forEach(function(b){{
       b.addEventListener('click',function(){{setLang(this.getAttribute('data-lang'))}});
     }});
-    document.querySelectorAll('.nc-menu__item[data-chat-msg]').forEach(function(c){{
+    document.querySelectorAll('.nc-home__chip[data-chat-msg]').forEach(function(c){{
       c.addEventListener('click',function(){{
         var key=this.getAttribute('data-chat-msg');
         var msg=t(key+'Msg');
