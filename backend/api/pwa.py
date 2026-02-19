@@ -688,6 +688,95 @@ html,body{{
 </html>"""
 
 
+@pwa_router.get("/test")
+async def serve_test():
+    """Minimal debug chat page — no service worker, no cache."""
+    test_html = """<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NAKAI Chat Test</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#000;color:#f5f5f7;height:100vh;display:flex;flex-direction:column}
+#log{flex:1;overflow-y:auto;padding:16px;font-size:14px;line-height:1.8}
+.msg{margin:8px 0;padding:10px 14px;border-radius:16px;max-width:80%}
+.bot{background:#1c1c1e;align-self:flex-start}
+.user{background:#7BA06D;align-self:flex-end;margin-left:auto}
+#log{display:flex;flex-direction:column}
+form{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #333}
+input{flex:1;background:#1c1c1e;border:none;color:#fff;padding:12px 16px;border-radius:20px;font-size:16px;outline:none}
+button{background:#7BA06D;color:#fff;border:none;padding:12px 20px;border-radius:20px;font-size:14px;cursor:pointer}
+#debug{background:#1a1a1a;color:#86868b;padding:8px 16px;font-size:11px;max-height:80px;overflow-y:auto;border-top:1px solid #222}
+</style>
+</head>
+<body>
+<div style="padding:12px 16px;border-bottom:1px solid #333;font-size:13px;color:#86868b">
+  NAKAI Chat Debug — <span id="status">checking...</span>
+</div>
+<div id="log">
+  <div class="msg bot">テスト用チャットページです。メッセージを入力してください。</div>
+</div>
+<form id="f">
+  <input id="i" placeholder="メッセージを入力..." autocomplete="off">
+  <button type="submit">送信</button>
+</form>
+<div id="debug"></div>
+<script>
+var debug=document.getElementById('debug');
+function log(s){debug.textContent+=new Date().toLocaleTimeString()+' '+s+'\\n';debug.scrollTop=debug.scrollHeight;}
+
+// Health check
+log('Checking API...');
+fetch('/api/health').then(function(r){return r.json()}).then(function(d){
+  document.getElementById('status').textContent='OK - '+d.model+' ('+d.documents+' docs)';
+  document.getElementById('status').style.color='#7BA06D';
+  log('Health OK: '+JSON.stringify(d));
+}).catch(function(e){
+  document.getElementById('status').textContent='ERROR: '+e.message;
+  document.getElementById('status').style.color='red';
+  log('Health ERROR: '+e.message);
+});
+
+// Chat
+var loading=false;
+document.getElementById('f').addEventListener('submit',function(e){
+  e.preventDefault();
+  var inp=document.getElementById('i');
+  var msg=inp.value.trim();
+  if(!msg||loading)return;
+  inp.value='';
+  var logEl=document.getElementById('log');
+  var ud=document.createElement('div');ud.className='msg user';ud.textContent=msg;logEl.appendChild(ud);
+  logEl.scrollTop=logEl.scrollHeight;
+  log('Sending: '+msg);
+  loading=true;
+  fetch('/api/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({message:msg,history:[],language:'ja'})
+  }).then(function(r){
+    log('Response status: '+r.status);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(d){
+    log('Response OK: '+d.response.substring(0,50)+'...');
+    var bd=document.createElement('div');bd.className='msg bot';bd.textContent=d.response;logEl.appendChild(bd);
+    logEl.scrollTop=logEl.scrollHeight;
+  }).catch(function(e){
+    log('ERROR: '+e.message);
+    var ed=document.createElement('div');ed.className='msg bot';ed.style.color='red';ed.textContent='Error: '+e.message;logEl.appendChild(ed);
+    logEl.scrollTop=logEl.scrollHeight;
+  }).finally(function(){loading=false});
+});
+log('Page loaded');
+</script>
+</body>
+</html>"""
+    return HTMLResponse(content=test_html, headers={"Cache-Control": "no-store"})
+
+
 @pwa_router.get("/app")
 async def serve_app():
     return HTMLResponse(
