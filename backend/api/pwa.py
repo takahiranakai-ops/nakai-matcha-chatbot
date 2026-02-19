@@ -568,7 +568,7 @@ html,body{{
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
       .replace(/^- (.*?)$/gm,'<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>')
-      .replace(/\n/g,'<br>');
+      .replace(/\\n/g,'<br>');
   }}
 
   function scroll(){{var m=$('nc-messages');if(m)m.scrollTop=m.scrollHeight}}
