@@ -14,11 +14,11 @@ _GREETING_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Cosine distance threshold — higher distance = less relevant
-_RELEVANCE_THRESHOLD = 0.75
+# Cosine distance threshold — lower = stricter, higher = more permissive
+_RELEVANCE_THRESHOLD = 0.80
 
 # Retrieve extra candidates for better filtering
-_RETRIEVAL_MULTIPLIER = 2
+_RETRIEVAL_MULTIPLIER = 3
 
 
 class RAGEngine:
@@ -77,7 +77,7 @@ class RAGEngine:
         # 3. Retrieve extra candidates for better filtering
         n_retrieve = min(
             settings.max_context_chunks * _RETRIEVAL_MULTIPLIER,
-            self.vector_store.count(),
+            max(self.vector_store.count(), 1),
         )
         results = self.vector_store.query(
             query_embedding=query_embedding,
@@ -97,12 +97,12 @@ class RAGEngine:
             if url:
                 source_urls.add(url)
 
-        # 5. Build messages
+        # 5. Build messages — always use RAG prompt format
         if context_texts:
             context = "\n---\n".join(context_texts)
             rag_context = build_rag_prompt(context=context, question=user_message)
         else:
-            rag_context = user_message
+            rag_context = build_rag_prompt(context="", question=user_message)
 
         messages = [{"role": "system", "content": system_prompt}]
         if conversation_history:
@@ -110,7 +110,7 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 6. Generate response
-        response = await chat_completion(messages, temperature=0.3, max_tokens=512)
+        response = await chat_completion(messages, temperature=0.3, max_tokens=1024)
 
         return {
             "response": response,
