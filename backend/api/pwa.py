@@ -247,7 +247,16 @@ html,body{{
 @keyframes ncMsgIn{{from{{opacity:0;transform:translateY(8px)}}to{{opacity:1;transform:translateY(0)}}}}
 
 /* Bot */
-.nc-msg--bot{{align-items:flex-start;padding-right:48px}}
+.nc-msg--bot{{align-items:flex-start;padding-right:48px;position:relative;padding-left:40px}}
+.nc-msg--bot::before{{
+  content:'';position:absolute;left:0;top:0;
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--matcha),var(--matcha-deep));
+  flex-shrink:0;
+  /* Leaf icon via SVG data URI */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.71c.59.35 1.27.71 2.06.71 2.02 0 4.5-1.98 4.69-4.34C14.65 14.39 17 12.5 17 8z' opacity='.9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:center;background-size:16px;
+}}
 .nc-msg--bot .nc-msg__bubble{{
   background:var(--surface);
   border-radius:20px 20px 20px 6px;
@@ -267,7 +276,7 @@ html,body{{
 /* User */
 .nc-msg--user{{align-items:flex-end;padding-left:48px;margin-top:4px}}
 .nc-msg--user .nc-msg__bubble{{
-  background:var(--matcha);
+  background:linear-gradient(135deg,var(--matcha) 0%,#6B9460 100%);
   color:rgba(255,255,255,.95);
   border-radius:20px 20px 6px 20px;
   padding:12px 18px;
@@ -287,11 +296,14 @@ html,body{{
 .nc-msg__sources{{margin-top:8px;padding-left:4px;display:flex;flex-wrap:wrap;gap:6px}}
 .nc-msg__source{{
   display:inline-flex;align-items:center;gap:4px;
-  font-size:.7rem;color:var(--matcha);text-decoration:none;font-weight:400;
-  background:var(--matcha-bg2);border-radius:8px;padding:4px 10px;
+  font-size:.72rem;color:var(--matcha);text-decoration:none;font-weight:400;
+  background:var(--matcha-bg2);border-radius:10px;padding:8px 14px;
+  min-height:36px;
   transition:all .25s var(--ease);
+  -webkit-tap-highlight-color:transparent;
 }}
 .nc-msg__source:hover{{background:var(--matcha-bg)}}
+.nc-msg__source:active{{transform:scale(.95)}}
 
 /* Typing */
 .nc-typing .nc-msg__bubble{{
@@ -327,7 +339,7 @@ html,body{{
   background:var(--elevated);
   transform:translateY(-1px);
 }}
-.nc-quick__btn:active{{transform:scale(.97)}}
+.nc-quick__btn:active{{transform:scale(.95);background:var(--fill)}}
 
 /* ===== Input Area ===== */
 .nc-input-area{{
@@ -397,22 +409,146 @@ html,body{{
   .nc-brand__logo{{width:120px;margin-bottom:44px}}
   .nc-brand__tagline{{font-size:1.25rem}}
 }}
+
 @media(max-width:899px){{
+  /* Brand panel hidden on mobile */
   .nc-brand{{display:none}}
-  .nc-header__logo-m{{display:block}}
-  .nc-messages{{padding:20px 16px 12px}}
-  .nc-msg--bot{{padding-right:24px}}
-  .nc-msg--user{{padding-left:24px}}
-  .nc-msg--bot .nc-msg__bubble,.nc-msg--user .nc-msg__bubble{{
-    font-size:.88rem;padding:12px 16px;
+
+  /* App shell */
+  #nc-app{{height:100vh;height:100dvh;height:-webkit-fill-available}}
+
+  /* Header — compact with centered layout */
+  .nc-header{{
+    padding:max(12px,env(safe-area-inset-top)) 16px 10px;
+    background:rgba(0,0,0,.85);
+    -webkit-backdrop-filter:saturate(180%) blur(24px);
+    backdrop-filter:saturate(180%) blur(24px);
+    border-bottom:1px solid rgba(255,255,255,.06);
   }}
-  .nc-banner{{font-size:.68rem;padding:8px 14px;margin-bottom:16px}}
-  .nc-quick{{gap:6px}}
-  .nc-quick__btn{{font-size:.75rem;padding:9px 15px;border-radius:12px}}
-  .nc-input-area{{padding:10px 16px 12px}}
-  .nc-input{{font-size:16px}}
-  .nc-header{{padding:12px 16px}}
-  .nc-footer{{padding:4px 16px max(8px,env(safe-area-inset-bottom))}}
+  .nc-header__logo-m{{display:block;height:20px;opacity:.85}}
+  .nc-header__title{{font-size:.72rem;letter-spacing:.12em}}
+  .nc-header__badge{{font-size:.6rem;padding:2px 8px 2px 5px}}
+  .nc-header__badge-dot{{width:4px;height:4px}}
+  .nc-lang{{
+    padding:5px 10px;font-size:.65rem;border-radius:6px;
+    background:rgba(255,255,255,.08);
+  }}
+  .nc-lang:active{{transform:scale(.92)}}
+
+  /* Messages area */
+  .nc-messages{{
+    padding:16px 14px 8px;
+    -webkit-overflow-scrolling:touch;
+  }}
+  .nc-msg--bot{{padding-right:16px;padding-left:36px}}
+  .nc-msg--bot::before{{width:24px;height:24px;background-size:13px}}
+  .nc-msg--user{{padding-left:40px}}
+  .nc-msg--bot .nc-msg__bubble{{
+    font-size:.92rem;padding:12px 16px;line-height:1.75;
+    border-radius:22px 22px 22px 6px;
+    background:rgba(28,28,30,.8);
+  }}
+  .nc-msg--user .nc-msg__bubble{{
+    font-size:.92rem;padding:12px 16px;line-height:1.7;
+    border-radius:22px 22px 6px 22px;
+  }}
+  .nc-msg--bot+.nc-msg--user,.nc-msg--user+.nc-msg--bot{{margin-top:10px}}
+
+  /* Banner */
+  .nc-banner{{
+    font-size:.66rem;padding:7px 12px;margin-bottom:14px;
+    border-radius:10px;background:rgba(123,160,109,.06);
+  }}
+  .nc-banner__dot{{width:3px;height:3px}}
+
+  /* Quick actions — horizontal scroll */
+  .nc-quick{{
+    display:flex;flex-wrap:nowrap;gap:8px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    padding:2px 0 6px;margin-top:14px;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+  }}
+  .nc-quick::-webkit-scrollbar{{display:none}}
+  .nc-quick__btn{{
+    font-size:.8rem;padding:10px 18px;border-radius:20px;
+    white-space:nowrap;flex-shrink:0;
+    background:rgba(28,28,30,.7);
+    border:1px solid rgba(255,255,255,.06);
+  }}
+  .nc-quick__btn:hover{{background:var(--elevated);transform:none}}
+
+  /* Sources */
+  .nc-msg__sources{{gap:8px;margin-top:6px;padding-left:0}}
+  .nc-msg__source{{font-size:.7rem;padding:6px 12px;min-height:32px;border-radius:8px}}
+
+  /* Meta */
+  .nc-msg__meta{{margin-top:4px}}
+  .nc-msg__time{{font-size:.58rem;opacity:.5}}
+
+  /* Typing */
+  .nc-typing .nc-msg__bubble{{padding:14px 18px!important}}
+  .nc-typing__label{{font-size:.6rem}}
+
+  /* Input area — sticky bottom */
+  .nc-input-area{{
+    padding:8px 14px 4px;
+    background:rgba(0,0,0,.9);
+    -webkit-backdrop-filter:saturate(150%) blur(20px);
+    backdrop-filter:saturate(150%) blur(20px);
+    border-top:1px solid rgba(255,255,255,.04);
+  }}
+  .nc-form{{
+    padding:4px 4px 4px 18px;
+    border-radius:22px;
+    background:rgba(28,28,30,.9);
+    border:1px solid rgba(255,255,255,.06);
+  }}
+  .nc-input{{
+    font-size:16px;padding:12px 0;
+    min-height:44px;
+  }}
+  .nc-send{{
+    width:38px;height:38px;
+    transition:all .15s var(--ease);
+  }}
+  .nc-send:active{{transform:scale(.85)}}
+  .nc-send:hover{{transform:none;opacity:1}}
+
+  /* Footer — minimal on mobile */
+  .nc-footer{{
+    padding:4px 16px max(6px,env(safe-area-inset-bottom));
+    gap:12px;
+    background:rgba(0,0,0,.9);
+  }}
+  .nc-footer__link{{font-size:.58rem;letter-spacing:.08em}}
+  .nc-footer__link:active{{color:var(--matcha)}}
+  .nc-footer__sep{{height:8px;opacity:.3}}
+  .nc-footer__powered{{font-size:.52rem;opacity:.3}}
+
+  /* Disable hover on touch */
+  @media(hover:none){{
+    .nc-quick__btn:hover,.nc-lang:hover,.nc-send:hover,.nc-cta:hover,.nc-msg__source:hover{{
+      transform:none;background:inherit;
+    }}
+  }}
+}}
+
+/* ===== Small phones ===== */
+@media(max-width:430px){{
+  .nc-messages{{padding:14px 10px 8px}}
+  .nc-msg--bot{{padding-right:10px;padding-left:32px}}
+  .nc-msg--bot::before{{width:22px;height:22px;background-size:12px}}
+  .nc-msg--user{{padding-left:32px}}
+  .nc-msg--bot .nc-msg__bubble,.nc-msg--user .nc-msg__bubble{{
+    font-size:.88rem;padding:10px 14px;
+  }}
+  .nc-quick__btn{{font-size:.75rem;padding:8px 14px}}
+  .nc-input-area{{padding:6px 10px 2px}}
+  .nc-form{{padding:3px 3px 3px 14px;border-radius:20px}}
+  .nc-send{{width:34px;height:34px}}
+  .nc-send svg{{width:13px;height:13px}}
+  .nc-footer{{padding:2px 12px max(4px,env(safe-area-inset-bottom));gap:10px}}
 }}
 </style>
 </head>
