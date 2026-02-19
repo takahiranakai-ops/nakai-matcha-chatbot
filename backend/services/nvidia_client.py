@@ -62,4 +62,5 @@ async def chat_completion(
         )
         response.raise_for_status()
         data = response.json()
-        return data["choices"][0]["message"]["content"]
+        msg = data["choices"][0]["message"]
+        return msg.get("content") or msg.get("reasoning_content") or ""
