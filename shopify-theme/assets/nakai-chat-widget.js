@@ -83,7 +83,10 @@
     if (panel) panel.setAttribute('aria-hidden', 'false');
     var toggle = document.getElementById('nakai-chat-toggle');
     if (toggle) toggle.setAttribute('aria-expanded', 'true');
-    if (this.input) this.input.focus();
+    // Only auto-focus on desktop to avoid mobile keyboard pushing content up
+    if (this.input && window.innerWidth > 749) {
+      this.input.focus();
+    }
   };
 
   NakaiChat.prototype.closeChat = function () {
