@@ -622,10 +622,14 @@ async def serve_test():
 
 @pwa_router.get("/app")
 async def serve_app():
-    return HTMLResponse(
-        content=APP_HTML,
-        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"},
-    )
+    try:
+        return HTMLResponse(
+            content=APP_HTML,
+            headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"},
+        )
+    except Exception as e:
+        import traceback
+        return HTMLResponse(content=f"<pre>{traceback.format_exc()}</pre>", status_code=500)
 
 
 @pwa_router.get("/manifest.json")
