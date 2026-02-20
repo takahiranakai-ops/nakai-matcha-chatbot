@@ -113,22 +113,35 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 
 /* Brand Panel (desktop) */
 .nc-brand{{
-  width:380px;flex-shrink:0;background:var(--green);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 56px;
+  width:320px;flex-shrink:0;background:var(--green);
+  display:flex;flex-direction:column;padding:48px 40px;position:relative;overflow:hidden;
 }}
-.nc-brand__logo{{width:120px;opacity:.85;margin-bottom:56px;animation:ncFadeUp .8s var(--ease) both}}
-.nc-brand__tagline{{font-family:var(--serif);font-weight:300;font-size:1.35rem;line-height:2;text-align:center;color:var(--cream);opacity:.55;margin-bottom:56px;animation:ncFadeUp .8s .12s var(--ease) both;font-style:italic}}
-.nc-brand__ctas{{display:flex;flex-direction:column;gap:12px;width:100%;max-width:200px;animation:ncFadeUp .8s .24s var(--ease) both}}
+.nc-brand__top{{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:auto}}
+.nc-brand__logo{{width:100px;opacity:.85;margin-bottom:36px;animation:ncFadeUp .8s var(--ease) both}}
+.nc-brand__tagline{{font-family:var(--serif);font-weight:300;font-size:1.1rem;line-height:2;text-align:center;color:var(--cream);opacity:.55;margin-bottom:36px;animation:ncFadeUp .8s .12s var(--ease) both;font-style:italic}}
+.nc-brand__nav{{display:flex;flex-direction:column;gap:4px;width:100%;animation:ncFadeUp .8s .2s var(--ease) both}}
+.nc-brand__nav-item{{
+  display:flex;align-items:center;gap:12px;font-family:var(--sans);font-size:.74rem;font-weight:400;
+  color:rgba(249,240,226,.5);padding:12px 16px;border-radius:12px;cursor:pointer;
+  transition:all .35s var(--ease);border:none;background:transparent;text-align:left;
+  -webkit-tap-highlight-color:transparent;width:100%;
+}}
+.nc-brand__nav-item:hover{{color:var(--cream);background:rgba(249,240,226,.08)}}
+.nc-brand__nav-item svg{{width:16px;height:16px;opacity:.5;flex-shrink:0}}
+.nc-brand__nav-item:hover svg{{opacity:.8}}
+.nc-brand__bottom{{margin-top:auto;padding-top:32px}}
+.nc-brand__ctas{{display:flex;flex-direction:column;gap:10px;width:100%;animation:ncFadeUp .8s .3s var(--ease) both}}
 .nc-brand__cta{{
-  display:block;text-align:center;font-family:var(--sans);font-size:.68rem;font-weight:500;
-  letter-spacing:.16em;text-transform:uppercase;text-decoration:none;
-  padding:15px 20px;border-radius:10px;cursor:pointer;transition:all .5s var(--ease);
+  display:block;text-align:center;font-family:var(--sans);font-size:.66rem;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;text-decoration:none;
+  padding:14px 20px;border-radius:10px;cursor:pointer;transition:all .5s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }}
 .nc-brand__cta--p{{background:rgba(249,240,226,.12);color:var(--cream);border:none}}
 .nc-brand__cta--p:hover{{background:rgba(249,240,226,.22)}}
 .nc-brand__cta--s{{background:transparent;color:rgba(249,240,226,.4);border:1px solid rgba(249,240,226,.1)}}
 .nc-brand__cta--s:hover{{color:var(--cream);border-color:rgba(249,240,226,.28)}}
+.nc-brand__copy{{font-family:var(--sans);font-size:.58rem;color:rgba(249,240,226,.2);text-align:center;margin-top:20px;letter-spacing:.06em}}
 
 /* Main */
 .nc-main{{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;overflow:hidden}}
@@ -149,8 +162,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 /* Hero */
 .nc-hero{{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 52px);min-height:calc(100dvh - 52px);padding:0 28px;text-align:center}}
 .nc-hero__sub{{font-family:var(--serif);font-weight:300;font-size:.78rem;font-style:italic;letter-spacing:.08em;color:var(--g35);margin-bottom:20px;animation:ncFadeUp .7s var(--ease) both}}
-.nc-hero__greeting{{font-family:var(--serif);font-size:clamp(1.6rem,4.5vw,2.1rem);font-weight:300;font-style:italic;color:var(--green);line-height:1.55;max-width:440px;margin-bottom:max(36px,4.5vh);animation:ncFadeUp .7s .08s var(--ease) both}}
-.nc-hero__input-wrap{{width:100%;max-width:440px;animation:ncFadeUp .7s .16s var(--ease) both}}
+.nc-hero__greeting{{font-family:var(--serif);font-size:clamp(1.6rem,4.5vw,2.1rem);font-weight:300;font-style:italic;color:var(--green);line-height:1.55;max-width:520px;margin-bottom:max(36px,4.5vh);animation:ncFadeUp .7s .08s var(--ease) both}}
+.nc-hero__input-wrap{{width:100%;max-width:520px;animation:ncFadeUp .7s .16s var(--ease) both}}
 .nc-hero__scroll-hint{{margin-top:max(32px,4vh);opacity:.15;animation:ncScrollHint 2.5s ease-in-out infinite,ncFadeUp .7s .3s var(--ease) both;transition:opacity .5s var(--ease)}}
 .nc-hero__scroll-hint.nc-hidden-hint{{opacity:0}}
 @keyframes ncScrollHint{{0%,100%{{transform:translateY(0)}}50%{{transform:translateY(6px)}}}}
@@ -162,7 +175,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__input::placeholder{{color:var(--g35);font-weight:300}}
 
 /* Topic pills */
-.nc-topics{{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:480px;padding:0 28px;margin-top:max(36px,4vh);animation:ncFadeUp .7s .24s var(--ease) both}}
+.nc-topics{{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:580px;padding:0 28px;margin-top:max(36px,4vh);animation:ncFadeUp .7s .24s var(--ease) both}}
 .nc-topics__pill{{
   font-family:var(--sans);font-size:.78rem;font-weight:400;color:var(--g50);
   background:var(--g03);border:none;border-radius:22px;
@@ -175,11 +188,11 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-topics__pill--primary:hover{{background:var(--g12)}}
 
 /* Sections */
-.nc-section{{width:100%;max-width:520px;padding:0 28px;margin-top:max(48px,6vh)}}
+.nc-section{{width:100%;max-width:720px;padding:0 28px;margin-top:max(48px,6vh)}}
 .nc-section__title{{font-family:var(--serif);font-weight:300;font-size:.85rem;font-style:italic;letter-spacing:.05em;color:var(--g35);margin-bottom:20px;padding-left:4px}}
 
 /* Product Cards v2 */
-.nc-products-grid{{display:flex;flex-direction:column;gap:16px}}
+.nc-products-grid{{display:grid;grid-template-columns:1fr;gap:16px}}
 .nc-pcard-v2{{background:var(--white);border:none;border-radius:20px;overflow:hidden;cursor:pointer;transition:all .5s var(--ease);-webkit-tap-highlight-color:transparent;box-shadow:var(--shadow-s)}}
 .nc-pcard-v2:hover{{box-shadow:var(--shadow-m)}}
 .nc-pcard-v2:active{{transform:scale(.98);transition-duration:.12s}}
@@ -308,7 +321,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 @keyframes ncBreathe{{0%,100%{{opacity:.5;transform:scale(1)}}50%{{opacity:.2;transform:scale(.8)}}}}
 
 /* Messages */
-.nc-messages{{flex:1;overflow-y:auto;padding:24px 24px 16px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth}}
+.nc-messages{{flex:1;overflow-y:auto;padding:24px 24px 16px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth;max-width:760px;width:100%;margin:0 auto}}
 .nc-messages::-webkit-scrollbar{{width:0;display:none}}
 .nc-banner{{text-align:center;padding:10px 16px;margin:0 auto 24px;font-family:var(--serif);font-size:.74rem;font-weight:300;font-style:italic;color:var(--g20);letter-spacing:.03em}}
 .nc-msg{{display:flex;flex-direction:column;animation:ncMsgIn .5s var(--ease) both}}
@@ -344,7 +357,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-quick__btn:active{{transform:scale(.96);transition-duration:.12s}}
 
 /* Input */
-.nc-input-area{{padding:12px 24px 16px;flex-shrink:0}}
+.nc-input-area{{padding:12px 24px 16px;flex-shrink:0;max-width:760px;width:100%;margin:0 auto}}
 .nc-form{{display:flex;align-items:center;gap:8px;background:var(--white);border:none;border-radius:28px;padding:5px 5px 5px 22px;transition:box-shadow .5s var(--ease);box-shadow:var(--shadow-s)}}
 .nc-form:focus-within{{box-shadow:var(--shadow-m)}}
 .nc-input{{flex:1;border:none;background:transparent;color:var(--green);font-family:inherit;font-size:.88rem;font-weight:400;outline:none;padding:11px 0}}
@@ -362,8 +375,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 
 @keyframes ncFadeUp{{from{{opacity:0;transform:translateY(12px)}}to{{opacity:1;transform:translateY(0)}}}}
 
-@media(min-width:900px){{.nc-topbar{{display:none}}.nc-products-grid{{flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}}.nc-products-grid::-webkit-scrollbar{{display:none}}.nc-pcard-v2{{flex-shrink:0;width:280px}}.nc-recipes-grid{{grid-template-columns:repeat(3,1fr)}}.nc-hero{{min-height:calc(100vh - 20px)}}.nc-invite-sheet{{max-width:420px;left:50%;right:auto;transform:translateX(-50%) translateY(100%)}}.nc-invite-sheet--active{{transform:translateX(-50%) translateY(0)}}}}
-@media(max-width:1199px){{.nc-brand{{width:320px;padding:56px 40px}}.nc-brand__logo{{width:100px;margin-bottom:44px}}.nc-brand__tagline{{font-size:1.15rem}}}}
+@media(min-width:900px){{.nc-topbar{{display:none}}.nc-products-grid{{grid-template-columns:repeat(3,1fr)}}.nc-pcard-v2__visual{{height:120px}}.nc-recipes-grid{{grid-template-columns:repeat(3,1fr)}}.nc-hero{{min-height:calc(100vh - 20px)}}.nc-invite-sheet{{max-width:420px;left:50%;right:auto;transform:translateX(-50%) translateY(100%)}}.nc-invite-sheet--active{{transform:translateX(-50%) translateY(0)}}.nc-invite{{max-width:720px;margin:0 auto}}.nc-msg--bot{{padding-right:80px}}.nc-msg--user{{padding-left:80px}}}}
+@media(min-width:1400px){{.nc-section{{max-width:800px}}.nc-products-grid{{gap:20px}}.nc-messages{{max-width:840px}}.nc-input-area{{max-width:840px}}}}
 @media(max-width:899px){{
   .nc-brand{{display:none}}
   #nc-app{{height:100vh;height:100dvh;height:-webkit-fill-available}}
@@ -398,11 +411,23 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 <body>
 <div id="nc-app">
   <aside class="nc-brand">
-    <img class="nc-brand__logo" src="data:image/png;base64,{_LOGO_WHITE_B64}" alt="NAKAI" />
-    <p class="nc-brand__tagline">Grounded in nature,<br>elevated in ritual.</p>
-    <div class="nc-brand__ctas">
-      <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-brand__cta nc-brand__cta--p">Shop NAKAI</a>
-      <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-brand__cta nc-brand__cta--s">Wholesale</a>
+    <div class="nc-brand__top">
+      <img class="nc-brand__logo" src="data:image/png;base64,{_LOGO_WHITE_B64}" alt="NAKAI" />
+      <p class="nc-brand__tagline">Grounded in nature,<br>elevated in ritual.</p>
+    </div>
+    <nav class="nc-brand__nav">
+      <button class="nc-brand__nav-item" id="nc-nav-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>Home</button>
+      <button class="nc-brand__nav-item" id="nc-nav-find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span id="nc-nav-find-label">Find My Matcha</span></button>
+      <button class="nc-brand__nav-item" id="nc-nav-brew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg><span id="nc-nav-brew-label">Barista Guide</span></button>
+      <button class="nc-brand__nav-item" id="nc-nav-recipes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span id="nc-nav-recipes-label">Recipes</span></button>
+      <button class="nc-brand__nav-item" id="nc-nav-faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="nc-nav-faq-label">About Matcha</span></button>
+    </nav>
+    <div class="nc-brand__bottom">
+      <div class="nc-brand__ctas">
+        <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-brand__cta nc-brand__cta--p">Shop NAKAI</a>
+        <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-brand__cta nc-brand__cta--s">Wholesale</a>
+      </div>
+      <p class="nc-brand__copy">&copy; NAKAI Matcha</p>
     </div>
   </aside>
   <div class="nc-main">
@@ -645,6 +670,10 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     $('nc-h-ws').textContent=t('hWs');
     $('nc-f-shop').textContent=t('hShop');
     $('nc-f-ws').textContent=t('hWs');
+    var nfl=$('nc-nav-find-label');if(nfl)nfl.textContent=t('tFind');
+    var nbl=$('nc-nav-brew-label');if(nbl)nbl.textContent=t('tBrew');
+    var nrl=$('nc-nav-recipes-label');if(nrl)nrl.textContent=t('tProduct');
+    var nql=$('nc-nav-faq-label');if(nql)nql.textContent=t('tFaq');
     buildQuickActions();
     buildProductCards();
     buildRecipeCards();
@@ -895,6 +924,12 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     $('nc-t-brew').addEventListener('click',function(){{showChat(t('brewMsg'))}});
     $('nc-t-product').addEventListener('click',function(){{showChat(t('productMsg'))}});
     $('nc-t-faq').addEventListener('click',function(){{showChat(t('faqMsg'))}});
+    /* Sidebar nav */
+    var nh=$('nc-nav-home');if(nh)nh.addEventListener('click',showHome);
+    var nf=$('nc-nav-find');if(nf)nf.addEventListener('click',function(){{showChat(t('findMsg'))}});
+    var nb=$('nc-nav-brew');if(nb)nb.addEventListener('click',function(){{showChat(t('brewMsg'))}});
+    var nr=$('nc-nav-recipes');if(nr)nr.addEventListener('click',function(){{showChat(t('productMsg'))}});
+    var nq=$('nc-nav-faq');if(nq)nq.addEventListener('click',function(){{showChat(t('faqMsg'))}});
     $('nc-topbar-mark').addEventListener('click',function(){{var s=$('nc-home-scroll');if(s)s.scrollTo({{top:0,behavior:'smooth'}})}});
     initTopbarScroll();
     $('nc-overlay-bg').addEventListener('click',closeInviteSheet);
