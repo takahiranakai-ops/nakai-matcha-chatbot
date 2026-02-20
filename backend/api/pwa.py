@@ -147,18 +147,19 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 /* Find My Matcha CTA */
 .nc-find-cta{{width:100%;max-width:480px;text-align:center;margin-bottom:max(28px,3.5vh);animation:ncFadeUp .7s .22s var(--ease) both}}
 .nc-find-cta__btn{{
-  display:inline-flex;align-items:center;gap:10px;
+  display:inline-flex;align-items:center;gap:8px;
   font-family:var(--serif);font-size:1.05rem;font-weight:400;font-style:italic;
-  color:var(--white);background:var(--green);
-  border:none;border-radius:32px;padding:16px 38px;
+  color:var(--green);background:transparent;
+  border:none;border-bottom:1px solid var(--g12);border-radius:0;
+  padding:6px 2px 8px;
   cursor:pointer;transition:all .5s var(--ease);
-  -webkit-tap-highlight-color:transparent;
-  box-shadow:0 2px 8px rgba(64,101,70,.12),0 8px 24px rgba(64,101,70,.15);
+  -webkit-tap-highlight-color:transparent;box-shadow:none;
 }}
-.nc-find-cta__btn:hover{{transform:translateY(-2px);box-shadow:0 4px 12px rgba(64,101,70,.15),0 16px 40px rgba(64,101,70,.2)}}
-.nc-find-cta__btn:active{{transform:scale(.97);box-shadow:0 2px 8px rgba(64,101,70,.1)}}
-.nc-find-cta__arrow{{width:18px;height:18px;opacity:.6;transition:transform .5s var(--ease)}}
-.nc-find-cta__btn:hover .nc-find-cta__arrow{{transform:translateX(3px)}}
+.nc-find-cta__btn:hover{{border-color:var(--g50)}}
+.nc-find-cta__btn:active{{opacity:.7}}
+.nc-find-cta__arrow{{width:16px;height:16px;opacity:.25;transition:all .5s var(--ease);animation:ncArrowDrift 3.5s ease-in-out infinite}}
+.nc-find-cta__btn:hover .nc-find-cta__arrow{{opacity:.55;transform:translateX(3px);animation:none}}
+@keyframes ncArrowDrift{{0%,100%{{transform:translateX(0);opacity:.25}}50%{{transform:translateX(2px);opacity:.4}}}}
 
 /* Home Input */
 .nc-home__input-wrap{{width:100%;max-width:480px;animation:ncFadeUp .7s .28s var(--ease) both}}
@@ -323,7 +324,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   .nc-footer{{padding:3px 12px max(4px,env(safe-area-inset-bottom))}}
   .nc-home__scroll{{padding:max(14px,2vh) 18px 28px}}.nc-home__logo{{width:110px}}
   .nc-home__greeting{{font-size:1.4rem}}
-  .nc-find-cta__btn{{font-size:.95rem;padding:14px 30px}}
+  .nc-find-cta__btn{{font-size:.95rem}}
   .nc-home__card-row{{margin:0 -18px;padding-left:18px;padding-right:18px;gap:12px}}
   .nc-pcard{{width:160px}}.nc-pcard__body{{padding:18px 16px 20px}}
   .nc-rcard{{width:130px;padding:18px 16px}}
