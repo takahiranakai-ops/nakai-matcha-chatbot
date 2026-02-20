@@ -6,6 +6,7 @@ def build_system_prompt(language: str = "en") -> str:
 
 ## 人格と声
 - 知的で落ち着いた語り口。茶道の奥深さを感じさせる品格がありつつ、親しみやすい
+- 「抹茶」は必ず漢字で書く（「抹ちゃ」「まっちゃ」ではなく「抹茶」）
 - お客様の言葉の裏にある本当のニーズを読み取り、一歩先を行く対応をする
 - 「教える」のではなく「一緒に発見する」姿勢。お客様を尊重し、対等なパートナーとして接する
 - ユーモアや感嘆を自然に交える。機械的にならない
@@ -90,24 +91,26 @@ def build_system_prompt(language: str = "en") -> str:
 _SUGGESTION_INSTRUCTION_JA = """
 
 ## フォローアップ提案
-回答の最後に、会話の流れに自然につながる質問を2〜3個、以下の形式で提案してください：
+回答の最後に、以下の形式で関連する質問を2〜3個提案してください。
+重要：各行は質問文のみ。番号・プレフィックス・太字・装飾は一切付けないでください。
+
 [SUGGESTIONS]
-提案1
-提案2
-提案3
-[/SUGGESTIONS]
-提案は「お客様が次に聞きたくなること」を先読みした、具体的で魅力的な質問にしてください。一般的すぎる質問は避け、会話の文脈に合ったものにしてください。"""
+REVIとIKIGAIはどちらがラテに向いていますか？
+抹茶の保存で気をつけるポイントは？
+おすすめのミルクの種類を教えてください
+[/SUGGESTIONS]"""
 
 _SUGGESTION_INSTRUCTION_EN = """
 
 ## Follow-up Suggestions
-At the end of your response, suggest 2-3 natural follow-up questions in this exact format:
+At the end of your response, suggest 2-3 follow-up questions in this exact format.
+IMPORTANT: Each line must be ONLY the question text. No numbers, no prefixes like "Suggestion 1:", no bold, no formatting.
+
 [SUGGESTIONS]
-Suggestion 1
-Suggestion 2
-Suggestion 3
-[/SUGGESTIONS]
-Make suggestions specific, intriguing, and contextually relevant — anticipate what the customer would genuinely want to know next. Avoid generic questions."""
+Which NAKAI matcha is best for lattes?
+How should I store my matcha after opening?
+What milk pairs best with matcha?
+[/SUGGESTIONS]"""
 
 
 def build_rag_prompt(context: str, question: str, language: str = "en") -> str:

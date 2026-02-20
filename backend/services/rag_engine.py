@@ -27,6 +27,12 @@ _RELEVANCE_THRESHOLD = 0.82
 _RETRIEVAL_MULTIPLIER = 3
 
 
+# Strip common LLM prefixes from suggestion lines
+_SUGGESTION_PREFIX_RE = re.compile(
+    r"^(?:(?:Suggestion|提案)\s*\**\d*\**\s*[:：]\s*)?(?:\*\*)?(.+?)(?:\*\*)?$"
+)
+
+
 def _parse_suggestions(response: str) -> tuple[str, list[str]]:
     """Extract follow-up suggestions from the LLM response.
     Returns (clean_response, suggestions_list)."""
@@ -35,11 +41,19 @@ def _parse_suggestions(response: str) -> tuple[str, list[str]]:
         return response.strip(), []
 
     suggestions_text = match.group(1).strip()
-    suggestions = [
-        line.strip().lstrip("0123456789.-) ")
-        for line in suggestions_text.split("\n")
-        if line.strip()
-    ]
+    suggestions = []
+    for line in suggestions_text.split("\n"):
+        line = line.strip().lstrip("0123456789.-) ")
+        if not line:
+            continue
+        # Strip "Suggestion **1**: ..." or "提案1: ..." prefixes
+        m = _SUGGESTION_PREFIX_RE.match(line)
+        if m:
+            line = m.group(1).strip()
+        # Remove any remaining bold markers
+        line = line.replace("**", "")
+        if line:
+            suggestions.append(line)
     clean = response[: match.start()].strip()
     return clean, suggestions[:3]
 
