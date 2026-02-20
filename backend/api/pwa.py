@@ -140,15 +140,30 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 /* Greeting */
 .nc-home__greeting{{font-family:var(--serif);font-size:1.7rem;font-weight:300;font-style:italic;color:var(--green);text-align:center;line-height:1.5;margin-bottom:max(32px,4vh);max-width:440px;animation:ncUp .5s .12s var(--ease) both}}
 
+/* Find My Matcha CTA */
+.nc-find-cta{{width:100%;max-width:480px;text-align:center;margin-bottom:max(24px,3vh);animation:ncUp .5s .16s var(--ease) both}}
+.nc-find-cta__btn{{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--serif);font-size:1rem;font-weight:400;font-style:italic;
+  color:var(--white);background:var(--green);
+  border:none;border-radius:28px;padding:14px 32px;
+  cursor:pointer;transition:all .25s var(--ease);
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 2px 12px rgba(64,101,70,.18);
+}}
+.nc-find-cta__btn:hover{{opacity:.88;box-shadow:0 4px 20px rgba(64,101,70,.25)}}
+.nc-find-cta__btn:active{{transform:scale(.97)}}
+.nc-find-cta__arrow{{width:18px;height:18px;opacity:.7}}
+
 /* Home Input */
-.nc-home__input-wrap{{width:100%;max-width:480px;animation:ncUp .5s .18s var(--ease) both}}
+.nc-home__input-wrap{{width:100%;max-width:480px;animation:ncUp .5s .22s var(--ease) both}}
 .nc-home__form{{display:flex;align-items:center;gap:8px;background:var(--white);border:none;border-radius:24px;padding:4px 4px 4px 18px;transition:all .2s;box-shadow:0 1px 6px rgba(64,101,70,.06)}}
 .nc-home__form:focus-within{{box-shadow:0 2px 12px rgba(64,101,70,.1)}}
 .nc-home__input{{flex:1;border:none;background:transparent;color:var(--green);font-family:inherit;font-size:16px;font-weight:400;outline:none;padding:12px 0}}
 .nc-home__input::placeholder{{color:var(--g40);font-weight:300}}
 
 /* Chips */
-.nc-home__chips{{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%;max-width:480px;margin-top:20px;animation:ncUp .5s .24s var(--ease) both}}
+.nc-home__chips{{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%;max-width:480px;margin-top:20px;animation:ncUp .5s .28s var(--ease) both}}
 .nc-home__chip{{
   font-family:inherit;font-size:.74rem;font-weight:300;color:var(--g60);
   background:transparent;border:none;border-radius:0;
@@ -298,6 +313,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   .nc-footer{{padding:2px 10px max(4px,env(safe-area-inset-bottom))}}
   .nc-home__scroll{{padding:max(12px,2vh) 16px 24px}}.nc-home__logo{{width:110px}}
   .nc-home__greeting{{font-size:1.45rem}}
+  .nc-find-cta__btn{{font-size:.92rem;padding:12px 28px}}
   .nc-home__card-row{{margin:0 -16px;padding-left:16px;padding-right:16px;gap:10px}}
   .nc-pcard{{width:150px}}.nc-rcard{{width:125px;padding:16px 14px}}
   .nc-home__section{{margin-top:max(20px,2vh)}}.nc-home__section-title{{font-size:.76rem}}
@@ -327,6 +343,12 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
         <img class="nc-home__logo" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" />
         <p class="nc-home__sub" id="nc-home-sub">Matcha Concierge</p>
         <h1 class="nc-home__greeting" id="nc-home-greeting">What can I help you with?</h1>
+        <div class="nc-find-cta">
+          <button class="nc-find-cta__btn" id="nc-find-btn">
+            <span id="nc-find-label">Find My Matcha</span>
+            <svg class="nc-find-cta__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
         <div class="nc-home__input-wrap">
           <form class="nc-home__form" id="nc-home-form">
             <input type="text" class="nc-home__input" id="nc-home-input" autocomplete="off" maxlength="500" />
@@ -339,7 +361,6 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           <button class="nc-home__chip" data-chat-msg="brew" id="nc-c-brew">Barista Guide</button>
           <button class="nc-home__chip" data-chat-msg="product" id="nc-c-product">NAKAI Matcha Product Recipes</button>
           <button class="nc-home__chip" data-chat-msg="faq" id="nc-c-faq">Learn about Matcha</button>
-          <button class="nc-home__chip" data-chat-msg="find" id="nc-c-find">Find My Matcha</button>
         </div>
         <div class="nc-home__section">
           <h2 class="nc-home__section-title" id="nc-sec-products">Our Matcha</h2>
@@ -416,7 +437,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       q4:'Recommend',q4m:'What matcha products do you recommend?',
       error:"Connection issue. Please try again.",
       sub:'AI Matcha Concierge',homeGreeting:'What can I help you with?',
-      mBrew:'Barista Guide',mProduct:'NAKAI Matcha Product Recipes',mFaq:'Learn about Matcha',mFind:'Find My Matcha',
+      findCta:'Find My Matcha',
+      mBrew:'Barista Guide',mProduct:'NAKAI Matcha Product Recipes',mFaq:'Learn about Matcha',
       hShop:'Shop',hWs:'Wholesale',
       brewMsg:'How do I brew the perfect cup of matcha? Please include water temperature, matcha-to-water ratio, and whisking technique.',
       productMsg:'Tell me about NAKAI matcha products. What grades do you offer and what makes each one special?',
@@ -444,7 +466,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       q4:'おすすめ',q4m:'おすすめの抹茶商品を教えてください',
       error:'接続に問題が発生しました。もう一度お試しください。',
       sub:'AI 抹茶コンシェルジュ',homeGreeting:'何をお手伝いしましょうか？',
-      mBrew:'バリスタガイド',mProduct:'NAKAI Matcha プロダクトレシピ',mFaq:'抹茶について学ぶ',mFind:'自分に合った抹茶を探す',
+      findCta:'自分に合った抹茶を探す',
+      mBrew:'バリスタガイド',mProduct:'NAKAI Matcha プロダクトレシピ',mFaq:'抹茶について学ぶ',
       hShop:'ショップ',hWs:'卸売',
       brewMsg:'美味しい抹茶の点て方を教えてください。水温、抹茶と水の割合、茶筅の使い方を含めてください。',
       productMsg:'NAKAIの抹茶商品について教えてください。どんなグレードがあり、それぞれの特徴は何ですか？',
@@ -488,7 +511,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     $('nc-c-brew').textContent=t('mBrew');
     $('nc-c-product').textContent=t('mProduct');
     $('nc-c-faq').textContent=t('mFaq');
-    $('nc-c-find').textContent=t('mFind');
+    $('nc-find-label').textContent=t('findCta');
     $('nc-h-shop').textContent=t('hShop');
     $('nc-h-ws').textContent=t('hWs');
     $('nc-f-shop').textContent=t('hShop');
@@ -626,6 +649,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     document.querySelectorAll('.nc-lang-btn').forEach(function(b){{
       b.addEventListener('click',function(){{setLang(this.getAttribute('data-lang'))}});
     }});
+    $('nc-find-btn').addEventListener('click',function(){{showChat(t('findMsg'))}});
     document.querySelectorAll('.nc-home__chip[data-chat-msg]').forEach(function(c){{
       c.addEventListener('click',function(){{
         var key=this.getAttribute('data-chat-msg');
