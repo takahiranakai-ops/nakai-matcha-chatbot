@@ -113,7 +113,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 48px;
 }}
 .nc-brand__logo{{width:120px;opacity:.85;margin-bottom:48px;animation:ncUp .6s var(--ease) both}}
-.nc-brand__tagline{{font-family:var(--serif);font-weight:400;font-size:1.4rem;line-height:1.9;text-align:center;color:var(--cream);opacity:.7;margin-bottom:48px;animation:ncUp .6s .1s var(--ease) both;font-style:italic}}
+.nc-brand__tagline{{font-family:var(--serif);font-weight:300;font-size:1.4rem;line-height:1.9;text-align:center;color:var(--cream);opacity:.65;margin-bottom:48px;animation:ncUp .6s .1s var(--ease) both;font-style:italic}}
 .nc-brand__ctas{{display:flex;flex-direction:column;gap:10px;width:100%;max-width:200px;animation:ncUp .6s .2s var(--ease) both}}
 .nc-brand__cta{{
   display:block;text-align:center;font-family:var(--sans);font-size:.7rem;font-weight:500;
@@ -138,12 +138,12 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__sub{{font-family:var(--serif);font-weight:400;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--g40);margin-bottom:max(36px,5vh);animation:ncUp .5s .06s var(--ease) both}}
 
 /* Greeting */
-.nc-home__greeting{{font-family:var(--serif);font-size:1.7rem;font-weight:400;color:var(--green);text-align:center;line-height:1.5;margin-bottom:max(24px,3vh);max-width:440px;animation:ncUp .5s .12s var(--ease) both}}
+.nc-home__greeting{{font-family:var(--serif);font-size:1.7rem;font-weight:300;color:var(--green);text-align:center;line-height:1.5;margin-bottom:max(28px,3.5vh);max-width:440px;animation:ncUp .5s .12s var(--ease) both}}
 
 /* Home Input */
 .nc-home__input-wrap{{width:100%;max-width:480px;animation:ncUp .5s .18s var(--ease) both}}
-.nc-home__form{{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--g20);border-radius:24px;padding:4px 4px 4px 18px;transition:all .2s;box-shadow:0 2px 8px rgba(64,101,70,.06)}}
-.nc-home__form:focus-within{{border-color:var(--g40);box-shadow:0 2px 12px rgba(64,101,70,.1)}}
+.nc-home__form{{display:flex;align-items:center;gap:8px;background:var(--white);border:none;border-radius:24px;padding:4px 4px 4px 18px;transition:all .2s;box-shadow:0 1px 6px rgba(64,101,70,.06)}}
+.nc-home__form:focus-within{{box-shadow:0 2px 12px rgba(64,101,70,.1)}}
 .nc-home__input{{flex:1;border:none;background:transparent;color:var(--green);font-family:inherit;font-size:16px;font-weight:400;outline:none;padding:12px 0}}
 .nc-home__input::placeholder{{color:var(--g40);font-weight:300}}
 
@@ -151,48 +151,48 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__chips{{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:480px;margin-top:16px;animation:ncUp .5s .24s var(--ease) both}}
 .nc-home__chip{{
   font-family:inherit;font-size:.78rem;font-weight:400;color:var(--green);
-  background:var(--white);border:1px solid var(--g10);border-radius:20px;
+  background:var(--white);border:none;border-radius:20px;
   padding:10px 18px;cursor:pointer;transition:all .2s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }}
-.nc-home__chip:hover{{background:var(--g05);border-color:var(--g20)}}
-.nc-home__chip:active{{background:var(--g10);transform:scale(.96)}}
+.nc-home__chip:hover{{background:var(--g05)}}
+.nc-home__chip:active{{background:var(--g10);transform:scale(.97)}}
 
 /* Home Sections */
-.nc-home__section{{width:100%;max-width:520px;margin-top:max(28px,3vh)}}
+.nc-home__section{{width:100%;max-width:520px;margin-top:max(32px,4vh)}}
 .nc-home__section:first-of-type{{animation:ncUp .5s .3s var(--ease) both}}
 .nc-home__section:last-of-type{{animation:ncUp .5s .36s var(--ease) both}}
-.nc-home__section-title{{font-family:var(--serif);font-weight:400;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--g60);margin-bottom:14px;padding-left:2px}}
+.nc-home__section-title{{font-family:var(--serif);font-weight:400;font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g40);margin-bottom:16px;padding-left:2px}}
 .nc-home__card-row{{display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:8px;margin:0 -24px;padding-left:24px;padding-right:24px;scrollbar-width:none}}
 .nc-home__card-row::-webkit-scrollbar{{display:none}}
 
 /* Product Card */
-.nc-pcard{{flex-shrink:0;width:160px;scroll-snap-align:start;background:var(--white);border:1px solid var(--g10);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent}}
-.nc-pcard:hover{{border-color:var(--g20);transform:translateY(-2px);box-shadow:0 4px 12px rgba(64,101,70,.08)}}
+.nc-pcard{{flex-shrink:0;width:160px;scroll-snap-align:start;background:var(--white);border:none;border-radius:16px;overflow:hidden;cursor:pointer;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent}}
+.nc-pcard:hover{{transform:translateY(-2px);box-shadow:0 4px 16px rgba(64,101,70,.08)}}
 .nc-pcard:active{{transform:scale(.97)}}
 .nc-pcard__img{{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}}
-.nc-pcard__badge{{position:absolute;top:8px;left:8px;font-family:var(--sans);font-size:.56rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;background:rgba(64,101,70,.85);color:var(--cream);padding:4px 9px;border-radius:6px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}}
+.nc-pcard__badge{{position:absolute;top:10px;left:10px;font-family:var(--sans);font-size:.54rem;font-weight:400;letter-spacing:.1em;text-transform:uppercase;background:rgba(249,240,226,.88);color:var(--green);padding:4px 9px;border-radius:6px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}}
 .nc-pcard__body{{padding:14px 14px 16px}}
 .nc-pcard__name{{font-family:var(--serif);font-weight:400;font-size:1rem;color:var(--green);letter-spacing:.01em}}
 .nc-pcard__desc{{font-weight:300;font-size:.7rem;color:var(--g60);margin-top:5px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 .nc-pcard__price{{font-weight:400;font-size:.68rem;color:var(--g40);margin-top:8px;letter-spacing:.03em}}
 
 /* Recipe Card */
-.nc-rcard{{flex-shrink:0;width:140px;scroll-snap-align:start;background:var(--white);border:1px solid var(--g10);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .25s var(--ease);padding:16px 14px;display:flex;flex-direction:column;gap:8px;-webkit-tap-highlight-color:transparent}}
-.nc-rcard:hover{{border-color:var(--g20);transform:translateY(-2px);box-shadow:0 4px 12px rgba(64,101,70,.08)}}
+.nc-rcard{{flex-shrink:0;width:140px;scroll-snap-align:start;background:var(--white);border:none;border-radius:14px;overflow:hidden;cursor:pointer;transition:all .25s var(--ease);padding:16px 14px;display:flex;flex-direction:column;gap:8px;-webkit-tap-highlight-color:transparent}}
+.nc-rcard:hover{{transform:translateY(-2px);box-shadow:0 4px 16px rgba(64,101,70,.08)}}
 .nc-rcard:active{{transform:scale(.97)}}
-.nc-rcard__icon{{width:36px;height:36px;border-radius:10px;background:var(--g05);border:1px solid var(--g10);display:flex;align-items:center;justify-content:center;font-size:1.1rem}}
+.nc-rcard__icon{{width:36px;height:36px;border-radius:10px;background:var(--g05);border:none;display:flex;align-items:center;justify-content:center;font-size:1.1rem}}
 .nc-rcard__name{{font-family:var(--serif);font-weight:400;font-size:.92rem;color:var(--green);letter-spacing:.01em}}
 .nc-rcard__desc{{font-weight:300;font-size:.66rem;color:var(--g60);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 
 /* Home footer */
-.nc-home__links{{display:flex;align-items:center;gap:20px;margin-top:24px;animation:ncUp .5s .42s var(--ease) both}}
+.nc-home__links{{display:flex;align-items:center;gap:20px;margin-top:max(32px,4vh);animation:ncUp .5s .42s var(--ease) both}}
 .nc-home__link{{font-size:.68rem;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--g40);text-decoration:none}}
 .nc-home__link:active{{color:var(--green)}}
 .nc-home__dot{{width:3px;height:3px;border-radius:50%;background:var(--g20)}}
 
 /* Language toggle */
-.nc-lang-toggle{{display:flex;background:var(--g05);border-radius:8px;overflow:hidden;border:1px solid var(--g10)}}
+.nc-lang-toggle{{display:flex;background:var(--g05);border-radius:8px;overflow:hidden;border:none}}
 .nc-lang-btn{{
   font-family:var(--sans);font-size:.68rem;font-weight:500;letter-spacing:.08em;
   padding:6px 14px;border:none;cursor:pointer;transition:all .2s var(--ease);
@@ -207,9 +207,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 /* Header */
 .nc-header{{
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 20px;background:rgba(249,240,226,.85);
-  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
-  border-bottom:1px solid var(--g10);flex-shrink:0;z-index:10;
+  padding:14px 20px;background:rgba(249,240,226,.92);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border-bottom:none;flex-shrink:0;z-index:10;
 }}
 .nc-header__left{{display:flex;align-items:center;gap:10px}}
 .nc-back{{display:none;background:none;border:none;color:var(--g60);font-size:1.3rem;cursor:pointer;padding:4px 8px 4px 0;-webkit-tap-highlight-color:transparent}}
@@ -226,7 +226,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-msg{{display:flex;flex-direction:column;animation:ncMsgIn .35s var(--ease) both}}
 @keyframes ncMsgIn{{from{{opacity:0;transform:translateY(6px)}}to{{opacity:1;transform:translateY(0)}}}}
 .nc-msg--bot{{align-items:flex-start;padding-right:48px}}
-.nc-msg--bot .nc-msg__bubble{{background:var(--white);border-radius:18px 18px 18px 4px;padding:16px 20px;font-size:.88rem;font-weight:400;line-height:1.85;color:var(--green);box-shadow:0 1px 4px rgba(64,101,70,.06)}}
+.nc-msg--bot .nc-msg__bubble{{background:var(--white);border-radius:18px 18px 18px 4px;padding:16px 20px;font-size:.88rem;font-weight:400;line-height:1.85;color:var(--green)}}
 .nc-msg__bubble a{{color:var(--green);font-weight:500;text-decoration:underline;text-decoration-color:var(--g20);text-underline-offset:2px}}
 .nc-msg__bubble a:hover{{text-decoration-color:var(--green)}}
 .nc-msg__bubble strong{{font-weight:600}}
@@ -238,11 +238,11 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-msg__meta{{margin-top:4px;padding-left:2px}}
 .nc-msg__time{{font-size:.6rem;color:var(--g40)}}
 .nc-suggestions{{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}}
-.nc-suggestion{{font-family:inherit;font-size:.76rem;font-weight:400;color:var(--green);background:var(--g05);border:1px solid var(--g10);border-radius:16px;padding:8px 14px;cursor:pointer;transition:all .2s var(--ease);text-align:left;line-height:1.4;-webkit-tap-highlight-color:transparent}}
-.nc-suggestion:hover{{background:var(--g10);border-color:var(--g20)}}
+.nc-suggestion{{font-family:inherit;font-size:.76rem;font-weight:400;color:var(--green);background:var(--g05);border:none;border-radius:16px;padding:8px 14px;cursor:pointer;transition:all .2s var(--ease);text-align:left;line-height:1.4;-webkit-tap-highlight-color:transparent}}
+.nc-suggestion:hover{{background:var(--g10)}}
 .nc-suggestion:active{{background:var(--g20);transform:scale(.97)}}
 .nc-msg__sources{{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px}}
-.nc-msg__source{{font-size:.7rem;color:var(--green);text-decoration:none;background:var(--g05);border:1px solid var(--g10);border-radius:8px;padding:7px 12px;-webkit-tap-highlight-color:transparent}}
+.nc-msg__source{{font-size:.7rem;color:var(--green);text-decoration:none;background:var(--g05);border:none;border-radius:8px;padding:7px 12px;-webkit-tap-highlight-color:transparent}}
 .nc-msg__source:active{{background:var(--g10)}}
 .nc-typing .nc-msg__bubble{{display:flex;gap:5px;align-items:center;padding:16px 20px!important;min-height:40px}}
 .nc-typing .nc-msg__bubble span{{width:4px;height:4px;background:var(--g20);border-radius:50%;display:inline-block;animation:ncWave 1.4s ease-in-out infinite}}
@@ -251,17 +251,18 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 @keyframes ncWave{{0%,60%,100%{{opacity:.2;transform:translateY(0)}}30%{{opacity:.8;transform:translateY(-3px)}}}}
 .nc-typing__label{{font-size:.62rem;color:var(--g40);padding-left:2px;margin-top:3px}}
 .nc-quick{{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}}
-.nc-quick__btn{{font-family:inherit;font-size:.76rem;font-weight:400;color:var(--green);background:var(--white);border:1px solid var(--g10);border-radius:20px;padding:9px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent}}
+.nc-quick__btn{{font-family:inherit;font-size:.76rem;font-weight:400;color:var(--green);background:var(--white);border:none;border-radius:20px;padding:9px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent}}
 .nc-quick__btn:active{{background:var(--g05);transform:scale(.96)}}
 
 /* Input */
 .nc-input-area{{padding:10px 20px 14px;flex-shrink:0}}
-.nc-form{{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--g10);border-radius:24px;padding:4px 4px 4px 18px;transition:border-color .2s}}
-.nc-form:focus-within{{border-color:var(--g20)}}
+.nc-form{{display:flex;align-items:center;gap:8px;background:var(--white);border:none;border-radius:24px;padding:4px 4px 4px 18px;transition:box-shadow .2s}}
+.nc-form:focus-within{{box-shadow:0 1px 8px rgba(64,101,70,.08)}}
 .nc-input{{flex:1;border:none;background:transparent;color:var(--green);font-family:inherit;font-size:.88rem;font-weight:400;outline:none;padding:10px 0}}
 .nc-input::placeholder{{color:var(--g40);font-weight:300}}
-.nc-send{{width:34px;height:34px;border-radius:50%;border:none;background:var(--green);color:var(--cream);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent}}
-.nc-send:active{{transform:scale(.88)}}
+.nc-send{{width:34px;height:34px;border-radius:50%;border:none;background:var(--green);color:var(--cream);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:opacity .15s}}
+.nc-send:hover{{opacity:.85}}
+.nc-send:active{{transform:scale(.9)}}
 .nc-send svg{{width:13px;height:13px}}
 
 /* Footer */
@@ -282,7 +283,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   .nc-msg--bot{{padding-right:16px}}.nc-msg--user{{padding-left:40px}}
   .nc-quick{{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}}
   .nc-quick::-webkit-scrollbar{{display:none}}.nc-quick__btn{{white-space:nowrap;flex-shrink:0}}
-  .nc-input-area{{padding:8px 14px 4px;background:rgba(249,240,226,.9);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--g05)}}
+  .nc-input-area{{padding:8px 14px 4px;background:rgba(249,240,226,.9);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:none}}
   .nc-form{{padding:3px 3px 3px 16px}}.nc-input{{font-size:16px;padding:12px 0;min-height:44px}}.nc-send{{width:36px;height:36px}}
   .nc-footer{{padding:3px 14px max(6px,env(safe-area-inset-bottom))}}
   .nc-home__scroll{{padding:max(16px,3vh) 20px 32px}}.nc-home__logo{{width:120px}}
