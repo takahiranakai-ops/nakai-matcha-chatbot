@@ -78,7 +78,7 @@ APP_HTML = f"""<!DOCTYPE html>
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
@@ -87,9 +87,10 @@ APP_HTML = f"""<!DOCTYPE html>
   --g40:rgba(64,101,70,.4);--g20:rgba(64,101,70,.2);
   --g10:rgba(64,101,70,.1);--g05:rgba(64,101,70,.05);
   --ease:cubic-bezier(.25,1,.5,1);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Work Sans',sans-serif;
 }}
-html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green);font-family:'Work Sans',sans-serif;-webkit-font-smoothing:antialiased}}
-html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
+html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green);font-family:var(--sans);-webkit-font-smoothing:antialiased}}
 #nc-app{{display:flex;height:100vh;height:100dvh}}
 
 /* Brand Panel (desktop) */
@@ -98,12 +99,12 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 48px;
 }}
 .nc-brand__logo{{width:120px;opacity:.85;margin-bottom:48px;animation:ncUp .6s var(--ease) both}}
-.nc-brand__tagline{{font-weight:300;font-size:1.3rem;line-height:1.8;text-align:center;color:var(--cream);opacity:.7;margin-bottom:48px;animation:ncUp .6s .1s var(--ease) both}}
+.nc-brand__tagline{{font-family:var(--serif);font-weight:400;font-size:1.4rem;line-height:1.9;text-align:center;color:var(--cream);opacity:.7;margin-bottom:48px;animation:ncUp .6s .1s var(--ease) both;font-style:italic}}
 .nc-brand__ctas{{display:flex;flex-direction:column;gap:10px;width:100%;max-width:200px;animation:ncUp .6s .2s var(--ease) both}}
 .nc-brand__cta{{
-  display:block;text-align:center;font-family:inherit;font-size:.72rem;font-weight:500;
-  letter-spacing:.12em;text-transform:uppercase;text-decoration:none;
-  padding:13px 20px;border-radius:10px;cursor:pointer;transition:all .25s var(--ease);
+  display:block;text-align:center;font-family:var(--sans);font-size:.7rem;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;text-decoration:none;
+  padding:14px 20px;border-radius:10px;cursor:pointer;transition:all .25s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }}
 .nc-brand__cta--p{{background:rgba(249,240,226,.15);color:var(--cream);border:none}}
@@ -120,10 +121,10 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 .nc-home__top{{display:flex;justify-content:flex-end;padding:max(14px,env(safe-area-inset-top)) 20px 0;flex-shrink:0}}
 .nc-home__scroll{{flex:1;display:flex;flex-direction:column;align-items:center;padding:max(24px,6vh) 24px 40px}}
 .nc-home__logo{{width:140px;margin-bottom:10px;animation:ncUp .5s var(--ease) both}}
-.nc-home__sub{{font-weight:400;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--g40);margin-bottom:max(36px,5vh);animation:ncUp .5s .06s var(--ease) both}}
+.nc-home__sub{{font-family:var(--serif);font-weight:400;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--g40);margin-bottom:max(36px,5vh);animation:ncUp .5s .06s var(--ease) both}}
 
 /* Greeting */
-.nc-home__greeting{{font-size:1.5rem;font-weight:300;color:var(--green);text-align:center;line-height:1.5;margin-bottom:max(24px,3vh);max-width:420px;animation:ncUp .5s .12s var(--ease) both}}
+.nc-home__greeting{{font-family:var(--serif);font-size:1.7rem;font-weight:400;color:var(--green);text-align:center;line-height:1.5;margin-bottom:max(24px,3vh);max-width:440px;animation:ncUp .5s .12s var(--ease) both}}
 
 /* Home Input */
 .nc-home__input-wrap{{width:100%;max-width:480px;animation:ncUp .5s .18s var(--ease) both}}
@@ -147,7 +148,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 .nc-home__section{{width:100%;max-width:520px;margin-top:max(28px,3vh)}}
 .nc-home__section:first-of-type{{animation:ncUp .5s .3s var(--ease) both}}
 .nc-home__section:last-of-type{{animation:ncUp .5s .36s var(--ease) both}}
-.nc-home__section-title{{font-family:'Shippori Mincho','Work Sans',sans-serif;font-weight:400;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g60);margin-bottom:14px;padding-left:2px}}
+.nc-home__section-title{{font-family:var(--serif);font-weight:600;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;color:var(--g60);margin-bottom:14px;padding-left:2px}}
 .nc-home__card-row{{display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:8px;margin:0 -24px;padding-left:24px;padding-right:24px;scrollbar-width:none}}
 .nc-home__card-row::-webkit-scrollbar{{display:none}}
 
@@ -156,10 +157,10 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 .nc-pcard:hover{{border-color:var(--g20);transform:translateY(-2px);box-shadow:0 4px 12px rgba(64,101,70,.08)}}
 .nc-pcard:active{{transform:scale(.97)}}
 .nc-pcard__img{{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}}
-.nc-pcard__badge{{position:absolute;top:8px;left:8px;font-size:.56rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;background:rgba(64,101,70,.85);color:var(--cream);padding:3px 8px;border-radius:6px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}}
-.nc-pcard__body{{padding:12px 14px 14px}}
-.nc-pcard__name{{font-weight:500;font-size:.82rem;color:var(--green);letter-spacing:.01em}}
-.nc-pcard__desc{{font-weight:300;font-size:.7rem;color:var(--g60);margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.nc-pcard__badge{{position:absolute;top:8px;left:8px;font-family:var(--sans);font-size:.56rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;background:rgba(64,101,70,.85);color:var(--cream);padding:4px 9px;border-radius:6px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}}
+.nc-pcard__body{{padding:14px 14px 16px}}
+.nc-pcard__name{{font-family:var(--serif);font-weight:600;font-size:.95rem;color:var(--green);letter-spacing:.01em}}
+.nc-pcard__desc{{font-weight:300;font-size:.7rem;color:var(--g60);margin-top:5px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 .nc-pcard__price{{font-weight:400;font-size:.68rem;color:var(--g40);margin-top:8px;letter-spacing:.03em}}
 
 /* Recipe Card */
@@ -167,7 +168,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 .nc-rcard:hover{{border-color:var(--g20);transform:translateY(-2px);box-shadow:0 4px 12px rgba(64,101,70,.08)}}
 .nc-rcard:active{{transform:scale(.97)}}
 .nc-rcard__icon{{width:36px;height:36px;border-radius:10px;background:var(--g05);border:1px solid var(--g10);display:flex;align-items:center;justify-content:center;font-size:1.1rem}}
-.nc-rcard__name{{font-weight:500;font-size:.78rem;color:var(--green);letter-spacing:.01em}}
+.nc-rcard__name{{font-family:var(--serif);font-weight:600;font-size:.88rem;color:var(--green);letter-spacing:.01em}}
 .nc-rcard__desc{{font-weight:300;font-size:.66rem;color:var(--g60);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 
 /* Home footer */
@@ -179,7 +180,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 /* Language toggle */
 .nc-lang-toggle{{display:flex;background:var(--g05);border-radius:8px;overflow:hidden;border:1px solid var(--g10)}}
 .nc-lang-btn{{
-  font-family:'Work Sans',sans-serif;font-size:.68rem;font-weight:500;letter-spacing:.08em;
+  font-family:var(--sans);font-size:.68rem;font-weight:500;letter-spacing:.08em;
   padding:6px 14px;border:none;cursor:pointer;transition:all .2s var(--ease);
   -webkit-tap-highlight-color:transparent;background:transparent;color:var(--g40);
 }}
@@ -200,18 +201,18 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 .nc-back{{display:none;background:none;border:none;color:var(--g60);font-size:1.3rem;cursor:pointer;padding:4px 8px 4px 0;-webkit-tap-highlight-color:transparent}}
 .nc-back:active{{color:var(--green)}}
 .nc-header__logo{{height:16px;opacity:.8;display:none}}
-.nc-header__title{{font-weight:500;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--g60)}}
+.nc-header__title{{font-family:var(--serif);font-weight:500;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g60)}}
 .nc-header__dot{{width:6px;height:6px;border-radius:50%;background:var(--green);opacity:.6;animation:ncPulse 3s ease-in-out infinite}}
 @keyframes ncPulse{{0%,100%{{opacity:.6}}50%{{opacity:.2}}}}
 
 /* Messages */
 .nc-messages{{flex:1;overflow-y:auto;padding:20px 20px 12px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth}}
 .nc-messages::-webkit-scrollbar{{width:0;display:none}}
-.nc-banner{{text-align:center;padding:8px 16px;margin:0 auto 16px;font-size:.68rem;color:var(--g40);letter-spacing:.02em}}
+.nc-banner{{text-align:center;padding:8px 16px;margin:0 auto 16px;font-family:var(--serif);font-size:.78rem;font-style:italic;color:var(--g40);letter-spacing:.02em}}
 .nc-msg{{display:flex;flex-direction:column;animation:ncMsgIn .35s var(--ease) both}}
 @keyframes ncMsgIn{{from{{opacity:0;transform:translateY(6px)}}to{{opacity:1;transform:translateY(0)}}}}
 .nc-msg--bot{{align-items:flex-start;padding-right:48px}}
-.nc-msg--bot .nc-msg__bubble{{background:var(--white);border-radius:18px 18px 18px 4px;padding:14px 18px;font-size:.88rem;font-weight:400;line-height:1.8;color:var(--green);box-shadow:0 1px 3px rgba(64,101,70,.05)}}
+.nc-msg--bot .nc-msg__bubble{{background:var(--white);border-radius:18px 18px 18px 4px;padding:16px 20px;font-size:.88rem;font-weight:400;line-height:1.85;color:var(--green);box-shadow:0 1px 4px rgba(64,101,70,.06)}}
 .nc-msg__bubble a{{color:var(--green);font-weight:500;text-decoration:underline;text-decoration-color:var(--g20);text-underline-offset:2px}}
 .nc-msg__bubble a:hover{{text-decoration-color:var(--green)}}
 .nc-msg__bubble strong{{font-weight:600}}
@@ -280,7 +281,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
   .nc-input-area{{padding:6px 10px 2px}}.nc-send{{width:34px;height:34px}}
   .nc-footer{{padding:2px 10px max(4px,env(safe-area-inset-bottom))}}
   .nc-home__scroll{{padding:max(12px,2vh) 16px 24px}}.nc-home__logo{{width:110px}}
-  .nc-home__greeting{{font-size:1.3rem}}
+  .nc-home__greeting{{font-size:1.45rem}}
   .nc-home__card-row{{margin:0 -16px;padding-left:16px;padding-right:16px;gap:10px}}
   .nc-pcard{{width:140px}}.nc-rcard{{width:120px;padding:14px 12px}}
   .nc-home__section{{margin-top:max(20px,2vh)}}.nc-home__section-title{{font-size:.76rem}}
