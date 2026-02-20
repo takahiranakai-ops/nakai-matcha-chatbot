@@ -107,7 +107,7 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(
-                messages, temperature=0.6, max_tokens=256, language=language
+                messages, temperature=0.6, max_tokens=100, language=language
             )
             return {
                 "response": response,
