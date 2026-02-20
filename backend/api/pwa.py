@@ -146,7 +146,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-topbar{{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:max(14px,env(safe-area-inset-top)) 24px 12px;transition:background .4s var(--ease)}}
 .nc-topbar--scrolled{{background:rgba(249,240,226,.88);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}}
 .nc-topbar__left{{display:flex;align-items:center;gap:8px}}
-.nc-topbar__wordmark{{height:12px;width:auto;opacity:.45;transition:opacity .3s var(--ease);cursor:pointer}}
+.nc-topbar__wordmark{{height:10px;width:auto;opacity:.45;transition:opacity .3s var(--ease);cursor:pointer}}
 .nc-topbar__wordmark:hover{{opacity:.65}}
 .nc-topbar__right{{display:flex;align-items:center;gap:8px}}
 
@@ -154,8 +154,23 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__scroll-area{{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center}}
 
 /* Hero */
-.nc-hero{{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:min(340px,40vh);padding:0 28px 0;text-align:center}}
-.nc-hero__sub{{font-family:var(--sans);font-weight:300;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g35);margin-bottom:12px;animation:ncFadeUp .7s var(--ease) both}}
+.nc-hero{{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:min(340px,40vh);padding:0 28px 0;text-align:center;position:relative}}
+.nc-hero__sub-wrap{{position:relative;display:inline-flex;align-items:center;gap:6px;animation:ncFadeUp .7s var(--ease) both}}
+.nc-hero__sub{{font-family:var(--sans);font-weight:300;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g35);margin-bottom:12px}}
+.nc-hero__leaves{{position:absolute;width:200px;height:40px;left:50%;top:-8px;transform:translateX(-50%);pointer-events:none;overflow:visible}}
+.nc-leaf{{position:absolute;font-size:12px;opacity:0;animation:ncLeafFloat linear infinite}}
+.nc-leaf:nth-child(1){{left:10%;animation-duration:4.5s;animation-delay:0s}}
+.nc-leaf:nth-child(2){{left:45%;animation-duration:5.2s;animation-delay:1.2s}}
+.nc-leaf:nth-child(3){{left:80%;animation-duration:4.8s;animation-delay:2.5s}}
+.nc-leaf:nth-child(4){{left:25%;animation-duration:5.5s;animation-delay:3.8s}}
+.nc-leaf:nth-child(5){{left:65%;animation-duration:4.2s;animation-delay:0.8s}}
+@keyframes ncLeafFloat{{
+  0%{{opacity:0;transform:translateY(-16px) rotate(0deg) scale(.7)}}
+  15%{{opacity:.35}}
+  50%{{opacity:.25;transform:translateY(8px) rotate(45deg) translateX(8px) scale(.85)}}
+  85%{{opacity:.15}}
+  100%{{opacity:0;transform:translateY(28px) rotate(90deg) translateX(-4px) scale(.7)}}
+}}
 .nc-hero__greeting{{font-family:var(--sans);font-size:clamp(1.4rem,3.5vw,1.8rem);font-weight:300;color:var(--green);line-height:1.5;max-width:520px;margin-bottom:24px;animation:ncFadeUp .7s .08s var(--ease) both}}
 .nc-hero__input-wrap{{width:100%;max-width:520px;animation:ncFadeUp .7s .16s var(--ease) both}}
 .nc-hero__scroll-hint{{display:none}}
@@ -184,7 +199,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-section__title{{font-family:var(--sans);font-weight:400;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--g35);margin-bottom:20px;padding-left:4px}}
 
 /* Product Cards v2 */
-.nc-products-grid{{display:grid;grid-template-columns:1fr;gap:16px}}
+.nc-products-grid{{display:flex;gap:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}}
+.nc-products-grid::-webkit-scrollbar{{display:none}}
+.nc-products-grid>.nc-pcard-v2{{min-width:260px;max-width:300px;flex-shrink:0;scroll-snap-align:start}}
 .nc-pcard-v2{{background:var(--white);border:none;border-radius:20px;overflow:hidden;cursor:pointer;transition:all .5s var(--ease);-webkit-tap-highlight-color:transparent;box-shadow:var(--shadow-s)}}
 .nc-pcard-v2:hover{{box-shadow:var(--shadow-m)}}
 .nc-pcard-v2:active{{transform:scale(.98);transition-duration:.12s}}
@@ -405,7 +422,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 
 @keyframes ncFadeUp{{from{{opacity:0;transform:translateY(12px)}}to{{opacity:1;transform:translateY(0)}}}}
 
-@media(min-width:900px){{.nc-topbar{{display:none}}.nc-drawer,.nc-drawer-overlay{{display:none}}.nc-products-grid{{grid-template-columns:repeat(3,1fr)}}.nc-pcard-v2__visual{{height:120px}}.nc-recipes-grid{{grid-template-columns:repeat(3,1fr)}}.nc-hero{{min-height:min(320px,38vh)}}.nc-invite-sheet{{max-width:420px;left:50%;right:auto;transform:translateX(-50%) translateY(100%)}}.nc-invite-sheet--active{{transform:translateX(-50%) translateY(0)}}.nc-invite{{max-width:720px;margin:0 auto}}.nc-msg--bot{{padding-right:80px}}.nc-msg--user{{padding-left:80px}}}}
+@media(min-width:900px){{.nc-topbar{{display:none}}.nc-drawer,.nc-drawer-overlay{{display:none}}.nc-products-grid{{flex-wrap:wrap;overflow-x:visible;scroll-snap-type:none}}.nc-products-grid>.nc-pcard-v2{{min-width:0;max-width:none;flex:1 1 calc(33.333% - 12px)}}.nc-pcard-v2__visual{{height:120px}}.nc-recipes-grid{{grid-template-columns:repeat(3,1fr)}}.nc-hero{{min-height:min(320px,38vh)}}.nc-invite-sheet{{max-width:420px;left:50%;right:auto;transform:translateX(-50%) translateY(100%)}}.nc-invite-sheet--active{{transform:translateX(-50%) translateY(0)}}.nc-invite{{max-width:720px;margin:0 auto}}.nc-msg--bot{{padding-right:80px}}.nc-msg--user{{padding-left:80px}}}}
 @media(min-width:1400px){{.nc-section{{max-width:800px}}.nc-products-grid{{gap:20px}}.nc-messages{{max-width:840px}}.nc-input-area{{max-width:840px}}}}
 @media(max-width:899px){{
   .nc-brand{{display:none}}
@@ -471,9 +488,6 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     <div class="nc-home" id="nc-home">
       <div class="nc-topbar" id="nc-topbar">
         <div class="nc-topbar__left">
-          <button class="nc-hamburger" id="nc-hamburger" aria-label="Menu">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
-          </button>
           <img class="nc-topbar__wordmark" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" id="nc-topbar-mark" />
         </div>
         <div class="nc-topbar__right">
@@ -481,11 +495,17 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
             <button class="nc-lang-btn active" data-lang="en">EN</button>
             <button class="nc-lang-btn" data-lang="ja">JA</button>
           </div>
+          <button class="nc-hamburger" id="nc-hamburger" aria-label="Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
         </div>
       </div>
       <div class="nc-home__scroll-area" id="nc-home-scroll">
         <div class="nc-hero">
-          <p class="nc-hero__sub" id="nc-home-sub">Your private matcha concierge</p>
+          <div class="nc-hero__sub-wrap">
+            <div class="nc-hero__leaves" aria-hidden="true"><span class="nc-leaf">\U0001f343</span><span class="nc-leaf">\U0001f33f</span><span class="nc-leaf">\U0001f343</span><span class="nc-leaf">\U0001f33f</span><span class="nc-leaf">\U0001f343</span></div>
+            <p class="nc-hero__sub" id="nc-home-sub">Your private matcha concierge</p>
+          </div>
           <h1 class="nc-hero__greeting" id="nc-home-greeting">Shall we talk about matcha?</h1>
           <div class="nc-hero__input-wrap">
             <form class="nc-home__form" id="nc-home-form">
