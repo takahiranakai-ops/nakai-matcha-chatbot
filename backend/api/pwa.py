@@ -510,9 +510,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   }}
 
   var products=[
-    {{id:'Revi',gradient:'linear-gradient(165deg,#5A8A52 0%,#3A6B40 40%,#2D5432 100%)',url:SHOP+'/products/revi-organic-matcha-20g-ss-grade-plus'}},
-    {{id:'Ikigai',gradient:'linear-gradient(165deg,#7BA06D 0%,#5A8A52 40%,#4A7350 100%)',url:SHOP+'/products/ikigai-organic-matcha-40g-ss-grade'}},
-    {{id:'Set',gradient:'linear-gradient(165deg,#6A9A5E 0%,#406546 40%,#C4A875 100%)',url:SHOP+'/products/the-exquisite-matcha-set-limited-edition'}}
+    {{id:'Revi',gradient:'linear-gradient(165deg,rgba(64,101,70,.95),rgba(64,101,70,.75))',url:SHOP+'/products/revi-organic-matcha-20g-ss-grade-plus'}},
+    {{id:'Ikigai',gradient:'linear-gradient(165deg,rgba(64,101,70,.78),rgba(64,101,70,.55))',url:SHOP+'/products/ikigai-organic-matcha-40g-ss-grade'}},
+    {{id:'Set',gradient:'linear-gradient(165deg,rgba(64,101,70,.88),rgba(64,101,70,.65))',url:SHOP+'/products/the-exquisite-matcha-set-limited-edition'}}
   ];
   var recipes=[
     {{id:'Usucha',icon:'\U0001F375'}},
