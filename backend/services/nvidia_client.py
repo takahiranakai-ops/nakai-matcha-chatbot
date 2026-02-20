@@ -50,19 +50,30 @@ async def chat_completion(
     messages: list[dict],
     temperature: float = 0.45,
     max_tokens: int = 1500,
+    language: str = "en",
 ) -> str:
-    """Get chat completion from NVIDIA NIM model."""
+    """Get chat completion from NVIDIA NIM model.
+
+    Uses a language-optimized model: Nemotron Super 49B for English
+    (superior structure and helpfulness), Llama 3.3 70B for Japanese
+    (better CJK token handling).
+    """
+    model = (
+        settings.nvidia_chat_model_ja
+        if language == "ja"
+        else settings.nvidia_chat_model
+    )
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
             f"{settings.nvidia_base_url}/chat/completions",
             headers=_headers(),
             json={
-                "model": settings.nvidia_chat_model,
+                "model": model,
                 "messages": messages,
                 "temperature": temperature,
                 "max_tokens": max_tokens,
                 "top_p": 0.92,
-                "frequency_penalty": 0.15,
+                "frequency_penalty": 0.1,
                 "stream": False,
             },
         )

@@ -107,7 +107,7 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(
-                messages, temperature=0.6, max_tokens=256
+                messages, temperature=0.6, max_tokens=256, language=language
             )
             return {
                 "response": response,
@@ -165,7 +165,7 @@ class RAGEngine:
 
         # 6. Generate response with tuned parameters
         raw_response = await chat_completion(
-            messages, temperature=0.45, max_tokens=1500
+            messages, temperature=0.45, max_tokens=1500, language=language
         )
 
         # 7. Parse out follow-up suggestions
