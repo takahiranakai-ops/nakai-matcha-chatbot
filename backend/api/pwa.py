@@ -103,7 +103,7 @@ APP_HTML = f"""<!DOCTYPE html>
   --g06:rgba(64,101,70,.06);--g03:rgba(64,101,70,.03);
   --serif:'Domaine Text',Georgia,serif;
   --sans:'Work Sans',sans-serif;
-  --ease:cubic-bezier(.22,1,.36,1);
+  --ease:cubic-bezier(.22,1,.36,1);--ease-spring:cubic-bezier(.175,.885,.32,1.275);
   --shadow-s:0 1px 2px rgba(64,101,70,.02),0 4px 12px rgba(64,101,70,.04);
   --shadow-m:0 2px 4px rgba(64,101,70,.03),0 10px 28px rgba(64,101,70,.06);
   --shadow-l:0 4px 8px rgba(64,101,70,.03),0 16px 48px rgba(64,101,70,.08);
@@ -144,22 +144,21 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 /* Greeting */
 .nc-home__greeting{{font-family:var(--serif);font-size:clamp(1.5rem,4vw,1.9rem);font-weight:300;font-style:italic;color:var(--green);text-align:center;line-height:1.55;margin-bottom:max(36px,4.5vh);max-width:440px;animation:ncFadeUp .7s .16s var(--ease) both}}
 
-/* Find My Matcha CTA */
+/* Find My Matcha CTA — Apple tinted button */
 .nc-find-cta{{width:100%;max-width:480px;text-align:center;margin-bottom:max(28px,3.5vh);animation:ncFadeUp .7s .22s var(--ease) both}}
 .nc-find-cta__btn{{
   display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--serif);font-size:1.05rem;font-weight:400;font-style:italic;
-  color:var(--green);background:transparent;
-  border:none;border-bottom:1px solid var(--g12);border-radius:0;
-  padding:6px 2px 8px;
-  cursor:pointer;transition:all .5s var(--ease);
-  -webkit-tap-highlight-color:transparent;box-shadow:none;
+  font-family:var(--serif);font-size:1.02rem;font-weight:400;font-style:italic;
+  color:var(--green);background:var(--g06);
+  border:none;border-radius:24px;
+  padding:13px 26px 13px 28px;
+  cursor:pointer;transition:all .35s var(--ease);
+  -webkit-tap-highlight-color:transparent;
 }}
-.nc-find-cta__btn:hover{{border-color:var(--g50)}}
-.nc-find-cta__btn:active{{opacity:.7}}
-.nc-find-cta__arrow{{width:16px;height:16px;opacity:.25;transition:all .5s var(--ease);animation:ncArrowDrift 3.5s ease-in-out infinite}}
-.nc-find-cta__btn:hover .nc-find-cta__arrow{{opacity:.55;transform:translateX(3px);animation:none}}
-@keyframes ncArrowDrift{{0%,100%{{transform:translateX(0);opacity:.25}}50%{{transform:translateX(2px);opacity:.4}}}}
+.nc-find-cta__btn:hover{{background:var(--g12)}}
+.nc-find-cta__btn:active{{transform:scale(.96)}}
+.nc-find-cta__arrow{{opacity:.35;transition:all .35s var(--ease)}}
+.nc-find-cta__btn:hover .nc-find-cta__arrow{{opacity:.6;transform:translateX(2px)}}
 
 /* Home Input */
 .nc-home__input-wrap{{width:100%;max-width:480px;animation:ncFadeUp .7s .28s var(--ease) both}}
@@ -168,16 +167,16 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__input{{flex:1;border:none;background:transparent;color:var(--green);font-family:inherit;font-size:16px;font-weight:400;outline:none;padding:13px 0}}
 .nc-home__input::placeholder{{color:var(--g35);font-weight:300}}
 
-/* Chips */
-.nc-home__chips{{display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:center;width:100%;max-width:480px;margin-top:24px;animation:ncFadeUp .7s .34s var(--ease) both}}
+/* Chips — capsule pills */
+.nc-home__chips{{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:480px;margin-top:24px;animation:ncFadeUp .7s .34s var(--ease) both}}
 .nc-home__chip{{
-  font-family:var(--sans);font-size:.72rem;font-weight:300;color:var(--g50);
-  background:transparent;border:none;border-radius:0;
-  padding:8px 14px;cursor:pointer;transition:all .4s var(--ease);
-  -webkit-tap-highlight-color:transparent;border-bottom:1px solid transparent;
+  font-family:var(--sans);font-size:.72rem;font-weight:400;color:var(--g50);
+  background:var(--g03);border:none;border-radius:20px;
+  padding:9px 18px;cursor:pointer;transition:all .35s var(--ease);
+  -webkit-tap-highlight-color:transparent;
 }}
-.nc-home__chip:hover{{color:var(--green);border-color:var(--g20)}}
-.nc-home__chip:active{{color:var(--green)}}
+.nc-home__chip:hover{{color:var(--green);background:var(--g06)}}
+.nc-home__chip:active{{transform:scale(.96)}}
 
 /* Home Sections */
 .nc-home__section{{width:100%;max-width:520px;margin-top:max(40px,5vh)}}
@@ -189,8 +188,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 
 /* Product Card */
 .nc-pcard{{flex-shrink:0;width:185px;scroll-snap-align:start;background:var(--white);border:none;border-radius:16px;overflow:hidden;cursor:pointer;transition:all .5s var(--ease);-webkit-tap-highlight-color:transparent;box-shadow:var(--shadow-s)}}
-.nc-pcard:hover{{transform:translateY(-4px);box-shadow:var(--shadow-l)}}
-.nc-pcard:active{{transform:scale(.97)}}
+.nc-pcard:hover{{transform:translateY(-3px);box-shadow:var(--shadow-m)}}
+.nc-pcard:active{{transform:scale(.97);transition-duration:.12s}}
 .nc-pcard__img{{width:100%;height:36px;display:block}}
 .nc-pcard__badge{{display:none}}
 .nc-pcard__body{{padding:20px 18px 22px}}
@@ -202,8 +201,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 
 /* Recipe Card */
 .nc-rcard{{flex-shrink:0;width:150px;scroll-snap-align:start;background:var(--white);border:none;border-radius:16px;overflow:hidden;cursor:pointer;transition:all .5s var(--ease);padding:20px 18px;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent;box-shadow:var(--shadow-s)}}
-.nc-rcard:hover{{transform:translateY(-4px);box-shadow:var(--shadow-l)}}
-.nc-rcard:active{{transform:scale(.97)}}
+.nc-rcard:hover{{transform:translateY(-3px);box-shadow:var(--shadow-m)}}
+.nc-rcard:active{{transform:scale(.97);transition-duration:.12s}}
 .nc-rcard__icon{{width:20px;height:1px;background:var(--g20);margin-bottom:14px;font-size:0;overflow:hidden;border-radius:0;transition:all .5s var(--ease)}}
 .nc-rcard__name{{font-family:var(--serif);font-weight:400;font-size:.95rem;color:var(--green);letter-spacing:.01em;line-height:1.3;transition:color .5s var(--ease)}}
 .nc-rcard__desc{{font-weight:300;font-size:.66rem;color:var(--g50);line-height:1.6;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
@@ -216,14 +215,15 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__link:hover{{color:var(--g50)}}
 .nc-home__dot{{width:3px;height:3px;border-radius:50%;background:var(--g12)}}
 
-/* Language toggle */
-.nc-lang-toggle{{display:flex;background:var(--g03);border-radius:8px;overflow:hidden;border:none}}
+/* Language toggle — iOS segmented control */
+.nc-lang-toggle{{display:flex;background:var(--g06);border-radius:9px;padding:2px;border:none;position:relative}}
 .nc-lang-btn{{
   font-family:var(--sans);font-size:.66rem;font-weight:500;letter-spacing:.08em;
-  padding:7px 14px;border:none;cursor:pointer;transition:all .4s var(--ease);
+  padding:6px 14px;border:none;cursor:pointer;transition:all .35s var(--ease);
   -webkit-tap-highlight-color:transparent;background:transparent;color:var(--g35);
+  border-radius:7px;position:relative;z-index:1;
 }}
-.nc-lang-btn.active{{background:var(--green);color:var(--cream)}}
+.nc-lang-btn.active{{background:var(--white);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)}}
 
 /* CHAT */
 .nc-chat{{position:absolute;inset:0;display:flex;flex-direction:column;transition:opacity .5s var(--ease),transform .5s var(--ease),filter .5s var(--ease);z-index:4}}
@@ -237,7 +237,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   border-bottom:none;flex-shrink:0;z-index:10;
 }}
 .nc-header__left{{display:flex;align-items:center;gap:12px}}
-.nc-back{{display:none;background:none;border:none;color:var(--g50);font-size:1.3rem;cursor:pointer;padding:4px 8px 4px 0;-webkit-tap-highlight-color:transparent;transition:color .3s var(--ease)}}
+.nc-back{{display:none;background:none;border:none;color:var(--g50);cursor:pointer;padding:6px 10px 6px 0;-webkit-tap-highlight-color:transparent;transition:color .3s var(--ease)}}
 .nc-back:hover{{color:var(--green)}}
 .nc-header__logo{{height:16px;opacity:.75;display:none}}
 .nc-header__title{{font-family:var(--serif);font-weight:300;font-size:.88rem;font-style:italic;letter-spacing:.04em;text-transform:none;color:var(--g35)}}
@@ -265,7 +265,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-suggestions{{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}}
 .nc-suggestion{{font-family:inherit;font-size:.76rem;font-weight:400;color:var(--green);background:var(--g03);border:none;border-radius:20px;padding:10px 16px;cursor:pointer;transition:all .4s var(--ease);text-align:left;line-height:1.4;-webkit-tap-highlight-color:transparent}}
 .nc-suggestion:hover{{background:var(--g06)}}
-.nc-suggestion:active{{background:var(--g12);transform:scale(.97)}}
+.nc-suggestion:active{{background:var(--g12);transform:scale(.97);transition-duration:.12s}}
 .nc-msg__sources{{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}}
 .nc-msg__source{{font-size:.68rem;color:var(--green);text-decoration:none;background:var(--g03);border:none;border-radius:10px;padding:8px 14px;transition:background .4s var(--ease);-webkit-tap-highlight-color:transparent}}
 .nc-msg__source:hover{{background:var(--g06)}}
@@ -278,7 +278,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-quick{{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}}
 .nc-quick__btn{{font-family:inherit;font-size:.76rem;font-weight:400;color:var(--green);background:var(--white);border:none;border-radius:20px;padding:10px 18px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .4s var(--ease);box-shadow:var(--shadow-s)}}
 .nc-quick__btn:hover{{box-shadow:var(--shadow-m);transform:translateY(-1px)}}
-.nc-quick__btn:active{{transform:scale(.96)}}
+.nc-quick__btn:active{{transform:scale(.96);transition-duration:.12s}}
 
 /* Input */
 .nc-input-area{{padding:12px 24px 16px;flex-shrink:0}}
@@ -288,7 +288,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-input::placeholder{{color:var(--g35);font-weight:300}}
 .nc-send{{width:36px;height:36px;border-radius:50%;border:none;background:var(--green);color:var(--cream);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:all .4s var(--ease)}}
 .nc-send:hover{{opacity:.85;transform:scale(1.04)}}
-.nc-send:active{{transform:scale(.9)}}
+.nc-send:active{{transform:scale(.88);transition-duration:.1s}}
 .nc-send svg{{width:13px;height:13px}}
 
 /* Footer */
@@ -324,7 +324,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   .nc-footer{{padding:3px 12px max(4px,env(safe-area-inset-bottom))}}
   .nc-home__scroll{{padding:max(14px,2vh) 18px 28px}}.nc-home__logo{{width:110px}}
   .nc-home__greeting{{font-size:1.4rem}}
-  .nc-find-cta__btn{{font-size:.95rem}}
+  .nc-find-cta__btn{{font-size:.95rem;padding:12px 22px 12px 24px}}
   .nc-home__card-row{{margin:0 -18px;padding-left:18px;padding-right:18px;gap:12px}}
   .nc-pcard{{width:160px}}.nc-pcard__body{{padding:18px 16px 20px}}
   .nc-rcard{{width:130px;padding:18px 16px}}
@@ -358,7 +358,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
         <div class="nc-find-cta">
           <button class="nc-find-cta__btn" id="nc-find-btn">
             <span id="nc-find-label">Find My Matcha</span>
-            <svg class="nc-find-cta__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <svg class="nc-find-cta__arrow" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l5 5-5 5"/></svg>
           </button>
         </div>
         <div class="nc-home__input-wrap">
@@ -393,7 +393,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     <div class="nc-chat nc-hidden" id="nc-chat">
       <header class="nc-header">
         <div class="nc-header__left">
-          <button class="nc-back" id="nc-back" aria-label="Back">&#8249;</button>
+          <button class="nc-back" id="nc-back" aria-label="Back"><svg width="10" height="18" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1L1 9l8 8"/></svg></button>
           <img class="nc-header__logo" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" />
           <span class="nc-header__title" id="nc-title">Concierge</span>
           <span class="nc-header__dot"></span>
