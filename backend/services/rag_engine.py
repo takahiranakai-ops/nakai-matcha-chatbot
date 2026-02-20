@@ -14,9 +14,9 @@ _GREETING_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Extract [SUGGESTIONS]...[/SUGGESTIONS] from response
+# Extract [SUGGESTIONS]...[/SUGGESTIONS] from response (closing tag optional)
 _SUGGESTIONS_RE = re.compile(
-    r"\[SUGGESTIONS\]\s*\n(.*?)\n?\[/SUGGESTIONS\]",
+    r"\[SUGGESTIONS\]\s*\n(.*?)(?:\n?\[/SUGGESTIONS\]|$)",
     re.DOTALL,
 )
 
