@@ -120,7 +120,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   display:flex;flex-direction:column;padding:32px 28px;position:relative;overflow:hidden;
 }}
 .nc-brand__top{{display:flex;flex-direction:column;align-items:flex-start;text-align:left;margin-bottom:0;gap:10px}}
-.nc-brand__logo{{height:18px;width:auto;opacity:.85;animation:ncFadeUp .8s var(--ease) both}}
+.nc-brand__logo{{height:14px;width:auto;opacity:.8;animation:ncFadeUp .8s var(--ease) both}}
 .nc-brand__tagline{{font-family:var(--serif);font-weight:300;font-size:.72rem;line-height:1.6;text-align:left;color:var(--cream);opacity:.4;animation:ncFadeUp .8s .12s var(--ease) both;font-style:italic;margin-bottom:0}}
 .nc-brand__nav{{display:flex;flex-direction:column;gap:2px;width:100%;margin-top:28px;animation:ncFadeUp .8s .2s var(--ease) both}}
 .nc-brand__nav-item{{
@@ -163,11 +163,11 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__scroll-area{{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center}}
 
 /* Hero */
-.nc-hero{{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 52px);min-height:calc(100dvh - 52px);padding:0 28px;text-align:center}}
+.nc-hero{{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:min(420px,50vh);padding:0 28px;text-align:center}}
 .nc-hero__sub{{font-family:var(--serif);font-weight:300;font-size:.78rem;font-style:italic;letter-spacing:.08em;color:var(--g35);margin-bottom:20px;animation:ncFadeUp .7s var(--ease) both}}
 .nc-hero__greeting{{font-family:var(--serif);font-size:clamp(1.6rem,4.5vw,2.1rem);font-weight:300;font-style:italic;color:var(--green);line-height:1.55;max-width:520px;margin-bottom:max(36px,4.5vh);animation:ncFadeUp .7s .08s var(--ease) both}}
 .nc-hero__input-wrap{{width:100%;max-width:520px;animation:ncFadeUp .7s .16s var(--ease) both}}
-.nc-hero__scroll-hint{{margin-top:max(32px,4vh);opacity:.15;animation:ncScrollHint 2.5s ease-in-out infinite,ncFadeUp .7s .3s var(--ease) both;transition:opacity .5s var(--ease)}}
+.nc-hero__scroll-hint{{margin-top:24px;opacity:.15;animation:ncScrollHint 2.5s ease-in-out infinite,ncFadeUp .7s .3s var(--ease) both;transition:opacity .5s var(--ease)}}
 .nc-hero__scroll-hint.nc-hidden-hint{{opacity:0}}
 @keyframes ncScrollHint{{0%,100%{{transform:translateY(0)}}50%{{transform:translateY(6px)}}}}
 
@@ -178,7 +178,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__input::placeholder{{color:var(--g35);font-weight:300}}
 
 /* Topic pills */
-.nc-topics{{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:580px;padding:0 28px;margin-top:max(36px,4vh);animation:ncFadeUp .7s .24s var(--ease) both}}
+.nc-topics{{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:580px;padding:0 28px;margin-top:24px;animation:ncFadeUp .7s .24s var(--ease) both}}
 .nc-topics__pill{{
   font-family:var(--sans);font-size:.78rem;font-weight:400;color:var(--g50);
   background:var(--g03);border:none;border-radius:22px;
@@ -191,7 +191,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-topics__pill--primary:hover{{background:var(--g12)}}
 
 /* Sections */
-.nc-section{{width:100%;max-width:720px;padding:0 28px;margin-top:max(48px,6vh)}}
+.nc-section{{width:100%;max-width:720px;padding:0 28px;margin-top:36px}}
 .nc-section__title{{font-family:var(--serif);font-weight:300;font-size:.85rem;font-style:italic;letter-spacing:.05em;color:var(--g35);margin-bottom:20px;padding-left:4px}}
 
 /* Product Cards v2 */
@@ -238,7 +238,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-invite__done{{font-family:var(--serif);font-weight:300;font-size:.85rem;font-style:italic;color:var(--g35);line-height:1.6}}
 
 /* Home footer */
-.nc-home__links{{display:flex;align-items:center;gap:24px;margin-top:max(48px,6vh);margin-bottom:max(36px,env(safe-area-inset-bottom));animation:ncFadeUp .7s .4s var(--ease) both}}
+.nc-home__links{{display:flex;align-items:center;gap:24px;margin-top:36px;margin-bottom:max(36px,env(safe-area-inset-bottom));animation:ncFadeUp .7s .4s var(--ease) both}}
 .nc-home__link{{font-size:.64rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--g20);text-decoration:none;transition:color .4s var(--ease)}}
 .nc-home__link:hover{{color:var(--g50)}}
 .nc-home__dot{{width:3px;height:3px;border-radius:50%;background:var(--g12)}}
@@ -416,7 +416,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   <aside class="nc-brand">
     <div class="nc-brand__top">
       <img class="nc-brand__logo" src="data:image/png;base64,{_LOGO_WM_WHITE_B64}" alt="NAKAI" />
-      <p class="nc-brand__tagline">Grounded in nature,<br>elevated in ritual.</p>
+      <p class="nc-brand__tagline">Enriching the present.</p>
     </div>
     <nav class="nc-brand__nav">
       <button class="nc-brand__nav-item" id="nc-nav-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>Home</button>
@@ -448,7 +448,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       <div class="nc-home__scroll-area" id="nc-home-scroll">
         <div class="nc-hero">
           <p class="nc-hero__sub" id="nc-home-sub">Your private matcha concierge</p>
-          <h1 class="nc-hero__greeting" id="nc-home-greeting">What would you like to explore?</h1>
+          <h1 class="nc-hero__greeting" id="nc-home-greeting">抹茶について何が知りたいですか？</h1>
           <div class="nc-hero__input-wrap">
             <form class="nc-home__form" id="nc-home-form">
               <input type="text" class="nc-home__input" id="nc-home-input" autocomplete="off" maxlength="500" />
@@ -585,7 +585,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       rIced:'Iced Matcha',rIcedDesc:'Refreshing, bright, and easy to make',rIcedMsg:'How do I make iced matcha? Step by step please.',
       rAffogato:'Affogato',rAffogatoDesc:'Matcha meets vanilla ice cream',rAffogatoMsg:'How do I make a matcha affogato?',
       rBarista:'Barista Tips',rBaristaDesc:'Water temp, whisking, milk pairing',rBaristaMsg:'What are the essential barista tips for working with matcha? Cover water temperature, whisking technique, and milk pairing.',
-      heroSub:'Your private matcha concierge',heroGreeting:'What would you like to explore?',
+      heroSub:'Your private matcha concierge',heroGreeting:'\u62b9\u8336\u306b\u3064\u3044\u3066\u4f55\u304c\u77e5\u308a\u305f\u3044\u3067\u3059\u304b\uff1f',
       tFind:'Find My Matcha',tBrew:'Barista Guide',tProduct:'Recipes',tFaq:'About Matcha',
       pAsk:'Ask about this',
       inviteHeadline:'Share matcha with someone you love',inviteBody:'Invite a close friend and they\u2019ll receive a special matcha gift.',
@@ -627,7 +627,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       rIced:'\u30a2\u30a4\u30b9\u62b9\u8336',rIcedDesc:'\u723d\u3084\u304b\u3067\u4f5c\u308a\u3084\u3059\u3044',rIcedMsg:'\u30a2\u30a4\u30b9\u62b9\u8336\u306e\u4f5c\u308a\u65b9\u3092\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u3067\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
       rAffogato:'\u30a2\u30d5\u30a9\u30ac\u30fc\u30c8',rAffogatoDesc:'\u62b9\u8336\u3068\u30d0\u30cb\u30e9\u30a2\u30a4\u30b9\u306e\u30cf\u30fc\u30e2\u30cb\u30fc',rAffogatoMsg:'\u62b9\u8336\u30a2\u30d5\u30a9\u30ac\u30fc\u30c8\u306e\u4f5c\u308a\u65b9\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
       rBarista:'\u30d0\u30ea\u30b9\u30bf Tips',rBaristaDesc:'\u6c34\u6e29\u3001\u8336\u7b45\u306e\u4f7f\u3044\u65b9\u3001\u30df\u30eb\u30af\u9078\u3073',rBaristaMsg:'\u62b9\u8336\u3092\u6271\u3046\u30d0\u30ea\u30b9\u30bf\u306e\u5fc5\u9808\u30c6\u30af\u30cb\u30c3\u30af\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u6c34\u6e29\u3001\u8336\u7b45\u306e\u4f7f\u3044\u65b9\u3001\u30df\u30eb\u30af\u306e\u76f8\u6027\u3092\u30ab\u30d0\u30fc\u3057\u3066\u304f\u3060\u3055\u3044\u3002',
-      heroSub:'\u3042\u306a\u305f\u306e\u62b9\u8336\u30b3\u30f3\u30b7\u30a7\u30eb\u30b8\u30e5',heroGreeting:'\u4f55\u3092\u63a2\u3057\u3066\u3044\u307e\u3059\u304b\uff1f',
+      heroSub:'\u3042\u306a\u305f\u306e\u62b9\u8336\u30b3\u30f3\u30b7\u30a7\u30eb\u30b8\u30e5',heroGreeting:'\u62b9\u8336\u306b\u3064\u3044\u3066\u4f55\u304c\u77e5\u308a\u305f\u3044\u3067\u3059\u304b\uff1f',
       tFind:'\u81ea\u5206\u306b\u5408\u3046\u62b9\u8336\u3092\u63a2\u3059',tBrew:'\u30d0\u30ea\u30b9\u30bf\u30ac\u30a4\u30c9',tProduct:'\u30ec\u30b7\u30d4',tFaq:'\u62b9\u8336\u306b\u3064\u3044\u3066',
       pAsk:'\u8a73\u3057\u304f\u805e\u304f',
       inviteHeadline:'\u5927\u5207\u306a\u4eba\u306b\u62b9\u8336\u3092\u8d08\u308d\u3046',inviteBody:'\u53cb\u4eba\u3092\u62db\u5f85\u3059\u308b\u3068\u3001\u7279\u5225\u306a\u62b9\u8336\u30ae\u30d5\u30c8\u304c\u5c4a\u304d\u307e\u3059\u3002',
