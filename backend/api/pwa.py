@@ -6,6 +6,7 @@ Endpoints:
   GET /sw.js         → Service worker
   GET /icon-192.png  → App icon
   GET /icon-512.png  → App icon
+  GET /fonts/*.woff2 → Domaine Text web fonts
 """
 
 import base64
@@ -28,6 +29,15 @@ _LOGO_ICON_BLACK_B64 = base64.b64encode(
     (_REPO_ROOT / "logo-black-icon.png").read_bytes()
 ).decode()
 _ICON_B64 = base64.b64encode(_ICON_BYTES).decode()
+
+# Load Domaine Text font files
+_FONTS_DIR = _REPO_ROOT / "fonts"
+_FONT_FILES = {
+    "domaine-text-regular.woff2": (_FONTS_DIR / "domaine-text-regular.woff2").read_bytes(),
+    "domaine-text-regular-italic.woff2": (_FONTS_DIR / "domaine-text-regular-italic.woff2").read_bytes(),
+    "domaine-text-light.woff2": (_FONTS_DIR / "domaine-text-light.woff2").read_bytes(),
+    "domaine-text-light-italic.woff2": (_FONTS_DIR / "domaine-text-light-italic.woff2").read_bytes(),
+}
 
 # ---- PWA Manifest ----
 MANIFEST_JSON = """{
@@ -78,8 +88,12 @@ APP_HTML = f"""<!DOCTYPE html>
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+@font-face{{font-family:'Domaine Text';font-style:normal;font-weight:300;font-display:swap;src:url('/fonts/domaine-text-light.woff2') format('woff2')}}
+@font-face{{font-family:'Domaine Text';font-style:italic;font-weight:300;font-display:swap;src:url('/fonts/domaine-text-light-italic.woff2') format('woff2')}}
+@font-face{{font-family:'Domaine Text';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/domaine-text-regular.woff2') format('woff2')}}
+@font-face{{font-family:'Domaine Text';font-style:italic;font-weight:400;font-display:swap;src:url('/fonts/domaine-text-regular-italic.woff2') format('woff2')}}
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
   --green:#406546;--cream:#F9F0E2;--white:#FFFFFF;
@@ -87,7 +101,7 @@ APP_HTML = f"""<!DOCTYPE html>
   --g40:rgba(64,101,70,.4);--g20:rgba(64,101,70,.2);
   --g10:rgba(64,101,70,.1);--g05:rgba(64,101,70,.05);
   --ease:cubic-bezier(.25,1,.5,1);
-  --serif:'Cormorant Garamond',Georgia,serif;
+  --serif:'Domaine Text',Georgia,serif;
   --sans:'Work Sans',sans-serif;
 }}
 html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green);font-family:var(--sans);-webkit-font-smoothing:antialiased}}
@@ -148,7 +162,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__section{{width:100%;max-width:520px;margin-top:max(28px,3vh)}}
 .nc-home__section:first-of-type{{animation:ncUp .5s .3s var(--ease) both}}
 .nc-home__section:last-of-type{{animation:ncUp .5s .36s var(--ease) both}}
-.nc-home__section-title{{font-family:var(--serif);font-weight:600;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;color:var(--g60);margin-bottom:14px;padding-left:2px}}
+.nc-home__section-title{{font-family:var(--serif);font-weight:400;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--g60);margin-bottom:14px;padding-left:2px}}
 .nc-home__card-row{{display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:8px;margin:0 -24px;padding-left:24px;padding-right:24px;scrollbar-width:none}}
 .nc-home__card-row::-webkit-scrollbar{{display:none}}
 
@@ -159,7 +173,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-pcard__img{{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}}
 .nc-pcard__badge{{position:absolute;top:8px;left:8px;font-family:var(--sans);font-size:.56rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;background:rgba(64,101,70,.85);color:var(--cream);padding:4px 9px;border-radius:6px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}}
 .nc-pcard__body{{padding:14px 14px 16px}}
-.nc-pcard__name{{font-family:var(--serif);font-weight:600;font-size:.95rem;color:var(--green);letter-spacing:.01em}}
+.nc-pcard__name{{font-family:var(--serif);font-weight:400;font-size:1rem;color:var(--green);letter-spacing:.01em}}
 .nc-pcard__desc{{font-weight:300;font-size:.7rem;color:var(--g60);margin-top:5px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 .nc-pcard__price{{font-weight:400;font-size:.68rem;color:var(--g40);margin-top:8px;letter-spacing:.03em}}
 
@@ -168,7 +182,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-rcard:hover{{border-color:var(--g20);transform:translateY(-2px);box-shadow:0 4px 12px rgba(64,101,70,.08)}}
 .nc-rcard:active{{transform:scale(.97)}}
 .nc-rcard__icon{{width:36px;height:36px;border-radius:10px;background:var(--g05);border:1px solid var(--g10);display:flex;align-items:center;justify-content:center;font-size:1.1rem}}
-.nc-rcard__name{{font-family:var(--serif);font-weight:600;font-size:.88rem;color:var(--green);letter-spacing:.01em}}
+.nc-rcard__name{{font-family:var(--serif);font-weight:400;font-size:.92rem;color:var(--green);letter-spacing:.01em}}
 .nc-rcard__desc{{font-weight:300;font-size:.66rem;color:var(--g60);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 
 /* Home footer */
@@ -201,7 +215,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-back{{display:none;background:none;border:none;color:var(--g60);font-size:1.3rem;cursor:pointer;padding:4px 8px 4px 0;-webkit-tap-highlight-color:transparent}}
 .nc-back:active{{color:var(--green)}}
 .nc-header__logo{{height:16px;opacity:.8;display:none}}
-.nc-header__title{{font-family:var(--serif);font-weight:500;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g60)}}
+.nc-header__title{{font-family:var(--serif);font-weight:400;font-size:.88rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g60)}}
 .nc-header__dot{{width:6px;height:6px;border-radius:50%;background:var(--green);opacity:.6;animation:ncPulse 3s ease-in-out infinite}}
 @keyframes ncPulse{{0%,100%{{opacity:.6}}50%{{opacity:.2}}}}
 
@@ -665,3 +679,15 @@ async def serve_icon_192():
 @pwa_router.get("/icon-512.png")
 async def serve_icon_512():
     return Response(content=_ICON_BYTES, media_type="image/png", headers={"Cache-Control": "public, max-age=604800"})
+
+
+@pwa_router.get("/fonts/{filename}")
+async def serve_font(filename: str):
+    data = _FONT_FILES.get(filename)
+    if not data:
+        return Response(status_code=404)
+    return Response(
+        content=data,
+        media_type="font/woff2",
+        headers={"Cache-Control": "public, max-age=31536000", "Access-Control-Allow-Origin": "*"},
+    )
