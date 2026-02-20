@@ -33,14 +33,7 @@ _LOGO_WM_WHITE_B64 = base64.b64encode(
 ).decode()
 _ICON_B64 = base64.b64encode(_ICON_BYTES).decode()
 
-# Load Domaine Text font files
-_FONTS_DIR = _REPO_ROOT / "fonts"
-_FONT_FILES = {
-    "domaine-text-regular.woff2": (_FONTS_DIR / "domaine-text-regular.woff2").read_bytes(),
-    "domaine-text-regular-italic.woff2": (_FONTS_DIR / "domaine-text-regular-italic.woff2").read_bytes(),
-    "domaine-text-light.woff2": (_FONTS_DIR / "domaine-text-light.woff2").read_bytes(),
-    "domaine-text-light-italic.woff2": (_FONTS_DIR / "domaine-text-light-italic.woff2").read_bytes(),
-}
+_FONT_FILES = {}
 
 # ---- PWA Manifest ----
 MANIFEST_JSON = """{
@@ -93,10 +86,6 @@ APP_HTML = f"""<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-@font-face{{font-family:'Domaine Text';font-style:normal;font-weight:300;font-display:swap;src:url('/fonts/domaine-text-light.woff2') format('woff2')}}
-@font-face{{font-family:'Domaine Text';font-style:italic;font-weight:300;font-display:swap;src:url('/fonts/domaine-text-light-italic.woff2') format('woff2')}}
-@font-face{{font-family:'Domaine Text';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/domaine-text-regular.woff2') format('woff2')}}
-@font-face{{font-family:'Domaine Text';font-style:italic;font-weight:400;font-display:swap;src:url('/fonts/domaine-text-regular-italic.woff2') format('woff2')}}
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
   --green:#406546;--cream:#F9F0E2;--white:#FFFFFF;
@@ -104,7 +93,6 @@ APP_HTML = f"""<!DOCTYPE html>
   --g50:rgba(64,101,70,.5);--g35:rgba(64,101,70,.35);
   --g20:rgba(64,101,70,.2);--g12:rgba(64,101,70,.12);
   --g06:rgba(64,101,70,.06);--g03:rgba(64,101,70,.03);
-  --serif:'Domaine Text',Georgia,serif;
   --sans:'Work Sans',sans-serif;
   --ease:cubic-bezier(.22,1,.36,1);--ease-spring:cubic-bezier(.175,.885,.32,1.275);
   --shadow-s:0 1px 2px rgba(64,101,70,.02),0 4px 12px rgba(64,101,70,.04);
@@ -120,8 +108,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   display:flex;flex-direction:column;padding:32px 28px;position:relative;overflow:hidden;
 }}
 .nc-brand__top{{display:flex;flex-direction:column;align-items:flex-start;text-align:left;margin-bottom:0;gap:10px}}
+.nc-brand__top-row{{display:flex;align-items:center;justify-content:space-between;width:100%}}
 .nc-brand__logo{{height:14px;width:auto;opacity:.8;animation:ncFadeUp .8s var(--ease) both}}
-.nc-brand__tagline{{font-family:var(--serif);font-weight:300;font-size:.72rem;line-height:1.6;text-align:left;color:var(--cream);opacity:.4;animation:ncFadeUp .8s .12s var(--ease) both;font-style:italic;margin-bottom:0}}
+.nc-brand__tagline{{font-family:var(--sans);font-weight:300;font-size:.68rem;line-height:1.6;text-align:left;color:var(--cream);opacity:.4;letter-spacing:.04em;animation:ncFadeUp .8s .12s var(--ease) both;margin-bottom:0}}
 .nc-brand__nav{{display:flex;flex-direction:column;gap:2px;width:100%;margin-top:28px;animation:ncFadeUp .8s .2s var(--ease) both}}
 .nc-brand__nav-item{{
   display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:.72rem;font-weight:400;
@@ -158,18 +147,17 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-topbar--scrolled{{background:rgba(249,240,226,.88);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}}
 .nc-topbar__mark{{width:24px;height:24px;opacity:.5;transition:opacity .3s var(--ease);cursor:pointer}}
 .nc-topbar__mark:hover{{opacity:.7}}
+.nc-topbar__right{{display:flex;align-items:center;gap:8px}}
 
 /* Scroll area */
 .nc-home__scroll-area{{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center}}
 
 /* Hero */
-.nc-hero{{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:min(420px,50vh);padding:0 28px;text-align:center}}
-.nc-hero__sub{{font-family:var(--serif);font-weight:300;font-size:.78rem;font-style:italic;letter-spacing:.08em;color:var(--g35);margin-bottom:20px;animation:ncFadeUp .7s var(--ease) both}}
-.nc-hero__greeting{{font-family:var(--serif);font-size:clamp(1.6rem,4.5vw,2.1rem);font-weight:300;font-style:italic;color:var(--green);line-height:1.55;max-width:520px;margin-bottom:max(36px,4.5vh);animation:ncFadeUp .7s .08s var(--ease) both}}
+.nc-hero{{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:min(340px,40vh);padding:0 28px 0;text-align:center}}
+.nc-hero__sub{{font-family:var(--sans);font-weight:300;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g35);margin-bottom:12px;animation:ncFadeUp .7s var(--ease) both}}
+.nc-hero__greeting{{font-family:var(--sans);font-size:clamp(1.4rem,3.5vw,1.8rem);font-weight:300;color:var(--green);line-height:1.5;max-width:520px;margin-bottom:24px;animation:ncFadeUp .7s .08s var(--ease) both}}
 .nc-hero__input-wrap{{width:100%;max-width:520px;animation:ncFadeUp .7s .16s var(--ease) both}}
-.nc-hero__scroll-hint{{margin-top:24px;opacity:.15;animation:ncScrollHint 2.5s ease-in-out infinite,ncFadeUp .7s .3s var(--ease) both;transition:opacity .5s var(--ease)}}
-.nc-hero__scroll-hint.nc-hidden-hint{{opacity:0}}
-@keyframes ncScrollHint{{0%,100%{{transform:translateY(0)}}50%{{transform:translateY(6px)}}}}
+.nc-hero__scroll-hint{{display:none}}
 
 /* Home Input */
 .nc-home__form{{display:flex;align-items:center;gap:8px;background:var(--white);border:none;border-radius:28px;padding:5px 5px 5px 22px;transition:box-shadow .5s var(--ease);box-shadow:var(--shadow-s)}}
@@ -178,7 +166,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home__input::placeholder{{color:var(--g35);font-weight:300}}
 
 /* Topic pills */
-.nc-topics{{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:580px;padding:0 28px;margin-top:24px;animation:ncFadeUp .7s .24s var(--ease) both}}
+.nc-topics{{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:580px;padding:0 28px;margin-top:16px;animation:ncFadeUp .7s .24s var(--ease) both}}
 .nc-topics__pill{{
   font-family:var(--sans);font-size:.78rem;font-weight:400;color:var(--g50);
   background:var(--g03);border:none;border-radius:22px;
@@ -191,8 +179,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-topics__pill--primary:hover{{background:var(--g12)}}
 
 /* Sections */
-.nc-section{{width:100%;max-width:720px;padding:0 28px;margin-top:36px}}
-.nc-section__title{{font-family:var(--serif);font-weight:300;font-size:.85rem;font-style:italic;letter-spacing:.05em;color:var(--g35);margin-bottom:20px;padding-left:4px}}
+.nc-section{{width:100%;max-width:720px;padding:0 28px;margin-top:28px}}
+.nc-section__title{{font-family:var(--sans);font-weight:400;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--g35);margin-bottom:20px;padding-left:4px}}
 
 /* Product Cards v2 */
 .nc-products-grid{{display:grid;grid-template-columns:1fr;gap:16px}}
@@ -203,7 +191,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-pcard-v2__blob{{position:absolute;width:100px;height:80px;bottom:-10px;right:20px;border-radius:60% 40% 50% 50%;background:rgba(255,255,255,.12)}}
 .nc-pcard-v2__body{{padding:22px 24px 24px}}
 .nc-pcard-v2__grade{{font-family:var(--sans);font-size:.58rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--g35);margin-bottom:8px}}
-.nc-pcard-v2__name{{font-family:var(--serif);font-weight:400;font-size:1.2rem;color:var(--green);letter-spacing:.01em;line-height:1.3;transition:color .5s var(--ease)}}
+.nc-pcard-v2__name{{font-family:var(--sans);font-weight:400;font-size:1.2rem;color:var(--green);letter-spacing:.01em;line-height:1.3;transition:color .5s var(--ease)}}
 .nc-pcard-v2:hover .nc-pcard-v2__name{{color:var(--g70)}}
 .nc-pcard-v2__desc{{font-weight:300;font-size:.76rem;color:var(--g50);margin-top:8px;line-height:1.65}}
 .nc-pcard-v2__footer{{display:flex;align-items:center;justify-content:space-between;margin-top:16px}}
@@ -217,13 +205,13 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-rcard-v2:hover{{box-shadow:var(--shadow-m)}}
 .nc-rcard-v2:active{{transform:scale(.97);transition-duration:.12s}}
 .nc-rcard-v2__emoji{{font-size:1.6rem;margin-bottom:14px;line-height:1}}
-.nc-rcard-v2__name{{font-family:var(--serif);font-weight:400;font-size:.95rem;color:var(--green);letter-spacing:.01em;line-height:1.3;transition:color .5s var(--ease)}}
+.nc-rcard-v2__name{{font-family:var(--sans);font-weight:400;font-size:.95rem;color:var(--green);letter-spacing:.01em;line-height:1.3;transition:color .5s var(--ease)}}
 .nc-rcard-v2:hover .nc-rcard-v2__name{{color:var(--g70)}}
 .nc-rcard-v2__desc{{font-weight:300;font-size:.68rem;color:var(--g50);line-height:1.6;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 
 /* Invite section */
 .nc-invite{{background:var(--g03);border-radius:24px;padding:36px 28px;text-align:center}}
-.nc-invite__headline{{font-family:var(--serif);font-weight:300;font-size:1.15rem;font-style:italic;color:var(--green);line-height:1.5;margin-bottom:12px}}
+.nc-invite__headline{{font-family:var(--sans);font-weight:300;font-size:1.15rem;color:var(--green);line-height:1.5;margin-bottom:12px}}
 .nc-invite__body{{font-size:.8rem;font-weight:300;color:var(--g50);line-height:1.65;margin-bottom:24px}}
 .nc-invite__btn{{
   font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
@@ -235,7 +223,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-invite__btn:active{{transform:scale(.96);transition-duration:.12s}}
 .nc-invite__btn:disabled{{background:var(--g12);color:var(--g35);cursor:default;transform:none}}
 .nc-invite__counter{{font-size:.68rem;font-weight:300;color:var(--g35);margin-top:14px}}
-.nc-invite__done{{font-family:var(--serif);font-weight:300;font-size:.85rem;font-style:italic;color:var(--g35);line-height:1.6}}
+.nc-invite__done{{font-family:var(--sans);font-weight:300;font-size:.85rem;color:var(--g35);line-height:1.6}}
 
 /* Home footer */
 .nc-home__links{{display:flex;align-items:center;gap:24px;margin-top:36px;margin-bottom:max(36px,env(safe-area-inset-bottom));animation:ncFadeUp .7s .4s var(--ease) both}}
@@ -252,16 +240,54 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   border-radius:7px;position:relative;z-index:1;
 }}
 .nc-lang-btn.active{{background:var(--white);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)}}
+.nc-brand .nc-lang-toggle{{background:rgba(249,240,226,.1)}}
+.nc-brand .nc-lang-btn{{color:rgba(249,240,226,.35);font-size:.6rem;padding:5px 10px}}
+.nc-brand .nc-lang-btn.active{{background:rgba(249,240,226,.18);color:var(--cream);box-shadow:none}}
 
 /* Overlay backdrop */
 .nc-overlay-bg{{position:fixed;inset:0;background:rgba(0,0,0,.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .35s var(--ease);z-index:40}}
 .nc-overlay-bg--active{{opacity:1;pointer-events:auto}}
 
+/* Mobile drawer */
+.nc-drawer-overlay{{position:fixed;inset:0;background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s var(--ease);z-index:50}}
+.nc-drawer-overlay--open{{opacity:1;pointer-events:auto}}
+.nc-drawer{{position:fixed;top:0;right:0;bottom:0;width:280px;max-width:80vw;background:var(--green);transform:translateX(100%);transition:transform .35s var(--ease);z-index:51;display:flex;flex-direction:column;padding:0}}
+.nc-drawer--open{{transform:translateX(0)}}
+.nc-drawer__header{{display:flex;align-items:center;justify-content:space-between;padding:max(16px,env(safe-area-inset-top)) 20px 12px}}
+.nc-drawer__close{{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--cream);opacity:.5;cursor:pointer;-webkit-tap-highlight-color:transparent}}
+.nc-drawer__close:hover{{opacity:.8}}
+.nc-drawer__lang{{}}
+.nc-drawer .nc-lang-toggle{{background:rgba(249,240,226,.1)}}
+.nc-drawer .nc-lang-btn{{color:rgba(249,240,226,.35);font-size:.6rem;padding:5px 10px}}
+.nc-drawer .nc-lang-btn.active{{background:rgba(249,240,226,.18);color:var(--cream);box-shadow:none}}
+.nc-drawer__nav{{display:flex;flex-direction:column;gap:2px;padding:8px 12px;flex:1}}
+.nc-drawer__nav-item{{
+  display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:.76rem;font-weight:400;
+  color:rgba(249,240,226,.5);padding:12px 16px;border-radius:10px;cursor:pointer;
+  transition:all .35s var(--ease);border:none;background:transparent;text-align:left;
+  -webkit-tap-highlight-color:transparent;width:100%;
+}}
+.nc-drawer__nav-item:hover{{color:var(--cream);background:rgba(249,240,226,.08)}}
+.nc-drawer__nav-item svg{{width:16px;height:16px;opacity:.5;flex-shrink:0}}
+.nc-drawer__bottom{{padding:16px 20px max(16px,env(safe-area-inset-bottom));margin-top:auto}}
+.nc-drawer__ctas{{display:flex;flex-direction:column;gap:8px}}
+.nc-drawer__cta{{
+  display:block;text-align:center;font-family:var(--sans);font-size:.64rem;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;text-decoration:none;
+  padding:12px 16px;border-radius:10px;cursor:pointer;transition:all .5s var(--ease);
+}}
+.nc-drawer__cta--p{{background:rgba(249,240,226,.12);color:var(--cream);border:none}}
+.nc-drawer__cta--p:hover{{background:rgba(249,240,226,.22)}}
+.nc-drawer__cta--s{{background:transparent;color:rgba(249,240,226,.4);border:1px solid rgba(249,240,226,.1)}}
+.nc-drawer__cta--s:hover{{color:var(--cream);border-color:rgba(249,240,226,.28)}}
+.nc-hamburger{{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0}}
+.nc-hamburger svg{{width:20px;height:20px;color:var(--g50)}}
+
 /* Invite sheet */
 .nc-invite-sheet{{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-radius:24px 24px 0 0;padding:28px 28px max(28px,env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .4s var(--ease);z-index:41;text-align:center;max-height:70vh}}
 .nc-invite-sheet--active{{transform:translateY(0)}}
 .nc-invite-sheet__handle{{width:32px;height:4px;border-radius:2px;background:var(--g12);margin:0 auto 24px}}
-.nc-invite-sheet__headline{{font-family:var(--serif);font-weight:300;font-size:1.15rem;font-style:italic;color:var(--green);margin-bottom:12px}}
+.nc-invite-sheet__headline{{font-family:var(--sans);font-weight:300;font-size:1.15rem;color:var(--green);margin-bottom:12px}}
 .nc-invite-sheet__body{{font-size:.82rem;font-weight:300;color:var(--g50);line-height:1.65;margin-bottom:28px;max-width:320px;margin-left:auto;margin-right:auto}}
 .nc-invite-sheet__primary{{
   font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
@@ -278,7 +304,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-coupon-overlay{{position:fixed;inset:0;background:var(--cream);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;opacity:0;pointer-events:none;transition:opacity .4s var(--ease),transform .4s var(--ease);transform:scale(.96)}}
 .nc-coupon-overlay--active{{opacity:1;pointer-events:auto;transform:scale(1)}}
 .nc-coupon-overlay__mark{{width:36px;height:36px;opacity:.65;margin-bottom:32px}}
-.nc-coupon-overlay__headline{{font-family:var(--serif);font-weight:300;font-size:1.3rem;font-style:italic;color:var(--green);text-align:center;line-height:1.5;max-width:300px;margin-bottom:14px}}
+.nc-coupon-overlay__headline{{font-family:var(--sans);font-weight:300;font-size:1.3rem;color:var(--green);text-align:center;line-height:1.5;max-width:300px;margin-bottom:14px}}
 .nc-coupon-overlay__body{{font-size:.82rem;font-weight:300;color:var(--g50);text-align:center;line-height:1.65;max-width:300px;margin-bottom:32px}}
 .nc-coupon-overlay__card{{background:var(--white);border:2px dashed var(--g12);border-radius:16px;padding:28px 32px;text-align:center;width:100%;max-width:320px;margin-bottom:32px}}
 .nc-coupon-overlay__code{{font-family:var(--sans);font-weight:500;font-size:1.2rem;letter-spacing:.2em;color:var(--green);margin-bottom:8px}}
@@ -319,14 +345,14 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-back{{display:none;background:none;border:none;color:var(--g50);cursor:pointer;padding:6px 10px 6px 0;-webkit-tap-highlight-color:transparent;transition:color .3s var(--ease)}}
 .nc-back:hover{{color:var(--green)}}
 .nc-header__logo{{height:16px;opacity:.75;display:none}}
-.nc-header__title{{font-family:var(--serif);font-weight:300;font-size:.88rem;font-style:italic;letter-spacing:.04em;text-transform:none;color:var(--g35)}}
+.nc-header__title{{font-family:var(--sans);font-weight:400;font-size:.82rem;letter-spacing:.06em;text-transform:none;color:var(--g35)}}
 .nc-header__dot{{width:6px;height:6px;border-radius:50%;background:var(--green);opacity:.5;animation:ncBreathe 4s ease-in-out infinite}}
 @keyframes ncBreathe{{0%,100%{{opacity:.5;transform:scale(1)}}50%{{opacity:.2;transform:scale(.8)}}}}
 
 /* Messages */
 .nc-messages{{flex:1;overflow-y:auto;padding:24px 24px 16px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth;max-width:760px;width:100%;margin:0 auto}}
 .nc-messages::-webkit-scrollbar{{width:0;display:none}}
-.nc-banner{{text-align:center;padding:10px 16px;margin:0 auto 24px;font-family:var(--serif);font-size:.74rem;font-weight:300;font-style:italic;color:var(--g20);letter-spacing:.03em}}
+.nc-banner{{text-align:center;padding:10px 16px;margin:0 auto 24px;font-family:var(--sans);font-size:.74rem;font-weight:300;color:var(--g20);letter-spacing:.03em}}
 .nc-msg{{display:flex;flex-direction:column;animation:ncMsgIn .5s var(--ease) both}}
 @keyframes ncMsgIn{{from{{opacity:0;transform:translateY(8px) scale(.98)}}to{{opacity:1;transform:translateY(0) scale(1)}}}}
 .nc-msg--bot{{align-items:flex-start;padding-right:48px}}
@@ -378,7 +404,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 
 @keyframes ncFadeUp{{from{{opacity:0;transform:translateY(12px)}}to{{opacity:1;transform:translateY(0)}}}}
 
-@media(min-width:900px){{.nc-topbar{{display:none}}.nc-products-grid{{grid-template-columns:repeat(3,1fr)}}.nc-pcard-v2__visual{{height:120px}}.nc-recipes-grid{{grid-template-columns:repeat(3,1fr)}}.nc-hero{{min-height:calc(100vh - 20px)}}.nc-invite-sheet{{max-width:420px;left:50%;right:auto;transform:translateX(-50%) translateY(100%)}}.nc-invite-sheet--active{{transform:translateX(-50%) translateY(0)}}.nc-invite{{max-width:720px;margin:0 auto}}.nc-msg--bot{{padding-right:80px}}.nc-msg--user{{padding-left:80px}}}}
+@media(min-width:900px){{.nc-topbar{{display:none}}.nc-drawer,.nc-drawer-overlay{{display:none}}.nc-products-grid{{grid-template-columns:repeat(3,1fr)}}.nc-pcard-v2__visual{{height:120px}}.nc-recipes-grid{{grid-template-columns:repeat(3,1fr)}}.nc-hero{{min-height:min(320px,38vh)}}.nc-invite-sheet{{max-width:420px;left:50%;right:auto;transform:translateX(-50%) translateY(100%)}}.nc-invite-sheet--active{{transform:translateX(-50%) translateY(0)}}.nc-invite{{max-width:720px;margin:0 auto}}.nc-msg--bot{{padding-right:80px}}.nc-msg--user{{padding-left:80px}}}}
 @media(min-width:1400px){{.nc-section{{max-width:800px}}.nc-products-grid{{gap:20px}}.nc-messages{{max-width:840px}}.nc-input-area{{max-width:840px}}}}
 @media(max-width:899px){{
   .nc-brand{{display:none}}
@@ -415,7 +441,13 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 <div id="nc-app">
   <aside class="nc-brand">
     <div class="nc-brand__top">
-      <img class="nc-brand__logo" src="data:image/png;base64,{_LOGO_WM_WHITE_B64}" alt="NAKAI" />
+      <div class="nc-brand__top-row">
+        <img class="nc-brand__logo" src="data:image/png;base64,{_LOGO_WM_WHITE_B64}" alt="NAKAI" />
+        <div class="nc-lang-toggle" id="nc-lang-brand">
+          <button class="nc-lang-btn active" data-lang="en">EN</button>
+          <button class="nc-lang-btn" data-lang="ja">JA</button>
+        </div>
+      </div>
       <p class="nc-brand__tagline">Enriching the present.</p>
     </div>
     <nav class="nc-brand__nav">
@@ -443,12 +475,15 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
             <button class="nc-lang-btn active" data-lang="en">EN</button>
             <button class="nc-lang-btn" data-lang="ja">JA</button>
           </div>
+          <button class="nc-hamburger" id="nc-hamburger" aria-label="Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
         </div>
       </div>
       <div class="nc-home__scroll-area" id="nc-home-scroll">
         <div class="nc-hero">
           <p class="nc-hero__sub" id="nc-home-sub">Your private matcha concierge</p>
-          <h1 class="nc-hero__greeting" id="nc-home-greeting">抹茶について何が知りたいですか？</h1>
+          <h1 class="nc-hero__greeting" id="nc-home-greeting">Shall we talk about matcha?</h1>
           <div class="nc-hero__input-wrap">
             <form class="nc-home__form" id="nc-home-form">
               <input type="text" class="nc-home__input" id="nc-home-input" autocomplete="off" maxlength="500" />
@@ -486,6 +521,31 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       </div>
     </div>
     <!-- Overlays -->
+    <div class="nc-drawer-overlay" id="nc-drawer-overlay"></div>
+    <nav class="nc-drawer" id="nc-drawer">
+      <div class="nc-drawer__header">
+        <div class="nc-drawer__lang">
+          <div class="nc-lang-toggle" id="nc-lang-drawer">
+            <button class="nc-lang-btn active" data-lang="en">EN</button>
+            <button class="nc-lang-btn" data-lang="ja">JA</button>
+          </div>
+        </div>
+        <button class="nc-drawer__close" id="nc-drawer-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+      </div>
+      <div class="nc-drawer__nav">
+        <button class="nc-drawer__nav-item" id="nc-dnav-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg><span>Home</span></button>
+        <button class="nc-drawer__nav-item" id="nc-dnav-find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span id="nc-dnav-find-label">Find My Matcha</span></button>
+        <button class="nc-drawer__nav-item" id="nc-dnav-brew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg><span id="nc-dnav-brew-label">Barista Guide</span></button>
+        <button class="nc-drawer__nav-item" id="nc-dnav-recipes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span id="nc-dnav-recipes-label">Recipes</span></button>
+        <button class="nc-drawer__nav-item" id="nc-dnav-faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="nc-dnav-faq-label">About Matcha</span></button>
+      </div>
+      <div class="nc-drawer__bottom">
+        <div class="nc-drawer__ctas">
+          <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-drawer__cta nc-drawer__cta--p">Shop NAKAI</a>
+          <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-drawer__cta nc-drawer__cta--s">Wholesale</a>
+        </div>
+      </div>
+    </nav>
     <div class="nc-overlay-bg" id="nc-overlay-bg"></div>
     <div class="nc-invite-sheet" id="nc-invite-sheet">
       <div class="nc-invite-sheet__handle"></div>
@@ -585,7 +645,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       rIced:'Iced Matcha',rIcedDesc:'Refreshing, bright, and easy to make',rIcedMsg:'How do I make iced matcha? Step by step please.',
       rAffogato:'Affogato',rAffogatoDesc:'Matcha meets vanilla ice cream',rAffogatoMsg:'How do I make a matcha affogato?',
       rBarista:'Barista Tips',rBaristaDesc:'Water temp, whisking, milk pairing',rBaristaMsg:'What are the essential barista tips for working with matcha? Cover water temperature, whisking technique, and milk pairing.',
-      heroSub:'Your private matcha concierge',heroGreeting:'\u62b9\u8336\u306b\u3064\u3044\u3066\u4f55\u304c\u77e5\u308a\u305f\u3044\u3067\u3059\u304b\uff1f',
+      heroSub:'Your private matcha concierge',heroGreeting:'Shall we talk about matcha?',
       tFind:'Find My Matcha',tBrew:'Barista Guide',tProduct:'Recipes',tFaq:'About Matcha',
       pAsk:'Ask about this',
       inviteHeadline:'Share matcha with someone you love',inviteBody:'Invite a close friend and they\u2019ll receive a special matcha gift.',
@@ -627,7 +687,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       rIced:'\u30a2\u30a4\u30b9\u62b9\u8336',rIcedDesc:'\u723d\u3084\u304b\u3067\u4f5c\u308a\u3084\u3059\u3044',rIcedMsg:'\u30a2\u30a4\u30b9\u62b9\u8336\u306e\u4f5c\u308a\u65b9\u3092\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u3067\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
       rAffogato:'\u30a2\u30d5\u30a9\u30ac\u30fc\u30c8',rAffogatoDesc:'\u62b9\u8336\u3068\u30d0\u30cb\u30e9\u30a2\u30a4\u30b9\u306e\u30cf\u30fc\u30e2\u30cb\u30fc',rAffogatoMsg:'\u62b9\u8336\u30a2\u30d5\u30a9\u30ac\u30fc\u30c8\u306e\u4f5c\u308a\u65b9\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
       rBarista:'\u30d0\u30ea\u30b9\u30bf Tips',rBaristaDesc:'\u6c34\u6e29\u3001\u8336\u7b45\u306e\u4f7f\u3044\u65b9\u3001\u30df\u30eb\u30af\u9078\u3073',rBaristaMsg:'\u62b9\u8336\u3092\u6271\u3046\u30d0\u30ea\u30b9\u30bf\u306e\u5fc5\u9808\u30c6\u30af\u30cb\u30c3\u30af\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u6c34\u6e29\u3001\u8336\u7b45\u306e\u4f7f\u3044\u65b9\u3001\u30df\u30eb\u30af\u306e\u76f8\u6027\u3092\u30ab\u30d0\u30fc\u3057\u3066\u304f\u3060\u3055\u3044\u3002',
-      heroSub:'\u3042\u306a\u305f\u306e\u62b9\u8336\u30b3\u30f3\u30b7\u30a7\u30eb\u30b8\u30e5',heroGreeting:'\u62b9\u8336\u306b\u3064\u3044\u3066\u4f55\u304c\u77e5\u308a\u305f\u3044\u3067\u3059\u304b\uff1f',
+      heroSub:'\u3042\u306a\u305f\u306e\u62b9\u8336\u30b3\u30f3\u30b7\u30a7\u30eb\u30b8\u30e5',heroGreeting:'\u62b9\u8336\u306b\u3064\u3044\u3066\u8a71\u3057\u307e\u305b\u3093\u304b\uff1f',
       tFind:'\u81ea\u5206\u306b\u5408\u3046\u62b9\u8336\u3092\u63a2\u3059',tBrew:'\u30d0\u30ea\u30b9\u30bf\u30ac\u30a4\u30c9',tProduct:'\u30ec\u30b7\u30d4',tFaq:'\u62b9\u8336\u306b\u3064\u3044\u3066',
       pAsk:'\u8a73\u3057\u304f\u805e\u304f',
       inviteHeadline:'\u5927\u5207\u306a\u4eba\u306b\u62b9\u8336\u3092\u8d08\u308d\u3046',inviteBody:'\u53cb\u4eba\u3092\u62db\u5f85\u3059\u308b\u3068\u3001\u7279\u5225\u306a\u62b9\u8336\u30ae\u30d5\u30c8\u304c\u5c4a\u304d\u307e\u3059\u3002',
@@ -677,6 +737,10 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     var nbl=$('nc-nav-brew-label');if(nbl)nbl.textContent=t('tBrew');
     var nrl=$('nc-nav-recipes-label');if(nrl)nrl.textContent=t('tProduct');
     var nql=$('nc-nav-faq-label');if(nql)nql.textContent=t('tFaq');
+    var dfl=$('nc-dnav-find-label');if(dfl)dfl.textContent=t('tFind');
+    var dbl=$('nc-dnav-brew-label');if(dbl)dbl.textContent=t('tBrew');
+    var drl=$('nc-dnav-recipes-label');if(drl)drl.textContent=t('tProduct');
+    var dql=$('nc-dnav-faq-label');if(dql)dql.textContent=t('tFaq');
     buildQuickActions();
     buildProductCards();
     buildRecipeCards();
@@ -935,6 +999,18 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     var nq=$('nc-nav-faq');if(nq)nq.addEventListener('click',function(){{showChat(t('faqMsg'))}});
     $('nc-topbar-mark').addEventListener('click',function(){{var s=$('nc-home-scroll');if(s)s.scrollTo({{top:0,behavior:'smooth'}})}});
     initTopbarScroll();
+    /* Drawer */
+    var drawer=$('nc-drawer'),drawerOv=$('nc-drawer-overlay');
+    function openDrawer(){{drawer.classList.add('nc-drawer--open');drawerOv.classList.add('nc-drawer-overlay--open');document.body.style.overflow='hidden'}}
+    function closeDrawer(){{drawer.classList.remove('nc-drawer--open');drawerOv.classList.remove('nc-drawer-overlay--open');document.body.style.overflow=''}}
+    var hb=$('nc-hamburger');if(hb)hb.addEventListener('click',openDrawer);
+    $('nc-drawer-close').addEventListener('click',closeDrawer);
+    drawerOv.addEventListener('click',closeDrawer);
+    $('nc-dnav-home').addEventListener('click',function(){{closeDrawer();showHome()}});
+    $('nc-dnav-find').addEventListener('click',function(){{closeDrawer();showChat(t('findMsg'))}});
+    $('nc-dnav-brew').addEventListener('click',function(){{closeDrawer();showChat(t('brewMsg'))}});
+    $('nc-dnav-recipes').addEventListener('click',function(){{closeDrawer();showChat(t('productMsg'))}});
+    $('nc-dnav-faq').addEventListener('click',function(){{closeDrawer();showChat(t('faqMsg'))}});
     $('nc-overlay-bg').addEventListener('click',closeInviteSheet);
     $('nc-sheet-share').addEventListener('click',shareInvite);
     $('nc-sheet-copy').addEventListener('click',function(){{shareInvite(true)}});
