@@ -146,8 +146,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-topbar{{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:max(14px,env(safe-area-inset-top)) 24px 12px;transition:background .4s var(--ease)}}
 .nc-topbar--scrolled{{background:rgba(249,240,226,.88);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}}
 .nc-topbar__left{{display:flex;align-items:center;gap:8px}}
-.nc-topbar__wordmark{{height:10px;width:auto;opacity:.45;transition:opacity .3s var(--ease);cursor:pointer}}
-.nc-topbar__wordmark:hover{{opacity:.65}}
+.nc-topbar__wordmark{{height:16px;width:auto;opacity:.5;transition:opacity .3s var(--ease);cursor:pointer}}
+.nc-topbar__wordmark:hover{{opacity:.7}}
 .nc-topbar__right{{display:flex;align-items:center;gap:8px}}
 
 /* Scroll area */
@@ -157,19 +157,14 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-hero{{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:min(340px,40vh);padding:0 28px 0;text-align:center;position:relative}}
 .nc-hero__sub-wrap{{position:relative;display:inline-flex;align-items:center;gap:6px;animation:ncFadeUp .7s var(--ease) both}}
 .nc-hero__sub{{font-family:var(--sans);font-weight:300;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g35);margin-bottom:12px}}
-.nc-hero__leaves{{position:absolute;width:200px;height:40px;left:50%;top:-8px;transform:translateX(-50%);pointer-events:none;overflow:visible}}
-.nc-leaf{{position:absolute;font-size:12px;opacity:0;animation:ncLeafFloat linear infinite}}
-.nc-leaf:nth-child(1){{left:10%;animation-duration:4.5s;animation-delay:0s}}
-.nc-leaf:nth-child(2){{left:45%;animation-duration:5.2s;animation-delay:1.2s}}
-.nc-leaf:nth-child(3){{left:80%;animation-duration:4.8s;animation-delay:2.5s}}
-.nc-leaf:nth-child(4){{left:25%;animation-duration:5.5s;animation-delay:3.8s}}
-.nc-leaf:nth-child(5){{left:65%;animation-duration:4.2s;animation-delay:0.8s}}
-@keyframes ncLeafFloat{{
-  0%{{opacity:0;transform:translateY(-16px) rotate(0deg) scale(.7)}}
-  15%{{opacity:.35}}
-  50%{{opacity:.25;transform:translateY(8px) rotate(45deg) translateX(8px) scale(.85)}}
-  85%{{opacity:.15}}
-  100%{{opacity:0;transform:translateY(28px) rotate(90deg) translateX(-4px) scale(.7)}}
+.nc-hero__leaf{{position:absolute;right:-32px;top:-6px;width:22px;height:22px;pointer-events:none;animation:ncLeafSway 3.5s ease-in-out infinite;transform-origin:70% 90%}}
+.nc-hero__leaf svg{{width:100%;height:100%}}
+@keyframes ncLeafSway{{
+  0%{{transform:rotate(-5deg) scale(1)}}
+  25%{{transform:rotate(8deg) scale(1.03)}}
+  50%{{transform:rotate(-3deg) scale(.98)}}
+  75%{{transform:rotate(6deg) scale(1.02)}}
+  100%{{transform:rotate(-5deg) scale(1)}}
 }}
 .nc-hero__greeting{{font-family:var(--sans);font-size:clamp(1.4rem,3.5vw,1.8rem);font-weight:300;color:var(--green);line-height:1.5;max-width:520px;margin-bottom:24px;animation:ncFadeUp .7s .08s var(--ease) both}}
 .nc-hero__input-wrap{{width:100%;max-width:520px;animation:ncFadeUp .7s .16s var(--ease) both}}
@@ -269,7 +264,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 /* Mobile drawer */
 .nc-drawer-overlay{{position:fixed;inset:0;background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s var(--ease);z-index:50}}
 .nc-drawer-overlay--open{{opacity:1;pointer-events:auto}}
-.nc-drawer{{position:fixed;top:0;right:0;bottom:0;width:280px;max-width:80vw;background:var(--green);transform:translateX(100%);transition:transform .35s var(--ease);z-index:51;display:flex;flex-direction:column;padding:0}}
+.nc-drawer{{position:fixed;top:0;left:0;bottom:0;width:280px;max-width:80vw;background:var(--green);transform:translateX(-100%);transition:transform .35s var(--ease);z-index:51;display:flex;flex-direction:column;padding:0}}
 .nc-drawer--open{{transform:translateX(0)}}
 .nc-drawer__header{{display:flex;align-items:center;justify-content:space-between;padding:max(16px,env(safe-area-inset-top)) 20px 12px}}
 .nc-drawer__close{{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--cream);opacity:.5;cursor:pointer;-webkit-tap-highlight-color:transparent}}
@@ -488,6 +483,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     <div class="nc-home" id="nc-home">
       <div class="nc-topbar" id="nc-topbar">
         <div class="nc-topbar__left">
+          <button class="nc-hamburger" id="nc-hamburger" aria-label="Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
           <img class="nc-topbar__wordmark" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" id="nc-topbar-mark" />
         </div>
         <div class="nc-topbar__right">
@@ -495,16 +493,13 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
             <button class="nc-lang-btn active" data-lang="en">EN</button>
             <button class="nc-lang-btn" data-lang="ja">JA</button>
           </div>
-          <button class="nc-hamburger" id="nc-hamburger" aria-label="Menu">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
-          </button>
         </div>
       </div>
       <div class="nc-home__scroll-area" id="nc-home-scroll">
         <div class="nc-hero">
           <div class="nc-hero__sub-wrap">
-            <div class="nc-hero__leaves" aria-hidden="true"><span class="nc-leaf">\U0001f343</span><span class="nc-leaf">\U0001f33f</span><span class="nc-leaf">\U0001f343</span><span class="nc-leaf">\U0001f33f</span><span class="nc-leaf">\U0001f343</span></div>
             <p class="nc-hero__sub" id="nc-home-sub">Your private matcha concierge</p>
+            <div class="nc-hero__leaf" aria-hidden="true"><svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 2C14 12 6 28 10 48c2 8 8 12 14 14" stroke="#8a8a6a" stroke-width="1.2" fill="none"/><path d="M24 2c10 10 18 26 14 46-2 8-8 12-14 14" stroke="#8a8a6a" stroke-width="1.2" fill="none"/><path d="M24 2v60" stroke="#c4a240" stroke-width="2.2" stroke-linecap="round"/><path d="M24 16c-5 3-9 8-11 14M24 26c-6 4-10 10-12 16M24 36c-4 3-7 8-9 12" stroke="#8a8a6a" stroke-width=".8" fill="none"/><path d="M24 16c5 3 9 8 11 14M24 26c6 4 10 10 12 16M24 36c4 3 7 8 9 12" stroke="#8a8a6a" stroke-width=".8" fill="none"/></svg></div>
           </div>
           <h1 class="nc-hero__greeting" id="nc-home-greeting">Shall we talk about matcha?</h1>
           <div class="nc-hero__input-wrap">
