@@ -137,7 +137,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-home{{position:absolute;inset:0;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:opacity .5s var(--ease),transform .5s var(--ease),filter .5s var(--ease);z-index:5}}
 .nc-home.nc-hidden{{opacity:0;transform:translateX(-20px);filter:blur(4px);pointer-events:none}}
 .nc-home__top{{display:flex;justify-content:flex-end;padding:max(16px,env(safe-area-inset-top)) 24px 0;flex-shrink:0}}
-.nc-home__scroll{{flex:1;display:flex;flex-direction:column;align-items:center;padding:max(32px,8vh) 28px 48px}}
+.nc-home__scroll{{flex:1;display:flex;flex-direction:column;align-items:center;padding:max(32px,8vh) 28px 48px;background:radial-gradient(ellipse at 50% 25%,rgba(255,255,255,.25) 0%,transparent 65%)}}
 .nc-home__logo{{width:140px;margin-bottom:14px;animation:ncFadeUp .7s var(--ease) both}}
 .nc-home__sub{{font-family:var(--serif);font-weight:300;font-size:.8rem;font-style:italic;letter-spacing:.1em;text-transform:none;color:var(--g35);margin-bottom:max(48px,6vh);animation:ncFadeUp .7s .08s var(--ease) both}}
 
@@ -194,17 +194,20 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-pcard__badge{{display:none}}
 .nc-pcard__body{{padding:20px 18px 22px}}
 .nc-pcard__grade{{font-family:var(--sans);font-size:.56rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--g35);margin-bottom:8px}}
-.nc-pcard__name{{font-family:var(--serif);font-weight:400;font-size:1.1rem;color:var(--green);letter-spacing:.01em;line-height:1.3}}
+.nc-pcard__name{{font-family:var(--serif);font-weight:400;font-size:1.1rem;color:var(--green);letter-spacing:.01em;line-height:1.3;transition:color .5s var(--ease)}}
 .nc-pcard__desc{{font-weight:300;font-size:.72rem;color:var(--g50);margin-top:8px;line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 .nc-pcard__price{{font-weight:300;font-size:.68rem;color:var(--g35);margin-top:12px;letter-spacing:.04em}}
+.nc-pcard:hover .nc-pcard__name{{color:var(--g70)}}
 
 /* Recipe Card */
 .nc-rcard{{flex-shrink:0;width:150px;scroll-snap-align:start;background:var(--white);border:none;border-radius:16px;overflow:hidden;cursor:pointer;transition:all .5s var(--ease);padding:20px 18px;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent;box-shadow:var(--shadow-s)}}
 .nc-rcard:hover{{transform:translateY(-4px);box-shadow:var(--shadow-l)}}
 .nc-rcard:active{{transform:scale(.97)}}
-.nc-rcard__icon{{width:20px;height:1px;background:var(--g20);margin-bottom:14px;font-size:0;overflow:hidden;border-radius:0}}
-.nc-rcard__name{{font-family:var(--serif);font-weight:400;font-size:.95rem;color:var(--green);letter-spacing:.01em;line-height:1.3}}
+.nc-rcard__icon{{width:20px;height:1px;background:var(--g20);margin-bottom:14px;font-size:0;overflow:hidden;border-radius:0;transition:all .5s var(--ease)}}
+.nc-rcard__name{{font-family:var(--serif);font-weight:400;font-size:.95rem;color:var(--green);letter-spacing:.01em;line-height:1.3;transition:color .5s var(--ease)}}
 .nc-rcard__desc{{font-weight:300;font-size:.66rem;color:var(--g50);line-height:1.6;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.nc-rcard:hover .nc-rcard__name{{color:var(--g70)}}
+.nc-rcard:hover .nc-rcard__icon{{background:var(--green);opacity:.35}}
 
 /* Home footer */
 .nc-home__links{{display:flex;align-items:center;gap:24px;margin-top:max(40px,5vh);animation:ncFadeUp .7s .56s var(--ease) both}}
