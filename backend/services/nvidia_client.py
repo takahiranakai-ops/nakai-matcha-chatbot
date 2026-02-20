@@ -1,6 +1,11 @@
+import re
+
 import httpx
 
 from config import settings
+
+# Strip <think>...</think> blocks from reasoning models
+_THINK_RE = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
 
 
 def _headers() -> dict:
@@ -13,7 +18,7 @@ def _headers() -> dict:
 async def get_embeddings(
     texts: list[str], input_type: str = "query"
 ) -> list[list[float]]:
-    """Get embeddings from NVIDIA NIM BGE-M3 model.
+    """Get embeddings from NVIDIA NIM embedding model.
 
     Args:
         texts: List of texts to embed.
@@ -43,10 +48,10 @@ async def get_embeddings(
 
 async def chat_completion(
     messages: list[dict],
-    temperature: float = 0.3,
-    max_tokens: int = 1024,
+    temperature: float = 0.45,
+    max_tokens: int = 1500,
 ) -> str:
-    """Get chat completion from NVIDIA NIM Nemotron model."""
+    """Get chat completion from NVIDIA NIM model."""
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
             f"{settings.nvidia_base_url}/chat/completions",
@@ -56,11 +61,15 @@ async def chat_completion(
                 "messages": messages,
                 "temperature": temperature,
                 "max_tokens": max_tokens,
-                "top_p": 0.9,
+                "top_p": 0.92,
+                "frequency_penalty": 0.15,
                 "stream": False,
             },
         )
         response.raise_for_status()
         data = response.json()
         msg = data["choices"][0]["message"]
-        return msg.get("content") or msg.get("reasoning_content") or ""
+        content = msg.get("content") or msg.get("reasoning_content") or ""
+        # Strip <think> blocks from reasoning models
+        content = _THINK_RE.sub("", content).strip()
+        return content

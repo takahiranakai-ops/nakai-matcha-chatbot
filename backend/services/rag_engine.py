@@ -21,7 +21,7 @@ _SUGGESTIONS_RE = re.compile(
 )
 
 # Cosine distance threshold — lower = stricter, higher = more permissive
-_RELEVANCE_THRESHOLD = 0.80
+_RELEVANCE_THRESHOLD = 0.82
 
 # Retrieve extra candidates for better filtering
 _RETRIEVAL_MULTIPLIER = 3
@@ -55,23 +55,23 @@ class RAGEngine:
     ) -> str:
         """Enrich the search query with recent conversation context.
 
-        Includes both user and assistant messages for better follow-up
-        question handling. For "How about the other one?" or "もう一つは？",
-        the assistant context helps the embedding capture the real intent.
+        Uses both user and assistant messages so follow-up questions like
+        "How about the other one?" carry the full topical context into
+        the embedding.
         """
         if not conversation_history:
             return user_message
 
-        # Collect the last 2 exchanges (user + assistant) for richer context
-        recent = conversation_history[-4:]
+        # Collect the last 3 exchanges for rich multi-turn context
+        recent = conversation_history[-6:]
         context_parts = []
         for msg in recent:
             role = msg.get("role", "")
             content = msg.get("content", "")
             if role == "user":
                 context_parts.append(content)
-            elif role == "assistant" and len(content) < 200:
-                # Include short assistant responses for topic context
+            elif role == "assistant" and len(content) < 300:
+                # Include shorter assistant responses for topic context
                 context_parts.append(content)
         # Append current question
         context_parts.append(user_message)
@@ -92,7 +92,9 @@ class RAGEngine:
             if conversation_history:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
-            response = await chat_completion(messages, temperature=0.5, max_tokens=256)
+            response = await chat_completion(
+                messages, temperature=0.6, max_tokens=256
+            )
             return {
                 "response": response,
                 "sources": [],
@@ -143,12 +145,13 @@ class RAGEngine:
 
         messages = [{"role": "system", "content": system_prompt}]
         if conversation_history:
-            messages.extend(conversation_history[-6:])
+            # Include more history for better multi-turn understanding
+            messages.extend(conversation_history[-8:])
         messages.append({"role": "user", "content": rag_context})
 
-        # 6. Generate response
+        # 6. Generate response with tuned parameters
         raw_response = await chat_completion(
-            messages, temperature=0.3, max_tokens=1024
+            messages, temperature=0.45, max_tokens=1500
         )
 
         # 7. Parse out follow-up suggestions
