@@ -29,7 +29,7 @@ _RETRIEVAL_MULTIPLIER = 3
 
 # Strip common LLM prefixes from suggestion lines
 _SUGGESTION_PREFIX_RE = re.compile(
-    r"^(?:(?:Suggestion|提案)\s*\**\d*\**\s*[:：]\s*)?(?:\*\*)?(.+?)(?:\*\*)?$"
+    r"^(?:(?:Suggestion|提案|Q)\s*\**\d*\**\s*[:：]\s*)?(?:\*\*)?(.+?)(?:\*\*)?$"
 )
 
 
@@ -107,10 +107,16 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(
-                messages, temperature=0.6, max_tokens=50, language=language
+                messages, temperature=0.6, max_tokens=80, language=language
             )
+            # Truncate after the first question mark to keep greetings short
+            for end_char in ("？", "?"):
+                idx = response.find(end_char)
+                if idx != -1:
+                    response = response[: idx + 1]
+                    break
             return {
-                "response": response,
+                "response": response.strip(),
                 "sources": [],
                 "context_chunks": 0,
                 "suggestions": [],

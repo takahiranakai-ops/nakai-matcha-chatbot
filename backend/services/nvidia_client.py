@@ -49,9 +49,9 @@ async def get_embeddings(
 # Common Nemotron CJK tokenization errors → correct forms
 _JA_FIXES = [
     ("抹ちゃ", "抹茶"), ("まっちゃ", "抹茶"),
+    ("抹cha", "抹茶"), ("抹 cha", "抹茶"),
     ("抹 tea", "抹茶"), ("薄 tea", "薄茶"), ("濃 tea", "濃茶"),
     ("みるく", "ミルク"), ("らて", "ラテ"),
-    ("うまみ", "うまみ"),  # keep as-is (valid hiragana)
 ]
 
 
