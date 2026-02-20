@@ -12,6 +12,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     response: str
     sources: list[str] = []
+    suggestions: list[str] = []
 
 
 class RefreshResponse(BaseModel):

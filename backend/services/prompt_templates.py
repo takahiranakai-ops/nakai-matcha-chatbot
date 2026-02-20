@@ -26,7 +26,8 @@ def build_system_prompt(language: str = "en") -> str:
 
 ## トーン
 - 温かく親しみやすい敬語
-- おもてなしの心"""
+- おもてなしの心
+- プロフェッショナルでありながら親しみやすい"""
 
     return """You are NAKAI's AI Matcha Concierge — a friendly, knowledgeable tea expert for nakaimatcha.com.
 
@@ -59,7 +60,34 @@ def build_system_prompt(language: str = "en") -> str:
 - Particle size science, stone-milling, organic safety standards"""
 
 
-def build_rag_prompt(context: str, question: str) -> str:
+_SUGGESTION_INSTRUCTION_JA = """
+
+## フォローアップ提案
+回答の最後に、必ず以下の形式で関連する質問を2〜3個提案してください：
+[SUGGESTIONS]
+提案1
+提案2
+提案3
+[/SUGGESTIONS]
+提案は会話の文脈に関連し、お客様が次に知りたくなるような質問にしてください。"""
+
+_SUGGESTION_INSTRUCTION_EN = """
+
+## Follow-up Suggestions
+At the end of your response, always include 2-3 related follow-up questions in this exact format:
+[SUGGESTIONS]
+Suggestion 1
+Suggestion 2
+Suggestion 3
+[/SUGGESTIONS]
+Suggestions should be relevant to the conversation and anticipate what the customer might want to know next."""
+
+
+def build_rag_prompt(context: str, question: str, language: str = "en") -> str:
+    suggestion_block = (
+        _SUGGESTION_INSTRUCTION_JA if language == "ja" else _SUGGESTION_INSTRUCTION_EN
+    )
+
     if context:
         return f"""## Knowledge Base (retrieved from NAKAI's database)
 
@@ -77,7 +105,8 @@ def build_rag_prompt(context: str, question: str) -> str:
 - Keep answers natural and conversational, like a knowledgeable tea expert
 - When explaining recipes or preparation steps, use clear numbered steps
 - When comparing products, highlight the key differences concisely
-- For Japanese questions about NAKAI specialty matcha, use the detailed knowledge base content"""
+- For Japanese questions about NAKAI specialty matcha, use the detailed knowledge base content
+{suggestion_block}"""
     else:
         return f"""## Customer Question
 {question}
@@ -86,4 +115,5 @@ def build_rag_prompt(context: str, question: str) -> str:
 - No matching knowledge base entries were found for this question
 - If the question is about NAKAI products, prices, or specific policies, say you don't have that information and suggest contacting info@s-natural.xyz
 - If the question is about general matcha knowledge, answer using your expertise
-- NEVER invent specific product details, prices, or URLs"""
+- NEVER invent specific product details, prices, or URLs
+{suggestion_block}"""

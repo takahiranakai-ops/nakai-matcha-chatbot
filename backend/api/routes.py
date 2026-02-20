@@ -110,6 +110,7 @@ async def chat(request: Request, body: ChatRequest):
         return ChatResponse(
             response=result["response"],
             sources=result["sources"],
+            suggestions=result.get("suggestions", []),
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

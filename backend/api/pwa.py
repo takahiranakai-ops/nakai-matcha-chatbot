@@ -222,6 +222,10 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
 .nc-msg--bot+.nc-msg--user,.nc-msg--user+.nc-msg--bot{{margin-top:10px}}
 .nc-msg__meta{{margin-top:4px;padding-left:2px}}
 .nc-msg__time{{font-size:.6rem;color:var(--g40)}}
+.nc-suggestions{{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}}
+.nc-suggestion{{font-family:inherit;font-size:.76rem;font-weight:400;color:var(--green);background:var(--g05);border:1px solid var(--g10);border-radius:16px;padding:8px 14px;cursor:pointer;transition:all .2s var(--ease);text-align:left;line-height:1.4;-webkit-tap-highlight-color:transparent}}
+.nc-suggestion:hover{{background:var(--g10);border-color:var(--g20)}}
+.nc-suggestion:active{{background:var(--g20);transform:scale(.97)}}
 .nc-msg__sources{{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px}}
 .nc-msg__source{{font-size:.7rem;color:var(--green);text-decoration:none;background:var(--g05);border:1px solid var(--g10);border-radius:8px;padding:7px 12px;-webkit-tap-highlight-color:transparent}}
 .nc-msg__source:active{{background:var(--g10)}}
@@ -547,8 +551,8 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
   }}
   function scroll(){{var m=$('nc-messages');if(m)m.scrollTop=m.scrollHeight}}
 
-  function addMsg(role,text,sources){{
-    sources=sources||[];var m=$('nc-messages');if(!m)return;
+  function addMsg(role,text,sources,suggestions){{
+    sources=sources||[];suggestions=suggestions||[];var m=$('nc-messages');if(!m)return;
     var d=document.createElement('div');d.className='nc-msg nc-msg--'+role;var html='';
     var content=role==='bot'?formatMd(text):escapeHtml(text);
     if(role==='bot'){{
@@ -560,10 +564,24 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
           html+='<a href="'+escapeHtml(url)+'" class="nc-msg__source" target="_blank" rel="noopener">'+label+'</a>'}});
         html+='</div>';
       }}
+      if(suggestions.length){{
+        html+='<div class="nc-suggestions">';
+        suggestions.forEach(function(s){{
+          html+='<button class="nc-suggestion" type="button">'+escapeHtml(s)+'</button>';
+        }});
+        html+='</div>';
+      }}
       var now=new Date();var ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
       html+='<div class="nc-msg__meta"><span class="nc-msg__time">'+ts+'</span></div>';
     }}else{{html='<div class="nc-msg__bubble">'+content+'</div>'}}
-    d.innerHTML=html;m.appendChild(d);scroll();
+    d.innerHTML=html;m.appendChild(d);
+    d.querySelectorAll('.nc-suggestion').forEach(function(btn){{
+      btn.addEventListener('click',function(){{
+        var q=this.textContent;$('nc-input').value=q;sendMessage();
+        var sc=d.querySelector('.nc-suggestions');if(sc)sc.remove();
+      }});
+    }});
+    scroll();
   }}
   function showTyping(){{var m=$('nc-messages');if(!m)return;var d=document.createElement('div');d.className='nc-msg nc-msg--bot nc-typing';d.innerHTML='<div class="nc-msg__bubble"><span></span><span></span><span></span></div><div class="nc-typing__label">'+t('typing')+'</div>';m.appendChild(d);scroll()}}
   function removeTyping(){{var m=$('nc-messages');if(!m)return;var tw=m.querySelector('.nc-typing');if(tw)tw.remove()}}
@@ -575,7 +593,7 @@ html[lang="ja"]{{font-family:'Shippori Mincho','Work Sans',sans-serif}}
     showTyping();loading=true;
     fetch('/api/chat',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang,session_id:SESSION_ID,source:'pwa'}})}})
     .then(function(r){{if(!r.ok)throw new Error('err');return r.json()}})
-    .then(function(d){{removeTyping();addMsg('bot',d.response,d.sources||[]);chatHistory.push({{role:'assistant',content:d.response}});saveHistory()}})
+    .then(function(d){{removeTyping();addMsg('bot',d.response,d.sources||[],d.suggestions||[]);chatHistory.push({{role:'assistant',content:d.response}});saveHistory()}})
     .catch(function(){{removeTyping();addMsg('bot',t('error'))}})
     .finally(function(){{loading=false}});
   }}
