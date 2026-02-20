@@ -43,7 +43,7 @@ def _parse_suggestions(response: str) -> tuple[str, list[str]]:
     suggestions_text = match.group(1).strip()
     suggestions = []
     for line in suggestions_text.split("\n"):
-        line = line.strip().lstrip("0123456789.-) ")
+        line = line.strip().lstrip("0123456789.-) ・•")
         if not line:
             continue
         # Strip "Suggestion **1**: ..." or "提案1: ..." prefixes
