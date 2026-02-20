@@ -46,29 +46,35 @@ async def get_embeddings(
     return results
 
 
+# Common Nemotron CJK tokenization errors → correct forms
+_JA_FIXES = [
+    ("抹ちゃ", "抹茶"), ("まっちゃ", "抹茶"),
+    ("抹 tea", "抹茶"), ("薄 tea", "薄茶"), ("濃 tea", "濃茶"),
+    ("みるく", "ミルク"), ("らて", "ラテ"),
+    ("うまみ", "うまみ"),  # keep as-is (valid hiragana)
+]
+
+
+def _fix_japanese(text: str) -> str:
+    """Fix known Nemotron CJK tokenization artifacts in Japanese text."""
+    for wrong, correct in _JA_FIXES:
+        text = text.replace(wrong, correct)
+    return text
+
+
 async def chat_completion(
     messages: list[dict],
     temperature: float = 0.45,
     max_tokens: int = 1500,
     language: str = "en",
 ) -> str:
-    """Get chat completion from NVIDIA NIM model.
-
-    Uses a language-optimized model: Nemotron Super 49B for English
-    (superior structure and helpfulness), Llama 3.3 70B for Japanese
-    (better CJK token handling).
-    """
-    model = (
-        settings.nvidia_chat_model_ja
-        if language == "ja"
-        else settings.nvidia_chat_model
-    )
+    """Get chat completion from NVIDIA NIM model."""
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
             f"{settings.nvidia_base_url}/chat/completions",
             headers=_headers(),
             json={
-                "model": model,
+                "model": settings.nvidia_chat_model,
                 "messages": messages,
                 "temperature": temperature,
                 "max_tokens": max_tokens,
@@ -83,4 +89,7 @@ async def chat_completion(
         content = msg.get("content") or msg.get("reasoning_content") or ""
         # Strip <think> blocks from reasoning models
         content = _THINK_RE.sub("", content).strip()
+        # Fix Japanese tokenization artifacts
+        if language == "ja":
+            content = _fix_japanese(content)
         return content
