@@ -91,25 +91,21 @@ def build_system_prompt(language: str = "en") -> str:
 _SUGGESTION_INSTRUCTION_JA = """
 
 ## フォローアップ提案
-回答の最後に、以下の形式で関連する質問を2〜3個提案してください。
-重要：各行は質問文のみ。番号・プレフィックス・太字・装飾は一切付けないでください。
-
+回答の最後に、[SUGGESTIONS]タグ内に質問を2〜3個書いてください。
+- この会話の内容から自然に続く質問を考えて生成する（毎回異なる内容にする）
+- 各行は質問文のみ（番号・プレフィックス・太字・装飾は不要）
 [SUGGESTIONS]
-REVIとIKIGAIはどちらがラテに向いていますか？
-抹茶の保存で気をつけるポイントは？
-おすすめのミルクの種類を教えてください
+（ここに会話の文脈に合った質問を2〜3個）
 [/SUGGESTIONS]"""
 
 _SUGGESTION_INSTRUCTION_EN = """
 
 ## Follow-up Suggestions
-At the end of your response, suggest 2-3 follow-up questions in this exact format.
-IMPORTANT: Each line must be ONLY the question text. No numbers, no prefixes like "Suggestion 1:", no bold, no formatting.
-
+At the end, include 2-3 contextual follow-up questions inside [SUGGESTIONS] tags.
+- Generate questions that naturally flow from THIS specific conversation (different every time)
+- Each line = plain question text only (no numbering, no bold, no prefixes)
 [SUGGESTIONS]
-Which NAKAI matcha is best for lattes?
-How should I store my matcha after opening?
-What milk pairs best with matcha?
+(2-3 questions relevant to what was just discussed)
 [/SUGGESTIONS]"""
 
 
