@@ -28,6 +28,9 @@ _LOGO_WM_BLACK_B64 = base64.b64encode(
 _LOGO_ICON_BLACK_B64 = base64.b64encode(
     (_REPO_ROOT / "logo-black-icon.png").read_bytes()
 ).decode()
+_LOGO_WM_WHITE_B64 = base64.b64encode(
+    (_REPO_ROOT / "logo-wordmark-white.png").read_bytes()
+).decode()
 _ICON_B64 = base64.b64encode(_ICON_BYTES).decode()
 
 # Load Domaine Text font files
@@ -113,28 +116,28 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 
 /* Brand Panel (desktop) */
 .nc-brand{{
-  width:320px;flex-shrink:0;background:var(--green);
-  display:flex;flex-direction:column;padding:48px 40px;position:relative;overflow:hidden;
+  width:280px;flex-shrink:0;background:var(--green);
+  display:flex;flex-direction:column;padding:32px 28px;position:relative;overflow:hidden;
 }}
-.nc-brand__top{{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:auto}}
-.nc-brand__logo{{width:100px;opacity:.85;margin-bottom:36px;animation:ncFadeUp .8s var(--ease) both}}
-.nc-brand__tagline{{font-family:var(--serif);font-weight:300;font-size:1.1rem;line-height:2;text-align:center;color:var(--cream);opacity:.55;margin-bottom:36px;animation:ncFadeUp .8s .12s var(--ease) both;font-style:italic}}
-.nc-brand__nav{{display:flex;flex-direction:column;gap:4px;width:100%;animation:ncFadeUp .8s .2s var(--ease) both}}
+.nc-brand__top{{display:flex;flex-direction:column;align-items:flex-start;text-align:left;margin-bottom:0;gap:10px}}
+.nc-brand__logo{{height:18px;width:auto;opacity:.85;animation:ncFadeUp .8s var(--ease) both}}
+.nc-brand__tagline{{font-family:var(--serif);font-weight:300;font-size:.72rem;line-height:1.6;text-align:left;color:var(--cream);opacity:.4;animation:ncFadeUp .8s .12s var(--ease) both;font-style:italic;margin-bottom:0}}
+.nc-brand__nav{{display:flex;flex-direction:column;gap:2px;width:100%;margin-top:28px;animation:ncFadeUp .8s .2s var(--ease) both}}
 .nc-brand__nav-item{{
-  display:flex;align-items:center;gap:12px;font-family:var(--sans);font-size:.74rem;font-weight:400;
-  color:rgba(249,240,226,.5);padding:12px 16px;border-radius:12px;cursor:pointer;
+  display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:.72rem;font-weight:400;
+  color:rgba(249,240,226,.45);padding:10px 14px;border-radius:10px;cursor:pointer;
   transition:all .35s var(--ease);border:none;background:transparent;text-align:left;
   -webkit-tap-highlight-color:transparent;width:100%;
 }}
 .nc-brand__nav-item:hover{{color:var(--cream);background:rgba(249,240,226,.08)}}
 .nc-brand__nav-item svg{{width:16px;height:16px;opacity:.5;flex-shrink:0}}
 .nc-brand__nav-item:hover svg{{opacity:.8}}
-.nc-brand__bottom{{margin-top:auto;padding-top:32px}}
-.nc-brand__ctas{{display:flex;flex-direction:column;gap:10px;width:100%;animation:ncFadeUp .8s .3s var(--ease) both}}
+.nc-brand__bottom{{margin-top:auto;padding-top:24px}}
+.nc-brand__ctas{{display:flex;flex-direction:column;gap:8px;width:100%;animation:ncFadeUp .8s .3s var(--ease) both}}
 .nc-brand__cta{{
-  display:block;text-align:center;font-family:var(--sans);font-size:.66rem;font-weight:500;
+  display:block;text-align:center;font-family:var(--sans);font-size:.64rem;font-weight:500;
   letter-spacing:.14em;text-transform:uppercase;text-decoration:none;
-  padding:14px 20px;border-radius:10px;cursor:pointer;transition:all .5s var(--ease);
+  padding:12px 16px;border-radius:10px;cursor:pointer;transition:all .5s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }}
 .nc-brand__cta--p{{background:rgba(249,240,226,.12);color:var(--cream);border:none}}
@@ -412,7 +415,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 <div id="nc-app">
   <aside class="nc-brand">
     <div class="nc-brand__top">
-      <img class="nc-brand__logo" src="data:image/png;base64,{_LOGO_WHITE_B64}" alt="NAKAI" />
+      <img class="nc-brand__logo" src="data:image/png;base64,{_LOGO_WM_WHITE_B64}" alt="NAKAI" />
       <p class="nc-brand__tagline">Grounded in nature,<br>elevated in ritual.</p>
     </div>
     <nav class="nc-brand__nav">
