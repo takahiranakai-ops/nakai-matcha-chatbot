@@ -145,8 +145,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 /* Top Bar */
 .nc-topbar{{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:max(14px,env(safe-area-inset-top)) 24px 12px;transition:background .4s var(--ease)}}
 .nc-topbar--scrolled{{background:rgba(249,240,226,.88);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}}
-.nc-topbar__mark{{width:24px;height:24px;opacity:.5;transition:opacity .3s var(--ease);cursor:pointer}}
-.nc-topbar__mark:hover{{opacity:.7}}
+.nc-topbar__left{{display:flex;align-items:center;gap:8px}}
+.nc-topbar__wordmark{{height:12px;width:auto;opacity:.45;transition:opacity .3s var(--ease);cursor:pointer}}
+.nc-topbar__wordmark:hover{{opacity:.65}}
 .nc-topbar__right{{display:flex;align-items:center;gap:8px}}
 
 /* Scroll area */
@@ -469,15 +470,17 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     <!-- HOME -->
     <div class="nc-home" id="nc-home">
       <div class="nc-topbar" id="nc-topbar">
-        <img class="nc-topbar__mark" src="data:image/png;base64,{_LOGO_ICON_BLACK_B64}" alt="NAKAI" id="nc-topbar-mark" />
+        <div class="nc-topbar__left">
+          <button class="nc-hamburger" id="nc-hamburger" aria-label="Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
+          <img class="nc-topbar__wordmark" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" id="nc-topbar-mark" />
+        </div>
         <div class="nc-topbar__right">
           <div class="nc-lang-toggle" id="nc-lang-home">
             <button class="nc-lang-btn active" data-lang="en">EN</button>
             <button class="nc-lang-btn" data-lang="ja">JA</button>
           </div>
-          <button class="nc-hamburger" id="nc-hamburger" aria-label="Menu">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
-          </button>
         </div>
       </div>
       <div class="nc-home__scroll-area" id="nc-home-scroll">
