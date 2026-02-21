@@ -118,6 +118,7 @@ WIDGET_JS = r"""
       .replace(/^\s*_{3,}\s*$/gm, '')
       .replace(/^\|.*\|$/gm, '')
       .replace(/^\*\*[^*]+\*\*\s*$/gm, '')
+      .replace(/^\*\*[^*]+:\*\*\s*$/gm, '')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\[(.*?)\]\(\/(.*?)\)/g, '<a href="' + SHOP_URL + '/$2" target="_blank" rel="noopener">$1</a>')
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')

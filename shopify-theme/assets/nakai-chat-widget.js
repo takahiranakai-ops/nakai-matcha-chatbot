@@ -663,6 +663,8 @@
       .replace(/^\|.*\|$/gm, '')
       // Strip bold-only lines (pseudo-headers like "**Title**")
       .replace(/^\*\*[^*]+\*\*\s*$/gm, '')
+      // Strip bold label lines (like "**Solution:**")
+      .replace(/^\*\*[^*]+:\*\*\s*$/gm, '')
       // Bold (inline)
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       // Relative links
