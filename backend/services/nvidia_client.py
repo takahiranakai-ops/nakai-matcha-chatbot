@@ -1,11 +1,32 @@
+import json as _json
+import logging
 import re
 
 import httpx
 
 from config import settings
 
+logger = logging.getLogger(__name__)
+
 # Strip <think>...</think> blocks from reasoning models
 _THINK_RE = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
+
+# ── Shared HTTP client ──────────────────────────────────────
+_client: httpx.AsyncClient | None = None
+
+
+def _get_client() -> httpx.AsyncClient:
+    global _client
+    if _client is None or _client.is_closed:
+        _client = httpx.AsyncClient(timeout=120.0)
+    return _client
+
+
+async def close():
+    global _client
+    if _client and not _client.is_closed:
+        await _client.aclose()
+        _client = None
 
 
 def _headers() -> dict:
@@ -18,17 +39,13 @@ def _headers() -> dict:
 async def get_embeddings(
     texts: list[str], input_type: str = "query"
 ) -> list[list[float]]:
-    """Get embeddings from NVIDIA NIM embedding model.
-
-    Args:
-        texts: List of texts to embed.
-        input_type: "query" for user questions, "passage" for documents.
-    """
+    """Get embeddings from NVIDIA NIM embedding model."""
     results = []
     batch_size = 50
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        for i in range(0, len(texts), batch_size):
-            batch = texts[i : i + batch_size]
+    client = _get_client()
+    for i in range(0, len(texts), batch_size):
+        batch = texts[i : i + batch_size]
+        try:
             response = await client.post(
                 f"{settings.nvidia_base_url}/embeddings",
                 headers=_headers(),
@@ -39,10 +56,15 @@ async def get_embeddings(
                     "encoding_format": "float",
                     "truncate": "END",
                 },
+                timeout=60.0,
             )
             response.raise_for_status()
-            data = response.json()
-            results.extend([item["embedding"] for item in data["data"]])
+        except httpx.TimeoutException as exc:
+            raise RuntimeError("Embedding service timed out. Please try again.") from exc
+        except httpx.HTTPStatusError as exc:
+            raise RuntimeError(f"Embedding service error: {exc.response.status_code}") from exc
+        data = response.json()
+        results.extend([item["embedding"] for item in data["data"]])
     return results
 
 
@@ -70,7 +92,8 @@ async def chat_completion(
     language: str = "en",
 ) -> str:
     """Get chat completion from NVIDIA NIM model."""
-    async with httpx.AsyncClient(timeout=120.0) as client:
+    client = _get_client()
+    try:
         response = await client.post(
             f"{settings.nvidia_base_url}/chat/completions",
             headers=_headers(),
@@ -85,18 +108,19 @@ async def chat_completion(
             },
         )
         response.raise_for_status()
-        data = response.json()
-        msg = data["choices"][0]["message"]
-        content = msg.get("content") or msg.get("reasoning_content") or ""
-        # Strip <think> blocks from reasoning models
-        content = _THINK_RE.sub("", content).strip()
-        # Fix Japanese tokenization artifacts
-        if language == "ja":
-            content = _fix_japanese(content)
-        return content
-
-
-import json as _json
+    except httpx.TimeoutException as exc:
+        raise RuntimeError("Chat service timed out. Please try again.") from exc
+    except httpx.HTTPStatusError as exc:
+        raise RuntimeError(f"Chat service error: {exc.response.status_code}") from exc
+    data = response.json()
+    msg = data["choices"][0]["message"]
+    content = msg.get("content") or msg.get("reasoning_content") or ""
+    # Strip <think> blocks from reasoning models
+    content = _THINK_RE.sub("", content).strip()
+    # Fix Japanese tokenization artifacts
+    if language == "ja":
+        content = _fix_japanese(content)
+    return content
 
 
 async def chat_completion_stream(
@@ -106,7 +130,8 @@ async def chat_completion_stream(
     language: str = "en",
 ):
     """Yield text chunks from NVIDIA NIM model via streaming."""
-    async with httpx.AsyncClient(timeout=120.0) as client:
+    client = _get_client()
+    try:
         async with client.stream(
             "POST",
             f"{settings.nvidia_base_url}/chat/completions",
@@ -151,3 +176,7 @@ async def chat_completion_stream(
                 if language == "ja":
                     text = _fix_japanese(text)
                 yield text
+    except httpx.TimeoutException as exc:
+        raise RuntimeError("Streaming service timed out. Please try again.") from exc
+    except httpx.HTTPStatusError as exc:
+        raise RuntimeError(f"Streaming service error: {exc.response.status_code}") from exc

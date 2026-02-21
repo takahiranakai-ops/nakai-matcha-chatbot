@@ -1,4 +1,5 @@
 import asyncio
+import hmac
 import json
 import logging
 import time
@@ -189,7 +190,7 @@ async def refresh(
 ):
     global _refresh_running
 
-    if x_refresh_secret != settings.refresh_secret:
+    if not hmac.compare_digest(x_refresh_secret, settings.refresh_secret):
         raise HTTPException(status_code=403, detail="Invalid refresh secret")
 
     if _refresh_running:

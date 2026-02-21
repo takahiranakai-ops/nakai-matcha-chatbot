@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import Optional, List, Dict
 
@@ -5,6 +6,8 @@ from services.nvidia_client import get_embeddings, chat_completion, chat_complet
 from services.vector_store import VectorStore
 from services.prompt_templates import build_system_prompt, build_rag_prompt
 from config import settings
+
+logger = logging.getLogger(__name__)
 
 # Simple greetings and small talk — no RAG needed
 _GREETING_RE = re.compile(
@@ -126,19 +129,32 @@ class RAGEngine:
         # 1. Build enriched search query using conversation context
         search_query = self._build_search_query(msg_stripped, conversation_history)
 
+        _error_result = {
+            "response": "I'm sorry, I'm having trouble processing your request right now. Please try again in a moment.",
+            "sources": [], "context_chunks": 0, "suggestions": [],
+        }
+
         # 2. Embed the search query
-        query_embeddings = await get_embeddings([search_query], input_type="query")
-        query_embedding = query_embeddings[0]
+        try:
+            query_embeddings = await get_embeddings([search_query], input_type="query")
+            query_embedding = query_embeddings[0]
+        except Exception as e:
+            logger.error(f"Embedding generation failed: {e}")
+            return _error_result
 
         # 3. Retrieve extra candidates for better filtering
         n_retrieve = min(
             settings.max_context_chunks * _RETRIEVAL_MULTIPLIER,
             max(self.vector_store.count(), 1),
         )
-        results = self.vector_store.query(
-            query_embedding=query_embedding,
-            n_results=max(n_retrieve, 1),
-        )
+        try:
+            results = self.vector_store.query(
+                query_embedding=query_embedding,
+                n_results=max(n_retrieve, 1),
+            )
+        except Exception as e:
+            logger.error(f"Vector store query failed: {e}")
+            results = []
 
         # 4. Filter by relevance and limit to max_context_chunks
         context_texts = []
@@ -171,9 +187,13 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 6. Generate response with tuned parameters
-        raw_response = await chat_completion(
-            messages, temperature=0.45, max_tokens=800, language=language
-        )
+        try:
+            raw_response = await chat_completion(
+                messages, temperature=0.45, max_tokens=800, language=language
+            )
+        except Exception as e:
+            logger.error(f"Chat completion failed: {e}")
+            return _error_result
 
         # 7. Parse out follow-up suggestions
         response, suggestions = _parse_suggestions(raw_response)
@@ -216,17 +236,27 @@ class RAGEngine:
 
         # 1-4: Same RAG retrieval as non-streaming
         search_query = self._build_search_query(msg_stripped, conversation_history)
-        query_embeddings = await get_embeddings([search_query], input_type="query")
-        query_embedding = query_embeddings[0]
+        try:
+            query_embeddings = await get_embeddings([search_query], input_type="query")
+            query_embedding = query_embeddings[0]
+        except Exception as e:
+            logger.error(f"Streaming embedding failed: {e}")
+            yield ("text", "I'm sorry, I'm having trouble right now. Please try again.")
+            yield ("done", {"sources": [], "suggestions": []})
+            return
 
         n_retrieve = min(
             settings.max_context_chunks * _RETRIEVAL_MULTIPLIER,
             max(self.vector_store.count(), 1),
         )
-        results = self.vector_store.query(
-            query_embedding=query_embedding,
-            n_results=max(n_retrieve, 1),
-        )
+        try:
+            results = self.vector_store.query(
+                query_embedding=query_embedding,
+                n_results=max(n_retrieve, 1),
+            )
+        except Exception as e:
+            logger.error(f"Streaming vector query failed: {e}")
+            results = []
 
         context_texts = []
         source_urls = set()
@@ -257,11 +287,18 @@ class RAGEngine:
 
         # 5. Stream LLM response
         full_response = []
-        async for chunk in chat_completion_stream(
-            messages, temperature=0.45, max_tokens=800, language=language
-        ):
-            full_response.append(chunk)
-            yield ("text", chunk)
+        try:
+            async for chunk in chat_completion_stream(
+                messages, temperature=0.45, max_tokens=800, language=language
+            ):
+                full_response.append(chunk)
+                yield ("text", chunk)
+        except Exception as e:
+            logger.error(f"Streaming chat completion failed: {e}")
+            if not full_response:
+                yield ("text", "I'm sorry, I'm having trouble right now. Please try again.")
+            yield ("done", {"sources": list(source_urls), "suggestions": []})
+            return
 
         # 6. Parse suggestions from full response
         raw = "".join(full_response)

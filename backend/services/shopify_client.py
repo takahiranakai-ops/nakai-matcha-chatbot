@@ -5,41 +5,58 @@ from config import settings
 
 BASE_URL = f"https://{settings.shopify_store_url}"
 
+# ── Shared HTTP client ──────────────────────────────────────
+_client: httpx.AsyncClient | None = None
+
+
+def _get_client() -> httpx.AsyncClient:
+    global _client
+    if _client is None or _client.is_closed:
+        _client = httpx.AsyncClient(timeout=30.0, follow_redirects=True)
+    return _client
+
+
+async def close():
+    global _client
+    if _client and not _client.is_closed:
+        await _client.aclose()
+        _client = None
+
 
 async def _public_get(path: str) -> dict:
     """Fetch data from Shopify's public JSON endpoints (no auth needed)."""
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(
-            f"{BASE_URL}{path}",
-            headers={"Accept": "application/json"},
-        )
-        response.raise_for_status()
-        return response.json()
+    client = _get_client()
+    response = await client.get(
+        f"{BASE_URL}{path}",
+        headers={"Accept": "application/json"},
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 async def _public_get_text(path: str) -> str:
     """Fetch raw HTML from a public Shopify page."""
-    async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-        response = await client.get(
-            f"{BASE_URL}{path}",
-            headers={"Accept": "text/html"},
-        )
-        response.raise_for_status()
-        return response.text
+    client = _get_client()
+    response = await client.get(
+        f"{BASE_URL}{path}",
+        headers={"Accept": "text/html"},
+    )
+    response.raise_for_status()
+    return response.text
 
 
 async def _admin_get(endpoint: str) -> dict:
     """Execute an Admin API GET request."""
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(
-            f"{BASE_URL}/admin/api/2024-10{endpoint}",
-            headers={
-                "X-Shopify-Access-Token": settings.shopify_admin_token,
-                "Content-Type": "application/json",
-            },
-        )
-        response.raise_for_status()
-        return response.json()
+    client = _get_client()
+    response = await client.get(
+        f"{BASE_URL}/admin/api/2024-10{endpoint}",
+        headers={
+            "X-Shopify-Access-Token": settings.shopify_admin_token,
+            "Content-Type": "application/json",
+        },
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 async def fetch_products() -> list:
@@ -75,16 +92,15 @@ async def fetch_blog_articles() -> list:
     articles = []
     try:
         # Get sitemap to find blog URLs
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-            resp = await client.get(f"{BASE_URL}/sitemap.xml")
-            sitemap_text = resp.text
+        client = _get_client()
+        resp = await client.get(f"{BASE_URL}/sitemap.xml")
+        sitemap_text = resp.text
 
         # Find blog sitemaps
         blog_sitemaps = re.findall(r'<loc>(.*?sitemap_blogs.*?)</loc>', sitemap_text)
         for sitemap_url in blog_sitemaps:
-            async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-                resp = await client.get(sitemap_url)
-                blog_sitemap = resp.text
+            resp = await client.get(sitemap_url)
+            blog_sitemap = resp.text
 
             # Find article URLs (with /blogs/ in path, containing a second path segment)
             article_urls = re.findall(r'<loc>(.*?/blogs/[^<]+/[^<]+)</loc>', blog_sitemap)

@@ -24,6 +24,11 @@ async def lifespan(app: FastAPI):
         logger.info("Vector store empty — starting auto-ingestion...")
         asyncio.create_task(_auto_ingest())
     yield
+    # Cleanup shared HTTP clients on shutdown
+    from services import nvidia_client, supabase_client, shopify_client
+    await nvidia_client.close()
+    await supabase_client.close()
+    await shopify_client.close()
 
 
 async def _auto_ingest():
@@ -43,7 +48,7 @@ logger.info("NAKAI Matcha Chatbot starting up...")
 origins = [origin.strip() for origin in settings.allowed_origins.split(",")]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=False,
     allow_methods=["POST", "GET", "PATCH", "DELETE"],
     allow_headers=["Content-Type", "X-Refresh-Secret", "X-Admin-Password"],

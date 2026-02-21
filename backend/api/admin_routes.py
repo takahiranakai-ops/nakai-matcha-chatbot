@@ -1,6 +1,7 @@
 """Admin API endpoints for knowledge management and analytics."""
 
 import asyncio
+import hmac
 import logging
 from typing import Optional
 
@@ -12,6 +13,7 @@ from fastapi import (
 )
 from pydantic import BaseModel, Field
 
+from api.middleware import limiter
 from config import settings
 from services import supabase_client
 
@@ -21,7 +23,7 @@ admin_api_router = APIRouter(prefix="/api/admin")
 
 
 async def verify_admin(x_admin_password: str = Header(...)):
-    if x_admin_password != settings.admin_password:
+    if not hmac.compare_digest(x_admin_password, settings.admin_password):
         raise HTTPException(status_code=401, detail="Invalid admin password")
     return True
 
@@ -47,8 +49,9 @@ class AdminLoginRequest(BaseModel):
 
 
 @admin_api_router.post("/login")
-async def admin_login(body: AdminLoginRequest):
-    if body.password == settings.admin_password:
+@limiter.limit("5/minute")
+async def admin_login(request: Request, body: AdminLoginRequest):
+    if hmac.compare_digest(body.password, settings.admin_password):
         return {"authenticated": True}
     raise HTTPException(status_code=401, detail="Invalid password")
 
@@ -58,8 +61,9 @@ class WholesaleLoginRequest(BaseModel):
 
 
 @admin_api_router.post("/wholesale/login")
-async def wholesale_login(body: WholesaleLoginRequest):
-    if body.password == settings.wholesale_password:
+@limiter.limit("5/minute")
+async def wholesale_login(request: Request, body: WholesaleLoginRequest):
+    if hmac.compare_digest(body.password, settings.wholesale_password):
         return {"authenticated": True}
     raise HTTPException(status_code=401, detail="Invalid password")
 
@@ -70,7 +74,8 @@ class WholesaleLeadCreate(BaseModel):
 
 
 @admin_api_router.post("/wholesale/leads")
-async def create_wholesale_lead(body: WholesaleLeadCreate):
+@limiter.limit("10/minute")
+async def create_wholesale_lead(request: Request, body: WholesaleLeadCreate):
     """Public endpoint — called from the wholesale gate."""
     await supabase_client.create_wholesale_lead(
         email=body.email, session_id=body.session_id,
@@ -134,7 +139,7 @@ async def upload_article(
     category: str = Form("general"),
     x_admin_password: str = Header(...),
 ):
-    if x_admin_password != settings.admin_password:
+    if not hmac.compare_digest(x_admin_password, settings.admin_password):
         raise HTTPException(status_code=401, detail="Invalid admin password")
 
     filename = file.filename or ""
