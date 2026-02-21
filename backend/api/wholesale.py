@@ -296,11 +296,58 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   .ws-section{{padding:0 18px;margin-top:24px}}
   .ws-cultivars-grid{{gap:10px}}.ws-menu-grid{{gap:10px}}
 }}
+/* Gate */
+.ws-gate{{display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;background:var(--cream);padding:24px}}
+.ws-gate.ws-hidden{{display:none}}
+.ws-gate__card{{background:var(--white);border-radius:24px;padding:48px 36px;max-width:420px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06)}}
+.ws-gate__logo{{width:80px;margin:0 auto 24px}}
+.ws-gate__q{{font-family:var(--font);font-size:1.15rem;font-weight:600;color:var(--green);margin-bottom:8px}}
+.ws-gate__sub{{font-family:var(--font);font-size:.88rem;color:rgba(64,101,70,.55);margin-bottom:32px}}
+.ws-gate__btns{{display:flex;gap:12px;justify-content:center;margin-bottom:0}}
+.ws-gate__btn{{flex:1;padding:14px 20px;border-radius:14px;font-family:var(--font);font-size:.92rem;font-weight:600;cursor:pointer;border:none;transition:all .3s ease}}
+.ws-gate__btn--yes{{background:var(--green);color:var(--white)}}
+.ws-gate__btn--yes:hover{{opacity:.88}}
+.ws-gate__btn--no{{background:rgba(64,101,70,.08);color:var(--green)}}
+.ws-gate__btn--no:hover{{background:rgba(64,101,70,.14)}}
+.ws-gate__email{{display:none;margin-top:24px}}
+.ws-gate__email.ws-gate__email--show{{display:block}}
+.ws-gate__email-label{{font-family:var(--font);font-size:.85rem;color:rgba(64,101,70,.6);margin-bottom:10px;display:block}}
+.ws-gate__email-wrap{{display:flex;gap:8px}}
+.ws-gate__email-input{{flex:1;padding:12px 16px;border:1.5px solid rgba(64,101,70,.15);border-radius:12px;font-family:var(--font);font-size:.92rem;outline:none;transition:border-color .2s}}
+.ws-gate__email-input:focus{{border-color:var(--green)}}
+.ws-gate__email-submit{{padding:12px 24px;background:var(--green);color:var(--white);border:none;border-radius:12px;font-family:var(--font);font-size:.92rem;font-weight:600;cursor:pointer;transition:opacity .2s;white-space:nowrap}}
+.ws-gate__email-submit:hover{{opacity:.88}}
+.ws-gate__lang{{position:absolute;top:16px;right:16px}}
 </style>
 </head>
 <body>
+<!-- GATE -->
+<div id="ws-gate" class="ws-gate">
+  <div class="ws-gate__lang">
+    <div class="ws-lang-toggle" id="ws-lang-gate">
+      <button class="ws-lang-btn active" data-lang="en">EN</button>
+      <button class="ws-lang-btn" data-lang="ja">JA</button>
+    </div>
+  </div>
+  <div class="ws-gate__card">
+    <img class="ws-gate__logo" src="data:image/png;base64,{_LOGO_WM_WHITE_B64}" alt="NAKAI" />
+    <p class="ws-gate__q" id="ws-gate-q">Are you a NAKAI wholesale partner?</p>
+    <p class="ws-gate__sub" id="ws-gate-sub">Access our wholesale partner portal</p>
+    <div class="ws-gate__btns">
+      <button class="ws-gate__btn ws-gate__btn--yes" id="ws-gate-yes">Yes</button>
+      <button class="ws-gate__btn ws-gate__btn--no" id="ws-gate-no">No, but I'm interested</button>
+    </div>
+    <div class="ws-gate__email" id="ws-gate-email">
+      <label class="ws-gate__email-label" id="ws-gate-email-label">Enter your email to access the portal</label>
+      <form class="ws-gate__email-wrap" id="ws-gate-email-form">
+        <input type="email" class="ws-gate__email-input" id="ws-gate-email-input" placeholder="your@email.com" required />
+        <button type="submit" class="ws-gate__email-submit" id="ws-gate-email-submit">Continue</button>
+      </form>
+    </div>
+  </div>
+</div>
 <!-- APP -->
-<div id="ws-app" class="ws-active">
+<div id="ws-app" class="ws-hidden">
   <!-- Desktop sidebar -->
   <aside class="ws-brand">
     <div class="ws-brand__top">
@@ -321,6 +368,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       <button class="ws-brand__nav-item" id="ws-nav-chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span id="ws-nav-chat-label">Chat</span></button>
     </nav>
     <div class="ws-brand__bottom">
+      <a href="/app" class="ws-brand__contact" id="ws-nav-consumer">Consumer App</a>
       <a href="mailto:wholesale@s-natural.xyz" class="ws-brand__contact">Contact Us</a>
       <p class="ws-brand__copy">&copy; NAKAI Matcha</p>
     </div>
@@ -379,6 +427,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           <div class="ws-menu-grid" id="ws-menu-cards"></div>
         </div>
         <div class="ws-home__footer">
+          <a href="/app" class="ws-home__link" id="ws-f-consumer">Consumer App</a>
+          <span class="ws-home__dot"></span>
           <a href="mailto:wholesale@s-natural.xyz" class="ws-home__link">wholesale@s-natural.xyz</a>
           <span class="ws-home__dot"></span>
           <a href="https://nakaimatcha.com" target="_blank" rel="noopener" class="ws-home__link">nakaimatcha.com</a>
@@ -404,6 +454,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
         <button class="ws-drawer__nav-item" id="ws-dnav-chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span id="ws-dnav-chat-label">Chat</span></button>
       </div>
       <div class="ws-drawer__bottom">
+        <a href="/app" class="ws-drawer__contact" id="ws-dnav-consumer">Consumer App</a>
         <a href="mailto:wholesale@s-natural.xyz" class="ws-drawer__contact">wholesale@s-natural.xyz</a>
       </div>
     </nav>
@@ -440,6 +491,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
         </form>
       </div>
       <div class="ws-chat-footer">
+        <a href="/app" class="ws-chat-footer__link" id="ws-cf-consumer">Consumer App</a>
+        <span class="ws-chat-footer__dot"></span>
         <a href="mailto:wholesale@s-natural.xyz" class="ws-chat-footer__link">Contact</a>
         <span class="ws-chat-footer__dot"></span>
         <a href="https://nakaimatcha.com" target="_blank" rel="noopener" class="ws-chat-footer__link">Shop</a>
@@ -530,6 +583,10 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       menu3msg:'How do I make a matcha americano? What variations can I offer?',
       menu4name:'Signature Cocktail',menu4specs:'3g \u00b7 various',menu4desc:'Creative matcha-based beverages',
       menu4msg:'What are some creative matcha cocktail or mocktail recipes for a bar or restaurant?',
+      gateQ:'Are you a NAKAI wholesale partner?',gateSub:'Access our wholesale partner portal',
+      gateYes:'Yes',gateNo:"No, but I'm interested",
+      gateEmailLabel:'Enter your email to access the portal',gateSubmit:'Continue',
+      consumerApp:'Consumer App',
     }},
     ja:{{
       greeting:'\u3088\u3046\u3053\u305d\uff01\u30db\u30fc\u30eb\u30bb\u30fc\u30eb\u62b9\u8336\u30b9\u30da\u30b7\u30e3\u30ea\u30b9\u30c8\u3067\u3059\u3002\u30d3\u30b8\u30cd\u30b9\u306e\u304a\u624b\u4f1d\u3044\u3092\u3044\u305f\u3057\u307e\u3059\u3002',
@@ -604,6 +661,10 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       menu3msg:'\u62b9\u8336\u30a2\u30e1\u30ea\u30ab\u30fc\u30ce\u306e\u4f5c\u308a\u65b9\u306f\uff1f\u3069\u306e\u3088\u3046\u306a\u30d0\u30ea\u30a8\u30fc\u30b7\u30e7\u30f3\u304c\u3042\u308a\u307e\u3059\u304b\uff1f',
       menu4name:'\u30b7\u30b0\u30cd\u30c1\u30e3\u30fc\u30ab\u30af\u30c6\u30eb',menu4specs:'3g \u00b7 various',menu4desc:'\u5275\u4f5c\u62b9\u8336\u30c9\u30ea\u30f3\u30af',
       menu4msg:'\u30d0\u30fc\u3084\u30ec\u30b9\u30c8\u30e9\u30f3\u5411\u3051\u306e\u5275\u4f5c\u62b9\u8336\u30ab\u30af\u30c6\u30eb\u30fb\u30e2\u30af\u30c6\u30eb\u306e\u30ec\u30b7\u30d4\u306f\uff1f',
+      gateQ:'NAKAI\u306e\u30db\u30fc\u30eb\u30bb\u30fc\u30eb\u30d1\u30fc\u30c8\u30ca\u30fc\u3067\u3059\u304b\uff1f',gateSub:'\u30db\u30fc\u30eb\u30bb\u30fc\u30eb\u30d1\u30fc\u30c8\u30ca\u30fc\u30dd\u30fc\u30bf\u30eb\u3078\u30a2\u30af\u30bb\u30b9',
+      gateYes:'\u306f\u3044',gateNo:'\u3044\u3044\u3048\u3001\u3067\u3082\u8208\u5473\u304c\u3042\u308a\u307e\u3059',
+      gateEmailLabel:'\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u5165\u529b\u3057\u3066\u30dd\u30fc\u30bf\u30eb\u306b\u30a2\u30af\u30bb\u30b9',gateSubmit:'\u7d9a\u3051\u308b',
+      consumerApp:'\u6d88\u8cbb\u8005\u5411\u3051\u30a2\u30d7\u30ea',
     }}
   }};
 
@@ -684,6 +745,16 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     $('ws-sec-barista').textContent=t('secBarista');
     $('ws-sec-cultivars').textContent=t('secCultivars');
     $('ws-sec-menu').textContent=t('secMenu');
+    /* Gate */
+    var gq=$('ws-gate-q');if(gq)gq.textContent=t('gateQ');
+    var gs=$('ws-gate-sub');if(gs)gs.textContent=t('gateSub');
+    var gy=$('ws-gate-yes');if(gy)gy.textContent=t('gateYes');
+    var gn=$('ws-gate-no');if(gn)gn.textContent=t('gateNo');
+    var gl=$('ws-gate-email-label');if(gl)gl.textContent=t('gateEmailLabel');
+    var ge=$('ws-gate-email-submit');if(ge)ge.textContent=t('gateSubmit');
+    /* Consumer app links */
+    var ca=[['ws-nav-consumer','consumerApp'],['ws-dnav-consumer','consumerApp'],['ws-f-consumer','consumerApp'],['ws-cf-consumer','consumerApp']];
+    ca.forEach(function(p){{var el=$(p[0]);if(el)el.textContent=t(p[1])}});
     /* Nav labels */
     var ids=[['ws-nav-home-label','navHome'],['ws-nav-products-label','navProducts'],['ws-nav-barista-label','navBarista'],['ws-nav-cultivars-label','navCultivars'],['ws-nav-chat-label','navChat'],['ws-dnav-home-label','navHome'],['ws-dnav-products-label','navProducts'],['ws-dnav-barista-label','navBarista'],['ws-dnav-cultivars-label','navCultivars'],['ws-dnav-chat-label','navChat']];
     ids.forEach(function(p){{var el=$(p[0]);if(el)el.textContent=t(p[1])}});
@@ -898,7 +969,38 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   }}
 
   function initLogin(){{
-    initApp();
+    /* Gate: check if already verified */
+    if(sessionStorage.getItem('ws_partner_verified')){{
+      $('ws-gate').classList.add('ws-hidden');
+      $('ws-app').classList.remove('ws-hidden');
+      $('ws-app').classList.add('ws-active');
+      initApp();
+      return;
+    }}
+    /* Show gate */
+    setLang(lang);
+    $('ws-gate-yes').addEventListener('click',function(){{
+      sessionStorage.setItem('ws_partner_verified','yes');
+      $('ws-gate').classList.add('ws-hidden');
+      $('ws-app').classList.remove('ws-hidden');
+      $('ws-app').classList.add('ws-active');
+      initApp();
+    }});
+    $('ws-gate-no').addEventListener('click',function(){{
+      $('ws-gate-email').classList.add('ws-gate__email--show');
+      $('ws-gate-email-input').focus();
+    }});
+    $('ws-gate-email-form').addEventListener('submit',function(e){{
+      e.preventDefault();
+      var email=$('ws-gate-email-input').value.trim();
+      if(!email)return;
+      sessionStorage.setItem('ws_partner_verified','interested');
+      sessionStorage.setItem('ws_lead_email',email);
+      $('ws-gate').classList.add('ws-hidden');
+      $('ws-app').classList.remove('ws-hidden');
+      $('ws-app').classList.add('ws-active');
+      initApp();
+    }});
   }}
 
   function initApp(){{

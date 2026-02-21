@@ -473,7 +473,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     <div class="nc-brand__bottom">
       <div class="nc-brand__ctas">
         <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-brand__cta nc-brand__cta--p">Shop NAKAI</a>
-        <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-brand__cta nc-brand__cta--s">Wholesale</a>
+        <a href="/wholesale" class="nc-brand__cta nc-brand__cta--s">Wholesale</a>
       </div>
       <p class="nc-brand__copy">&copy; NAKAI Matcha</p>
     </div>
@@ -560,7 +560,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       <div class="nc-drawer__bottom">
         <div class="nc-drawer__ctas">
           <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-drawer__cta nc-drawer__cta--p">Shop NAKAI</a>
-          <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-drawer__cta nc-drawer__cta--s">Wholesale</a>
+          <a href="/wholesale" class="nc-drawer__cta nc-drawer__cta--s">Wholesale</a>
         </div>
       </div>
     </nav>
@@ -620,7 +620,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       <div class="nc-footer">
         <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-footer__link" id="nc-f-shop">Shop</a>
         <span class="nc-footer__dot"></span>
-        <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-footer__link" id="nc-f-ws">Wholesale</a>
+        <a href="/wholesale" class="nc-footer__link" id="nc-f-ws">Wholesale</a>
       </div>
     </div>
   </div>
