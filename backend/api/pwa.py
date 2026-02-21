@@ -875,7 +875,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       .replace(/^- (.*?)$/gm,'<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>')
       .replace(/^\d+\.\s+(.*?)$/gm,'<li>$1</li>')
-      .replace(/\n{{3,}}/g,'\\n\\n')
+      .replace(/\\n{{3,}}/g,'\\n\\n')
       .replace(/\\n/g,'<br>')
       .replace(/(<br>){{3,}}/g,'<br><br>')
       .replace(/^(<br>)+/,'')
