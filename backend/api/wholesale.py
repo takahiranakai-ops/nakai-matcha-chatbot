@@ -299,21 +299,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 </style>
 </head>
 <body>
-<!-- LOGIN GATE -->
-<div id="ws-login-gate">
-  <div class="ws-login-box">
-    <img src="data:image/png;base64,{_LOGO_ICON_B64}" alt="NAKAI" />
-    <h2 id="ws-login-title">Wholesale Partner</h2>
-    <form id="ws-login-form">
-      <input type="password" id="ws-login-pw" placeholder="Enter partner password" autofocus />
-      <button type="submit">Sign In</button>
-    </form>
-    <div class="ws-login-error" id="ws-login-error">Invalid password</div>
-  </div>
-</div>
-
 <!-- APP -->
-<div id="ws-app">
+<div id="ws-app" class="ws-active">
   <!-- Desktop sidebar -->
   <aside class="ws-brand">
     <div class="ws-brand__top">
@@ -910,27 +897,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     }});
   }}
 
-  /* Login */
   function initLogin(){{
-    $('ws-login-form').addEventListener('submit',function(e){{
-      e.preventDefault();
-      var pw=$('ws-login-pw').value;
-      fetch('/api/admin/wholesale/login',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{password:pw}})}})
-      .then(function(r){{if(!r.ok)throw new Error();return r.json()}})
-      .then(function(){{
-        sessionStorage.setItem('nakai_ws_pw',pw);
-        $('ws-login-gate').style.display='none';
-        $('ws-app').classList.add('ws-active');
-        initApp();
-      }})
-      .catch(function(){{$('ws-login-error').style.display='block'}});
-    }});
-    var stored=sessionStorage.getItem('nakai_ws_pw');
-    if(stored){{
-      $('ws-login-gate').style.display='none';
-      $('ws-app').classList.add('ws-active');
-      initApp();
-    }}
+    initApp();
   }}
 
   function initApp(){{
