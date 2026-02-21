@@ -865,10 +865,12 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   function formatMd(s){{
     if(!s)return'';
     return s
-      .replace(/^#{{1,4}}\s*.*$/gm,'')
-      .replace(/^-{{3,}}$/gm,'')
-      .replace(/^\*{{3,}}$/gm,'')
+      .replace(/^#{{1,6}}\s*.*$/gm,'')
+      .replace(/^\s*-{{3,}}\s*$/gm,'')
+      .replace(/^\s*\*{{3,}}\s*$/gm,'')
+      .replace(/^\s*_{3,}\s*$/gm,'')
       .replace(/^\|.*\|$/gm,'')
+      .replace(/^\*\*[^*]+\*\*\s*$/gm,'')
       .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
       .replace(/\[(.*?)\]\(\/(.*?)\)/g,'<a href="'+SHOP+'/$2" target="_blank" rel="noopener">$1</a>')
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')

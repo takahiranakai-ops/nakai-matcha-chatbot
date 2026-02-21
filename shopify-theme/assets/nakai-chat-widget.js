@@ -653,14 +653,17 @@
   NakaiChat.prototype.formatMarkdown = function (text) {
     if (!text) return '';
     return text
-      // Strip markdown headers (# ## ### etc)
-      .replace(/^#{1,4}\s*.*$/gm, '')
-      // Strip horizontal rules
-      .replace(/^-{3,}$/gm, '')
-      .replace(/^\*{3,}$/gm, '')
+      // Strip markdown headers (# ## ### #### etc)
+      .replace(/^#{1,6}\s*.*$/gm, '')
+      // Strip horizontal rules (---, ***, ___)
+      .replace(/^\s*-{3,}\s*$/gm, '')
+      .replace(/^\s*\*{3,}\s*$/gm, '')
+      .replace(/^\s*_{3,}\s*$/gm, '')
       // Strip table rows
       .replace(/^\|.*\|$/gm, '')
-      // Bold
+      // Strip bold-only lines (pseudo-headers like "**Title**")
+      .replace(/^\*\*[^*]+\*\*\s*$/gm, '')
+      // Bold (inline)
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       // Relative links
       .replace(/\[(.*?)\]\(\/(.*?)\)/g, '<a href="' + SHOP_URL + '/$2" target="_blank" rel="noopener">$1</a>')
