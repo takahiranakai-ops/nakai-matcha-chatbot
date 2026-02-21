@@ -63,7 +63,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .ws-brand__nav-item:hover{{color:var(--cream);background:rgba(249,240,226,.08)}}
 .ws-brand__nav-item svg{{width:16px;height:16px;opacity:.5;flex-shrink:0}}
 .ws-brand__nav-item:hover svg{{opacity:.8}}
-.ws-brand__bottom{{margin-top:auto;padding-top:24px}}
+.ws-brand__bottom{{margin-top:auto;padding-top:24px;display:flex;flex-direction:column;gap:8px}}
 .ws-brand__contact{{display:block;text-align:center;font-family:var(--sans);font-size:.64rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:12px 16px;border-radius:10px;cursor:pointer;transition:all .5s var(--ease);background:rgba(249,240,226,.12);color:var(--cream);border:none}}
 .ws-brand__contact:hover{{background:rgba(249,240,226,.22)}}
 .ws-brand__copy{{font-family:var(--sans);font-size:.58rem;color:rgba(249,240,226,.2);text-align:center;margin-top:20px;letter-spacing:.06em}}
@@ -193,7 +193,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .ws-drawer__nav-item{{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:.76rem;font-weight:400;color:rgba(249,240,226,.5);padding:12px 16px;border-radius:10px;cursor:pointer;transition:all .35s var(--ease);border:none;background:transparent;text-align:left;-webkit-tap-highlight-color:transparent;width:100%}}
 .ws-drawer__nav-item:hover{{color:var(--cream);background:rgba(249,240,226,.08)}}
 .ws-drawer__nav-item svg{{width:16px;height:16px;opacity:.5;flex-shrink:0}}
-.ws-drawer__bottom{{padding:16px 20px max(16px,env(safe-area-inset-bottom));margin-top:auto}}
+.ws-drawer__bottom{{padding:16px 20px max(16px,env(safe-area-inset-bottom));margin-top:auto;display:flex;flex-direction:column;gap:8px}}
 .ws-drawer__contact{{display:block;text-align:center;font-family:var(--sans);font-size:.64rem;font-weight:400;letter-spacing:.08em;color:rgba(249,240,226,.4);text-decoration:none;padding:12px 16px;border-radius:10px;border:1px solid rgba(249,240,226,.1);transition:all .5s var(--ease)}}
 .ws-drawer__contact:hover{{color:var(--cream);border-color:rgba(249,240,226,.28)}}
 
@@ -318,6 +318,25 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .ws-gate__email-submit{{padding:12px 24px;background:var(--green);color:var(--white);border:none;border-radius:12px;font-family:var(--font);font-size:.92rem;font-weight:600;cursor:pointer;transition:opacity .2s;white-space:nowrap}}
 .ws-gate__email-submit:hover{{opacity:.88}}
 .ws-gate__lang{{position:absolute;top:16px;right:16px}}
+/* Inquiry Modal */
+.ws-inquiry-overlay{{position:fixed;inset:0;background:rgba(0,0,0,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:100;opacity:0;pointer-events:none;transition:opacity .3s ease;display:flex;align-items:center;justify-content:center}}
+.ws-inquiry-overlay--open{{opacity:1;pointer-events:auto}}
+.ws-inquiry{{background:var(--white);border-radius:24px;padding:36px 32px;max-width:440px;width:calc(100% - 48px);box-shadow:0 8px 40px rgba(0,0,0,.12);transform:translateY(20px) scale(.97);transition:transform .35s ease;position:relative}}
+.ws-inquiry-overlay--open .ws-inquiry{{transform:translateY(0) scale(1)}}
+.ws-inquiry__close{{position:absolute;top:16px;right:16px;width:32px;height:32px;border:none;background:var(--g03);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g50);transition:background .2s}}
+.ws-inquiry__close:hover{{background:var(--g06)}}
+.ws-inquiry__title{{font-family:var(--sans);font-size:1.1rem;font-weight:600;color:var(--green);margin-bottom:24px;text-align:center}}
+.ws-inquiry__tier{{border:1.5px solid var(--g06);border-radius:16px;padding:20px;margin-bottom:12px;transition:border-color .2s}}
+.ws-inquiry__tier:last-child{{margin-bottom:0}}
+.ws-inquiry__tier:hover{{border-color:var(--g12)}}
+.ws-inquiry__tier-label{{font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--g35);margin-bottom:6px}}
+.ws-inquiry__tier-range{{font-family:var(--sans);font-size:1rem;font-weight:600;color:var(--green);margin-bottom:4px}}
+.ws-inquiry__tier-desc{{font-family:var(--sans);font-size:.82rem;font-weight:300;color:var(--g50);margin-bottom:14px;line-height:1.5}}
+.ws-inquiry__tier-btn{{display:inline-block;font-family:var(--sans);font-size:.82rem;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:12px;cursor:pointer;transition:opacity .2s;border:none}}
+.ws-inquiry__tier-btn--shop{{background:var(--green);color:var(--white)}}
+.ws-inquiry__tier-btn--shop:hover{{opacity:.88}}
+.ws-inquiry__tier-btn--email{{background:rgba(64,101,70,.08);color:var(--green)}}
+.ws-inquiry__tier-btn--email:hover{{background:rgba(64,101,70,.14)}}
 </style>
 </head>
 <body>
@@ -346,6 +365,25 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     </div>
   </div>
 </div>
+<!-- INQUIRY MODAL -->
+<div class="ws-inquiry-overlay" id="ws-inquiry-overlay">
+  <div class="ws-inquiry">
+    <button class="ws-inquiry__close" id="ws-inquiry-close">&times;</button>
+    <h2 class="ws-inquiry__title" id="ws-inquiry-title">Wholesale Inquiry</h2>
+    <div class="ws-inquiry__tier">
+      <div class="ws-inquiry__tier-label" id="ws-inq-label1">SMALL ORDER</div>
+      <div class="ws-inquiry__tier-range" id="ws-inq-range1">Under 10 kg</div>
+      <div class="ws-inquiry__tier-desc" id="ws-inq-desc1">Purchase directly from our online store with fast shipping.</div>
+      <a href="https://nakaimatcha.com" target="_blank" rel="noopener" class="ws-inquiry__tier-btn ws-inquiry__tier-btn--shop" id="ws-inq-btn1">Shop Now</a>
+    </div>
+    <div class="ws-inquiry__tier">
+      <div class="ws-inquiry__tier-label" id="ws-inq-label2">BULK ORDER</div>
+      <div class="ws-inquiry__tier-range" id="ws-inq-range2">10 kg &ndash; 100 t</div>
+      <div class="ws-inquiry__tier-desc" id="ws-inq-desc2">Contact our team for custom pricing and logistics.</div>
+      <a href="mailto:info@s-natural.xyz" class="ws-inquiry__tier-btn ws-inquiry__tier-btn--email" id="ws-inq-btn2">Email Us</a>
+    </div>
+  </div>
+</div>
 <!-- APP -->
 <div id="ws-app" class="ws-hidden">
   <!-- Desktop sidebar -->
@@ -369,7 +407,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     </nav>
     <div class="ws-brand__bottom">
       <a href="/app" class="ws-brand__contact" id="ws-nav-consumer">Consumer App</a>
-      <a href="mailto:wholesale@s-natural.xyz" class="ws-brand__contact">Contact Us</a>
+      <button class="ws-brand__contact" id="ws-nav-inquiry">Wholesale Inquiry</button>
       <p class="ws-brand__copy">&copy; NAKAI Matcha</p>
     </div>
   </aside>
@@ -429,7 +467,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
         <div class="ws-home__footer">
           <a href="/app" class="ws-home__link" id="ws-f-consumer">Consumer App</a>
           <span class="ws-home__dot"></span>
-          <a href="mailto:wholesale@s-natural.xyz" class="ws-home__link">wholesale@s-natural.xyz</a>
+          <a href="#" class="ws-home__link" id="ws-f-inquiry">Wholesale Inquiry</a>
           <span class="ws-home__dot"></span>
           <a href="https://nakaimatcha.com" target="_blank" rel="noopener" class="ws-home__link">nakaimatcha.com</a>
         </div>
@@ -455,7 +493,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       </div>
       <div class="ws-drawer__bottom">
         <a href="/app" class="ws-drawer__contact" id="ws-dnav-consumer">Consumer App</a>
-        <a href="mailto:wholesale@s-natural.xyz" class="ws-drawer__contact">wholesale@s-natural.xyz</a>
+        <button class="ws-drawer__contact" id="ws-dnav-inquiry" style="cursor:pointer">Wholesale Inquiry</button>
       </div>
     </nav>
 
@@ -493,7 +531,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       <div class="ws-chat-footer">
         <a href="/app" class="ws-chat-footer__link" id="ws-cf-consumer">Consumer App</a>
         <span class="ws-chat-footer__dot"></span>
-        <a href="mailto:wholesale@s-natural.xyz" class="ws-chat-footer__link">Contact</a>
+        <a href="#" class="ws-chat-footer__link" id="ws-cf-inquiry">Inquiry</a>
         <span class="ws-chat-footer__dot"></span>
         <a href="https://nakaimatcha.com" target="_blank" rel="noopener" class="ws-chat-footer__link">Shop</a>
       </div>
@@ -522,7 +560,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       q4:'Order inquiry',q4m:'I would like to place a wholesale order. What are the available formats and minimum order quantities?',
       error:"Connection issue. Please try again.",
       heroSub:'Wholesale Partner Portal',heroHeading:'Specialty matcha for professionals',
-      tCompare:'Compare Products',tLatte:'Latte Recipe',tCultivar:'Cultivar Guide',tContact:'Contact Us',
+      tCompare:'Compare Products',tLatte:'Latte Recipe',tCultivar:'Cultivar Guide',tInquiry:'Wholesale Inquiry',
+      inquiryTitle:'Wholesale Inquiry',inqLabel1:'SMALL ORDER',inqRange1:'Under 10 kg',inqDesc1:'Purchase directly from our online store with fast shipping.',inqBtn1:'Shop Now',inqLabel2:'BULK ORDER',inqRange2:'10 kg \u2013 100 t',inqDesc2:'Contact our team for custom pricing and logistics.',inqBtn2:'Email Us',
       compareMsg:'Compare the NAKAI wholesale matcha products. What are the key differences in grade, origin, and recommended use?',
       latteMsg:'What is the ideal matcha latte recipe for a cafe setting? Include dosing, temperature, and milk recommendations.',
       cultivarMsg:'Tell me about the different matcha cultivars used in NAKAI products. How do they differ in flavor profile?',
@@ -600,7 +639,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       q4:'\u6ce8\u6587\u306b\u3064\u3044\u3066',q4m:'\u30db\u30fc\u30eb\u30bb\u30fc\u30eb\u6ce8\u6587\u3092\u3057\u305f\u3044\u3067\u3059\u3002\u5229\u7528\u53ef\u80fd\u306a\u30d5\u30a9\u30fc\u30de\u30c3\u30c8\u3068\u6700\u4f4e\u6ce8\u6587\u6570\u91cf\u306f\uff1f',
       error:'\u63a5\u7d9a\u306b\u554f\u984c\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\u3082\u3046\u4e00\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002',
       heroSub:'\u30db\u30fc\u30eb\u30bb\u30fc\u30eb\u30d1\u30fc\u30c8\u30ca\u30fc\u30dd\u30fc\u30bf\u30eb',heroHeading:'\u30d7\u30ed\u30d5\u30a7\u30c3\u30b7\u30e7\u30ca\u30eb\u306e\u305f\u3081\u306e\u30b9\u30da\u30b7\u30e3\u30eb\u30c6\u30a3\u62b9\u8336',
-      tCompare:'\u5546\u54c1\u6bd4\u8f03',tLatte:'\u30e9\u30c6\u30ec\u30b7\u30d4',tCultivar:'\u54c1\u7a2e\u30ac\u30a4\u30c9',tContact:'\u304a\u554f\u3044\u5408\u308f\u305b',
+      tCompare:'\u5546\u54c1\u6bd4\u8f03',tLatte:'\u30e9\u30c6\u30ec\u30b7\u30d4',tCultivar:'\u54c1\u7a2e\u30ac\u30a4\u30c9',tInquiry:'\u304a\u554f\u3044\u5408\u308f\u305b',
+      inquiryTitle:'\u304a\u554f\u3044\u5408\u308f\u305b',inqLabel1:'\u5c11\u91cf\u6ce8\u6587',inqRange1:'10 kg \u672a\u6e80',inqDesc1:'\u30aa\u30f3\u30e9\u30a4\u30f3\u30b9\u30c8\u30a2\u304b\u3089\u76f4\u63a5\u8cfc\u5165\u3044\u305f\u3060\u3051\u307e\u3059\u3002',inqBtn1:'\u30b7\u30e7\u30c3\u30d7\u3078',inqLabel2:'\u5927\u53e3\u6ce8\u6587',inqRange2:'10 kg \u2013 100 t',inqDesc2:'\u4fa1\u683c\u3068\u7269\u6d41\u306b\u3064\u3044\u3066\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002',inqBtn2:'\u30e1\u30fc\u30eb\u3059\u308b',
       compareMsg:'NAKAI\u306e\u30db\u30fc\u30eb\u30bb\u30fc\u30eb\u62b9\u8336\u5546\u54c1\u3092\u6bd4\u8f03\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u30b0\u30ec\u30fc\u30c9\u3001\u7523\u5730\u3001\u63a8\u5968\u7528\u9014\u306e\u4e3b\u306a\u9055\u3044\u306f\uff1f',
       latteMsg:'\u30ab\u30d5\u30a7\u3067\u306e\u7406\u60f3\u7684\u306a\u62b9\u8336\u30e9\u30c6\u30ec\u30b7\u30d4\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u5206\u91cf\u3001\u6e29\u5ea6\u3001\u30df\u30eb\u30af\u306e\u63a8\u5968\u3092\u542b\u3081\u3066\u3002',
       cultivarMsg:'NAKAI\u88fd\u54c1\u306b\u4f7f\u308f\u308c\u3066\u3044\u308b\u62b9\u8336\u306e\u54c1\u7a2e\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u98a8\u5473\u30d7\u30ed\u30d5\u30a1\u30a4\u30eb\u306e\u9055\u3044\u306f\uff1f',
@@ -740,7 +780,12 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     $('ws-t-compare').textContent=t('tCompare');
     $('ws-t-latte').textContent=t('tLatte');
     $('ws-t-cultivar').textContent=t('tCultivar');
-    $('ws-t-contact').textContent=t('tContact');
+    $('ws-t-contact').textContent=t('tInquiry');
+    /* Inquiry modal */
+    var iq=[['ws-inquiry-title','inquiryTitle'],['ws-inq-label1','inqLabel1'],['ws-inq-range1','inqRange1'],['ws-inq-desc1','inqDesc1'],['ws-inq-btn1','inqBtn1'],['ws-inq-label2','inqLabel2'],['ws-inq-range2','inqRange2'],['ws-inq-desc2','inqDesc2'],['ws-inq-btn2','inqBtn2']];
+    iq.forEach(function(p){{var el=$(p[0]);if(el)el.textContent=t(p[1])}});
+    var il=[['ws-nav-inquiry','tInquiry'],['ws-dnav-inquiry','tInquiry'],['ws-f-inquiry','tInquiry'],['ws-cf-inquiry','tInquiry']];
+    il.forEach(function(p){{var el=$(p[0]);if(el)el.textContent=t(p[1])}});
     $('ws-sec-products').textContent=t('secProducts');
     $('ws-sec-barista').textContent=t('secBarista');
     $('ws-sec-cultivars').textContent=t('secCultivars');
@@ -1019,7 +1064,15 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     $('ws-t-compare').addEventListener('click',function(){{showChat(t('compareMsg'))}});
     $('ws-t-latte').addEventListener('click',function(){{showChat(t('latteMsg'))}});
     $('ws-t-cultivar').addEventListener('click',function(){{showChat(t('cultivarMsg'))}});
-    $('ws-t-contact').addEventListener('click',function(){{showChat(t('contactMsg'))}});
+    $('ws-t-contact').addEventListener('click',function(){{openInquiry()}});
+    /* Inquiry modal */
+    function openInquiry(){{$('ws-inquiry-overlay').classList.add('ws-inquiry-overlay--open')}}
+    function closeInquiry(){{$('ws-inquiry-overlay').classList.remove('ws-inquiry-overlay--open')}}
+    $('ws-inquiry-close').addEventListener('click',closeInquiry);
+    $('ws-inquiry-overlay').addEventListener('click',function(e){{if(e.target===this)closeInquiry()}});
+    var ni=$('ws-nav-inquiry');if(ni)ni.addEventListener('click',openInquiry);
+    var fi=$('ws-f-inquiry');if(fi)fi.addEventListener('click',function(e){{e.preventDefault();openInquiry()}});
+    var ci=$('ws-cf-inquiry');if(ci)ci.addEventListener('click',function(e){{e.preventDefault();openInquiry()}});
     /* Sidebar nav */
     var sn=$('ws-nav-home');if(sn)sn.addEventListener('click',showHome);
     var sp=$('ws-nav-products');if(sp)sp.addEventListener('click',function(){{showHome();setTimeout(function(){{scrollToSection('ws-sec-products')}},100)}});
@@ -1040,6 +1093,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     $('ws-dnav-barista').addEventListener('click',function(){{closeDrawer();showHome();setTimeout(function(){{scrollToSection('ws-sec-barista')}},100)}});
     $('ws-dnav-cultivars').addEventListener('click',function(){{closeDrawer();showHome();setTimeout(function(){{scrollToSection('ws-sec-cultivars')}},100)}});
     $('ws-dnav-chat').addEventListener('click',function(){{closeDrawer();showChat()}});
+    var di=$('ws-dnav-inquiry');if(di)di.addEventListener('click',function(){{closeDrawer();openInquiry()}});
     if(chatHistory.length>0)showChat();
   }}
 
