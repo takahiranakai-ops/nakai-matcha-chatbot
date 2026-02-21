@@ -673,7 +673,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       brewMsg:'How do I brew the perfect cup of matcha? Please include water temperature, matcha-to-water ratio, and whisking technique.',
       productMsg:'Tell me about NAKAI matcha products. What grades do you offer and what makes each one special?',
       faqMsg:'What are the most common customer questions about matcha? Give me quick answers I can use as a barista.',
-      findMsg:'I\'d like to find the right matcha for me. Could you ask me a few questions to help narrow it down?',
+      findMsg:"I'd like to find the right matcha for me. Could you ask me a few questions to help narrow it down?",
       secProducts:'Our Matcha',secRecipes:'Recipes & Guides',
       pRevi:'REVI',pReviGrade:'SS Grade Plus',pReviDesc:'Our finest. Creamy, elegant, rich in umami.',pReviPrice:'From Dhs. 259',pReviMsg:'Tell me about REVI matcha. What makes it special and how should I use it?',
       pIkigai:'IKIGAI',pIkigaiGrade:'SS Grade',pIkigaiDesc:'Daily premium. Vibrant, balanced, versatile.',pIkigaiPrice:'Dhs. 296',pIkigaiMsg:'Tell me about IKIGAI matcha. What is it best for and how does it compare to REVI?',
