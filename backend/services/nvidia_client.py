@@ -66,7 +66,7 @@ def _fix_japanese(text: str) -> str:
 async def chat_completion(
     messages: list[dict],
     temperature: float = 0.45,
-    max_tokens: int = 1500,
+    max_tokens: int = 800,
     language: str = "en",
 ) -> str:
     """Get chat completion from NVIDIA NIM model."""
@@ -94,3 +94,60 @@ async def chat_completion(
         if language == "ja":
             content = _fix_japanese(content)
         return content
+
+
+import json as _json
+
+
+async def chat_completion_stream(
+    messages: list[dict],
+    temperature: float = 0.45,
+    max_tokens: int = 800,
+    language: str = "en",
+):
+    """Yield text chunks from NVIDIA NIM model via streaming."""
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        async with client.stream(
+            "POST",
+            f"{settings.nvidia_base_url}/chat/completions",
+            headers=_headers(),
+            json={
+                "model": settings.nvidia_chat_model,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+                "top_p": 0.92,
+                "frequency_penalty": 0.1,
+                "stream": True,
+            },
+        ) as response:
+            response.raise_for_status()
+            in_think = False
+            async for line in response.aiter_lines():
+                if not line.startswith("data: "):
+                    continue
+                payload = line[6:]
+                if payload.strip() == "[DONE]":
+                    break
+                try:
+                    chunk = _json.loads(payload)
+                except _json.JSONDecodeError:
+                    continue
+                delta = chunk.get("choices", [{}])[0].get("delta", {})
+                text = delta.get("content") or ""
+                if not text:
+                    continue
+                # Skip <think> blocks inline
+                if "<think>" in text:
+                    in_think = True
+                if in_think:
+                    if "</think>" in text:
+                        in_think = False
+                        text = text.split("</think>", 1)[-1]
+                    else:
+                        continue
+                if not text:
+                    continue
+                if language == "ja":
+                    text = _fix_japanese(text)
+                yield text

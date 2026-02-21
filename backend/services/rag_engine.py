@@ -1,7 +1,7 @@
 import re
 from typing import Optional, List, Dict
 
-from services.nvidia_client import get_embeddings, chat_completion
+from services.nvidia_client import get_embeddings, chat_completion, chat_completion_stream
 from services.vector_store import VectorStore
 from services.prompt_templates import build_system_prompt, build_rag_prompt
 from config import settings
@@ -24,7 +24,7 @@ _SUGGESTIONS_RE = re.compile(
 _RELEVANCE_THRESHOLD = 0.82
 
 # Retrieve extra candidates for better filtering
-_RETRIEVAL_MULTIPLIER = 3
+_RETRIEVAL_MULTIPLIER = 2
 
 
 # Strip common LLM prefixes from suggestion lines
@@ -171,7 +171,7 @@ class RAGEngine:
 
         # 6. Generate response with tuned parameters
         raw_response = await chat_completion(
-            messages, temperature=0.45, max_tokens=1500, language=language
+            messages, temperature=0.45, max_tokens=800, language=language
         )
 
         # 7. Parse out follow-up suggestions
@@ -183,3 +183,89 @@ class RAGEngine:
             "context_chunks": len(context_texts),
             "suggestions": suggestions,
         }
+
+    async def answer_stream(
+        self,
+        user_message: str,
+        conversation_history: Optional[List[Dict]] = None,
+        language: str = "en",
+    ):
+        """Yield (event_type, data) tuples for SSE streaming."""
+        system_prompt = build_system_prompt(language=language)
+        msg_stripped = user_message.strip()
+
+        # Greetings — skip RAG, non-streaming (fast enough)
+        if _GREETING_RE.match(msg_stripped):
+            messages = [{"role": "system", "content": system_prompt}]
+            if conversation_history:
+                messages.extend(conversation_history[-6:])
+            messages.append({"role": "user", "content": msg_stripped})
+            response = await chat_completion(
+                messages, temperature=0.6, max_tokens=80, language=language
+            )
+            for end_char in ("\uff1f", "?"):
+                idx = response.find(end_char)
+                if idx != -1:
+                    response = response[: idx + 1]
+                    break
+            yield ("text", response.strip())
+            yield ("done", {"sources": [], "suggestions": []})
+            return
+
+        # 1-4: Same RAG retrieval as non-streaming
+        search_query = self._build_search_query(msg_stripped, conversation_history)
+        query_embeddings = await get_embeddings([search_query], input_type="query")
+        query_embedding = query_embeddings[0]
+
+        n_retrieve = min(
+            settings.max_context_chunks * _RETRIEVAL_MULTIPLIER,
+            max(self.vector_store.count(), 1),
+        )
+        results = self.vector_store.query(
+            query_embedding=query_embedding,
+            n_results=max(n_retrieve, 1),
+        )
+
+        context_texts = []
+        source_urls = set()
+        for result in results:
+            if result["distance"] > _RELEVANCE_THRESHOLD:
+                continue
+            if len(context_texts) >= settings.max_context_chunks:
+                break
+            context_texts.append(result["text"])
+            url = result["metadata"].get("url")
+            if url:
+                source_urls.add(url)
+
+        if context_texts:
+            context = "\n---\n".join(context_texts)
+            rag_context = build_rag_prompt(
+                context=context, question=user_message, language=language
+            )
+        else:
+            rag_context = build_rag_prompt(
+                context="", question=user_message, language=language
+            )
+
+        messages = [{"role": "system", "content": system_prompt}]
+        if conversation_history:
+            messages.extend(conversation_history[-8:])
+        messages.append({"role": "user", "content": rag_context})
+
+        # 5. Stream LLM response
+        full_response = []
+        async for chunk in chat_completion_stream(
+            messages, temperature=0.45, max_tokens=800, language=language
+        ):
+            full_response.append(chunk)
+            yield ("text", chunk)
+
+        # 6. Parse suggestions from full response
+        raw = "".join(full_response)
+        _, suggestions = _parse_suggestions(raw)
+
+        yield ("done", {
+            "sources": list(source_urls),
+            "suggestions": suggestions,
+        })

@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     nvidia_embed_model: str = "nvidia/nv-embedqa-e5-v5"
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     chroma_persist_dir: str = "./data/chroma_db"
-    max_context_chunks: int = 8
+    max_context_chunks: int = 5
     chunk_size: int = 500
     chunk_overlap: int = 50
     supabase_url: str = ""

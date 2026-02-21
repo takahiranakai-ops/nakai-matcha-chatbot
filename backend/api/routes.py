@@ -1,8 +1,10 @@
 import asyncio
+import json
 import logging
 import time
 
 from fastapi import APIRouter, HTTPException, Header, Request
+from fastapi.responses import StreamingResponse
 from api.models import ChatRequest, ChatResponse, RefreshResponse
 from api.middleware import limiter
 from services.rag_engine import RAGEngine
@@ -114,6 +116,57 @@ async def chat(request: Request, body: ChatRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/chat/stream")
+@limiter.limit("20/minute")
+async def chat_stream(request: Request, body: ChatRequest):
+    start_time = time.time()
+
+    async def event_generator():
+        full_response = []
+        final_meta = {}
+        try:
+            async for event_type, data in rag_engine.answer_stream(
+                user_message=body.message,
+                conversation_history=body.history,
+                language=body.language,
+            ):
+                if event_type == "text":
+                    full_response.append(data)
+                    yield f"data: {json.dumps({'type': 'text', 'content': data})}\n\n"
+                elif event_type == "done":
+                    final_meta = data
+        except Exception as e:
+            yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+
+        yield f"data: {json.dumps({'type': 'done', 'sources': final_meta.get('sources', []), 'suggestions': final_meta.get('suggestions', [])})}\n\n"
+
+        # Non-blocking logging
+        elapsed_ms = int((time.time() - start_time) * 1000)
+        response_text = "".join(full_response)
+        if body.session_id:
+            asyncio.create_task(_log_chat_exchange(
+                session_id=body.session_id,
+                source=body.source,
+                language=body.language,
+                user_agent=request.headers.get("user-agent", ""),
+                referrer=request.headers.get("referer", ""),
+                user_message=body.message,
+                assistant_response=response_text,
+                sources=final_meta.get("sources", []),
+                context_chunks=0,
+                response_time_ms=elapsed_ms,
+            ))
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.get("/health")

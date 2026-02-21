@@ -888,11 +888,60 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     if(!msg||loading)return;inp.value='';
     addMsg('user',msg);chatHistory.push({{role:'user',content:msg}});
     showTyping();loading=true;
-    fetch('/api/chat',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang,session_id:SESSION_ID,source:'pwa'}})}})
-    .then(function(r){{if(!r.ok)throw new Error('err');return r.json()}})
-    .then(function(d){{removeTyping();addMsg('bot',d.response,d.sources||[],d.suggestions||[]);chatHistory.push({{role:'assistant',content:d.response}});saveHistory()}})
-    .catch(function(){{removeTyping();addMsg('bot',t('error'))}})
-    .finally(function(){{loading=false}});
+    fetch('/api/chat/stream',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang,session_id:SESSION_ID,source:'pwa'}})}})
+    .then(function(r){{
+      if(!r.ok)throw new Error('err');
+      removeTyping();
+      var m=$('nc-messages');var d=document.createElement('div');d.className='nc-msg nc-msg--bot';
+      var bubble=document.createElement('div');bubble.className='nc-msg__bubble';
+      d.appendChild(bubble);m.appendChild(d);
+      var fullText='';
+      var reader=r.body.getReader();var decoder=new TextDecoder();var buf='';
+      function read(){{
+        reader.read().then(function(result){{
+          if(result.done)return finish();
+          buf+=decoder.decode(result.value,{{stream:true}});
+          var lines=buf.split('\n');buf=lines.pop();
+          lines.forEach(function(line){{
+            if(!line.startsWith('data: '))return;
+            try{{var ev=JSON.parse(line.slice(6))}}catch(e){{return}}
+            if(ev.type==='text'){{fullText+=ev.content;bubble.innerHTML=formatMd(fullText);scroll()}}
+            else if(ev.type==='done'){{
+              var now=new Date();var ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+              var meta='';
+              if(ev.sources&&ev.sources.length){{
+                meta+='<div class="nc-msg__sources">';
+                ev.sources.forEach(function(s){{var url=s.startsWith('/')?SHOP+s:s;
+                  var label=s.indexOf('/products/')>-1?(lang==='ja'?'商品を見る':'View product'):s.indexOf('/blogs/')>-1?(lang==='ja'?'記事を読む':'Read article'):(lang==='ja'?'詳細':'Learn more');
+                  meta+='<a href="'+escapeHtml(url)+'" class="nc-msg__source" target="_blank" rel="noopener">'+label+'</a>'}});
+                meta+='</div>';
+              }}
+              if(ev.suggestions&&ev.suggestions.length){{
+                meta+='<div class="nc-suggestions">';
+                ev.suggestions.forEach(function(s){{meta+='<button class="nc-suggestion" type="button">'+escapeHtml(s)+'</button>'}});
+                meta+='</div>';
+              }}
+              meta+='<div class="nc-msg__meta"><span class="nc-msg__time">'+ts+'</span></div>';
+              var metaEl=document.createElement('div');metaEl.innerHTML=meta;
+              while(metaEl.firstChild)d.appendChild(metaEl.firstChild);
+              d.querySelectorAll('.nc-suggestion').forEach(function(btn){{
+                btn.addEventListener('click',function(){{var q=this.textContent;$('nc-input').value=q;sendMessage();var sc=d.querySelector('.nc-suggestions');if(sc)sc.remove()}});
+              }});
+              /* Clean [SUGGESTIONS] block from visible text */
+              var raw=fullText;var si=raw.indexOf('[SUGGESTIONS]');
+              if(si>-1){{fullText=raw.substring(0,si).trim();bubble.innerHTML=formatMd(fullText)}}
+              chatHistory.push({{role:'assistant',content:fullText}});saveHistory();
+              scroll();
+            }}
+            else if(ev.type==='error'){{bubble.innerHTML=formatMd(t('error'))}}
+          }});
+          read();
+        }}).catch(function(){{finish()}});
+      }}
+      function finish(){{loading=false;if(!fullText){{bubble.innerHTML=formatMd(t('error'))}}}}
+      read();
+    }})
+    .catch(function(){{removeTyping();addMsg('bot',t('error'));loading=false}});
   }}
 
   function saveHistory(){{try{{localStorage.setItem('nakai_app_history',JSON.stringify(chatHistory.slice(-MAX_H)))}}catch(e){{}}}}
