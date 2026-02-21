@@ -3,8 +3,28 @@
 
   // ---- Configuration ----
   var CHAT_API_URL = 'https://nakai-matcha-chat.onrender.com/api';
+  var SHOP_URL = 'https://nakaimatcha.com';
   var MAX_HISTORY = 20;
   var AI_STAR_SVG = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>';
+
+  // ---- Session ID ----
+  function getSessionId() {
+    var key = 'nakai_session_id';
+    var id = sessionStorage.getItem(key);
+    if (!id) {
+      id = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : 'w-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+      sessionStorage.setItem(key, id);
+    }
+    return id;
+  }
+
+  // ---- Streaming support check ----
+  var supportsStream = typeof ReadableStream !== 'undefined'
+    && typeof TextDecoder !== 'undefined'
+    && typeof Response !== 'undefined'
+    && typeof Response.prototype === 'object';
 
   // ---- Chat Widget Class ----
   function NakaiChat(opts) {
@@ -20,11 +40,14 @@
     this.messagesContainer = document.getElementById(this.messagesId);
     this.form = document.getElementById(this.formId);
     this.input = document.getElementById(this.inputId);
+    this.sendBtn = this.form ? this.form.querySelector('.nakai-chat__send') : null;
 
     this.history = [];
     this.isOpen = false;
     this.isLoading = false;
     this.language = this.widget.dataset.lang || 'en';
+    this.sessionId = getSessionId();
+    this.lastUserMessage = '';
 
     this.bindEvents();
     this.loadHistory();
@@ -33,7 +56,6 @@
   NakaiChat.prototype.bindEvents = function () {
     var self = this;
 
-    // Form submission
     if (this.form) {
       this.form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -49,13 +71,12 @@
           self.input.value = msg;
           self.sendMessage();
         }
-        // Hide quick actions after click
         var qa = this.closest('.nakai-chat__quick-actions');
         if (qa) qa.style.display = 'none';
       });
     });
 
-    // Floating widget specific (toggle, close, ESC)
+    // Floating widget (toggle, close, ESC)
     if (!this.isFullPage) {
       var toggle = document.getElementById('nakai-chat-toggle');
       var closeBtn = document.getElementById('nakai-chat-close');
@@ -83,7 +104,6 @@
     if (panel) panel.setAttribute('aria-hidden', 'false');
     var toggle = document.getElementById('nakai-chat-toggle');
     if (toggle) toggle.setAttribute('aria-expanded', 'true');
-    // Only auto-focus on desktop to avoid mobile keyboard pushing content up
     if (this.input && window.innerWidth > 749) {
       this.input.focus();
     }
@@ -98,16 +118,306 @@
     if (toggle) toggle.setAttribute('aria-expanded', 'false');
   };
 
-  NakaiChat.prototype.sendMessage = function () {
-    var message = this.input ? this.input.value.trim() : '';
+  // ---- Send Button Loading State ----
+  NakaiChat.prototype.setSendLoading = function (on) {
+    if (!this.sendBtn) return;
+    if (on) {
+      this.sendBtn.classList.add('nakai-chat__send--loading');
+      this.sendBtn.disabled = true;
+    } else {
+      this.sendBtn.classList.remove('nakai-chat__send--loading');
+      this.sendBtn.disabled = false;
+    }
+  };
+
+  // ---- Error HTML with Retry ----
+  NakaiChat.prototype.getErrorHtml = function () {
+    var msg = this.language === 'ja'
+      ? '接続に問題が発生しました。'
+      : 'Sorry, I\'m having trouble connecting right now.';
+    var retryLabel = this.language === 'ja' ? '再試行' : 'Retry';
+    return '<div class="nakai-chat__error-content">'
+      + '<span>' + msg + '</span>'
+      + '<button class="nakai-chat__retry-btn" type="button">' + retryLabel + '</button>'
+      + '</div>';
+  };
+
+  // ---- Main Send — SSE Streaming ----
+  NakaiChat.prototype.sendMessage = function (overrideMsg) {
+    var message = overrideMsg || (this.input ? this.input.value.trim() : '');
     if (!message || this.isLoading) return;
 
-    this.input.value = '';
-    this.addMessage('user', message);
+    if (this.input) this.input.value = '';
+    this.lastUserMessage = message;
+    this.addUserMessage(message);
     this.history.push({ role: 'user', content: message });
     this.showTyping();
     this.isLoading = true;
+    this.setSendLoading(true);
 
+    // Mock mode for local preview
+    if (window.__NAKAI_MOCK) {
+      this.mockStream(message);
+      return;
+    }
+
+    var self = this;
+    var useStream = supportsStream;
+
+    if (useStream) {
+      this.streamMessage(message);
+    } else {
+      this.legacyMessage(message);
+    }
+  };
+
+  // ---- SSE Streaming via ReadableStream ----
+  NakaiChat.prototype.streamMessage = function (message) {
+    var self = this;
+
+    fetch(CHAT_API_URL + '/chat/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: message,
+        history: this.history.slice(-MAX_HISTORY),
+        language: this.language,
+        session_id: this.sessionId,
+        source: 'widget'
+      })
+    })
+    .then(function (res) {
+      if (!res.ok) throw new Error('API error');
+      self.removeTyping();
+
+      // Create empty bot bubble
+      var msgDiv = document.createElement('div');
+      msgDiv.className = 'nakai-chat__message nakai-chat__message--bot';
+      var row = document.createElement('div');
+      row.className = 'nakai-chat__message-row';
+      var avatar = document.createElement('div');
+      avatar.className = 'nakai-chat__avatar';
+      avatar.innerHTML = AI_STAR_SVG;
+      var bubble = document.createElement('div');
+      bubble.className = 'nakai-chat__message-content';
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      msgDiv.appendChild(row);
+      self.messagesContainer.appendChild(msgDiv);
+
+      var fullText = '';
+      var reader = res.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '';
+
+      function read() {
+        reader.read().then(function (result) {
+          if (result.done) return finish();
+
+          buf += decoder.decode(result.value, { stream: true });
+          var lines = buf.split('\n');
+          buf = lines.pop();
+
+          lines.forEach(function (line) {
+            if (!line.startsWith('data: ')) return;
+            try { var ev = JSON.parse(line.slice(6)); } catch (e) { return; }
+
+            if (ev.type === 'text') {
+              fullText += ev.content;
+              bubble.innerHTML = self.formatMarkdown(fullText);
+              self.scrollToBottom();
+            }
+            else if (ev.type === 'done') {
+              self.finishStreamMessage(msgDiv, bubble, fullText, ev.sources, ev.suggestions);
+            }
+            else if (ev.type === 'error') {
+              bubble.innerHTML = self.getErrorHtml();
+              self.bindRetry(msgDiv);
+            }
+          });
+
+          read();
+        }).catch(function () { finish(); });
+      }
+
+      function finish() {
+        self.isLoading = false;
+        self.setSendLoading(false);
+        if (!fullText) {
+          bubble.innerHTML = self.getErrorHtml();
+          self.bindRetry(msgDiv);
+        }
+      }
+
+      read();
+    })
+    .catch(function () {
+      self.removeTyping();
+      self.addBotError();
+      self.isLoading = false;
+      self.setSendLoading(false);
+    });
+  };
+
+  // ---- Finish stream: sources, suggestions, timestamp ----
+  NakaiChat.prototype.finishStreamMessage = function (msgDiv, bubble, fullText, sources, suggestions) {
+    sources = sources || [];
+    suggestions = suggestions || [];
+
+    // Strip [SUGGESTIONS] block from visible text
+    var si = fullText.indexOf('[SUGGESTIONS]');
+    if (si > -1) {
+      fullText = fullText.substring(0, si).trim();
+      bubble.innerHTML = this.formatMarkdown(fullText);
+    }
+
+    // Source links
+    if (sources.length > 0) {
+      var srcDiv = document.createElement('div');
+      srcDiv.className = 'nakai-chat__sources';
+      for (var i = 0; i < sources.length; i++) {
+        var s = sources[i];
+        var url = s.startsWith('/') ? SHOP_URL + s : s;
+        var label = s.indexOf('/products/') > -1
+          ? (this.language === 'ja' ? '商品を見る' : 'View product')
+          : s.indexOf('/blogs/') > -1
+            ? (this.language === 'ja' ? '記事を読む' : 'Read article')
+            : (this.language === 'ja' ? '詳細' : 'Learn more');
+        var a = document.createElement('a');
+        a.href = url;
+        a.className = 'nakai-chat__source-link';
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = label;
+        srcDiv.appendChild(a);
+      }
+      msgDiv.appendChild(srcDiv);
+    }
+
+    // Product cards for product sources
+    this.renderProductCards(sources, msgDiv);
+
+    // Dynamic suggestions
+    if (suggestions.length > 0) {
+      var sugDiv = document.createElement('div');
+      sugDiv.className = 'nakai-chat__suggestions';
+      var self = this;
+      suggestions.forEach(function (text) {
+        var btn = document.createElement('button');
+        btn.className = 'nakai-chat__suggestion-btn';
+        btn.type = 'button';
+        btn.innerHTML = '<span>' + self.escapeHtml(text) + '</span>';
+        btn.addEventListener('click', function () {
+          self.input.value = text;
+          self.sendMessage();
+          sugDiv.remove();
+        });
+        sugDiv.appendChild(btn);
+      });
+      msgDiv.appendChild(sugDiv);
+    }
+
+    // Timestamp + AI tag
+    var now = new Date();
+    var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    var metaDiv = document.createElement('div');
+    metaDiv.className = 'nakai-chat__message-meta';
+    metaDiv.innerHTML =
+      '<span class="nakai-chat__timestamp">' + timeStr + '</span>' +
+      '<span class="nakai-chat__ai-tag">AI</span>';
+    msgDiv.appendChild(metaDiv);
+
+    this.history.push({ role: 'assistant', content: fullText });
+    this.saveHistory();
+    this.scrollToBottom();
+    this.isLoading = false;
+    this.setSendLoading(false);
+  };
+
+  // ---- Product Cards ----
+  NakaiChat.prototype.renderProductCards = function (sources, parentDiv) {
+    var productSources = sources.filter(function (s) {
+      return s.indexOf('/products/') > -1;
+    });
+    if (productSources.length === 0) return;
+
+    var grid = document.createElement('div');
+    grid.className = 'nakai-chat__product-grid';
+    var self = this;
+
+    productSources.forEach(function (s) {
+      var handle = s.split('/products/')[1];
+      if (!handle) return;
+      handle = handle.split('?')[0].split('#')[0];
+
+      // Create placeholder card with shimmer
+      var card = document.createElement('a');
+      card.className = 'nakai-chat__product-card nakai-chat__product-card--loading';
+      card.href = (s.startsWith('/') ? SHOP_URL : '') + s;
+      card.target = '_blank';
+      card.rel = 'noopener';
+      card.innerHTML =
+        '<div class="nakai-chat__product-card-img"></div>' +
+        '<div class="nakai-chat__product-card-body">' +
+        '<div class="nakai-chat__product-card-title">Loading...</div>' +
+        '<div class="nakai-chat__product-card-price">...</div>' +
+        '</div>';
+      grid.appendChild(card);
+
+      // Fetch product data
+      self.fetchProductCard(handle, card);
+    });
+
+    parentDiv.appendChild(grid);
+  };
+
+  NakaiChat.prototype.fetchProductCard = function (handle, card) {
+    var url = SHOP_URL + '/products/' + handle + '.json';
+    fetch(url)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.product) return;
+        var p = data.product;
+        var imgSrc = p.image ? p.image.src : '';
+        var price = p.variants && p.variants[0] ? p.variants[0].price : '';
+        var currency = '$';
+
+        card.classList.remove('nakai-chat__product-card--loading');
+        var imgEl = card.querySelector('.nakai-chat__product-card-img');
+        if (imgEl && imgSrc) {
+          var img = document.createElement('img');
+          img.src = imgSrc;
+          img.alt = p.title;
+          img.className = 'nakai-chat__product-card-img';
+          img.loading = 'lazy';
+          imgEl.replaceWith(img);
+        }
+        var titleEl = card.querySelector('.nakai-chat__product-card-title');
+        if (titleEl) titleEl.textContent = p.title;
+        var priceEl = card.querySelector('.nakai-chat__product-card-price');
+        if (priceEl && price) priceEl.textContent = currency + price;
+      })
+      .catch(function () {
+        card.classList.remove('nakai-chat__product-card--loading');
+      });
+  };
+
+  // ---- Retry Binding ----
+  NakaiChat.prototype.bindRetry = function (msgDiv) {
+    var self = this;
+    var btn = msgDiv.querySelector('.nakai-chat__retry-btn');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        msgDiv.remove();
+        self.isLoading = false;
+        self.setSendLoading(false);
+        self.sendMessage(self.lastUserMessage);
+      });
+    }
+  };
+
+  // ---- Legacy (non-streaming) fallback ----
+  NakaiChat.prototype.legacyMessage = function (message) {
     var self = this;
     fetch(CHAT_API_URL + '/chat', {
       method: 'POST',
@@ -116,79 +426,127 @@
         message: message,
         history: this.history.slice(-MAX_HISTORY),
         language: this.language,
-      }),
+        session_id: this.sessionId,
+        source: 'widget'
+      })
     })
-      .then(function (res) {
-        if (!res.ok) throw new Error('API error');
-        return res.json();
-      })
-      .then(function (data) {
-        self.removeTyping();
-        self.addMessage('bot', data.response, data.sources || []);
-        self.history.push({ role: 'assistant', content: data.response });
-        self.saveHistory();
-      })
-      .catch(function () {
-        self.removeTyping();
-        self.addMessage(
-          'bot',
-          'Sorry, I\'m having trouble connecting right now. Please try again or visit our <a href="/pages/contact">Contact page</a>.'
-        );
-      })
-      .finally(function () {
-        self.isLoading = false;
-      });
+    .then(function (res) {
+      if (!res.ok) throw new Error('API error');
+      return res.json();
+    })
+    .then(function (data) {
+      self.removeTyping();
+      self.addBotMessage(data.response, data.sources || [], data.suggestions || []);
+      self.history.push({ role: 'assistant', content: data.response });
+      self.saveHistory();
+    })
+    .catch(function () {
+      self.removeTyping();
+      self.addBotError();
+    })
+    .finally(function () {
+      self.isLoading = false;
+      self.setSendLoading(false);
+    });
   };
 
-  NakaiChat.prototype.addMessage = function (role, content, sources) {
-    sources = sources || [];
-    var div = document.createElement('div');
-    div.className = 'nakai-chat__message nakai-chat__message--' + role;
+  // ---- Mock Streaming for Preview ----
+  NakaiChat.prototype.mockStream = function (message) {
+    var self = this;
+    var mockResponse = this.language === 'ja'
+      ? 'NAKAI の抹茶は京都・宇治から直接仕入れています。石臼で丁寧に挽いた超微粉末で、鮮やかな緑色と豊かなうまみが特徴です。\n\n- **Revi オーガニック抹茶**: 日常使いに最適\n- **Ikigai オーガニック抹茶**: プレミアムグレード\n- **エクスキジット抹茶セット**: 限定ギフトセット'
+      : 'NAKAI matcha is sourced directly from Uji, Kyoto. Our matcha is stone-ground using traditional techniques, producing an ultra-fine powder with vibrant green color and rich umami flavor.\n\n- **Revi Organic Matcha**: Perfect for daily use\n- **Ikigai Organic Matcha**: Premium ceremonial grade\n- **The Exquisite Matcha Set**: Limited edition gift set';
 
-    var contentHtml = role === 'bot' ? this.formatMarkdown(content) : this.escapeHtml(content);
+    var mockSources = ['/products/revi-organic-matcha-20g-ss-grade-plus', '/products/ikigai-organic-matcha-40g-ss-grade'];
+    var mockSuggestions = this.language === 'ja'
+      ? ['淹れ方のコツ', '配送について', '茶道とは？']
+      : ['Brewing tips', 'Shipping info', 'What is tea ceremony?'];
 
-    if (role === 'bot') {
-      // Bot message with avatar row
-      var html =
-        '<div class="nakai-chat__message-row">' +
-        '<div class="nakai-chat__avatar">' + AI_STAR_SVG + '</div>' +
-        '<div class="nakai-chat__message-content">' + contentHtml + '</div>' +
-        '</div>';
+    setTimeout(function () {
+      self.removeTyping();
 
-      // Sources
-      if (sources.length > 0) {
-        html += '<div class="nakai-chat__sources">';
-        for (var i = 0; i < sources.length; i++) {
-          html +=
-            '<a href="' +
-            this.escapeHtml(sources[i]) +
-            '" class="nakai-chat__source-link">View product</a>';
+      var msgDiv = document.createElement('div');
+      msgDiv.className = 'nakai-chat__message nakai-chat__message--bot';
+      var row = document.createElement('div');
+      row.className = 'nakai-chat__message-row';
+      var avatar = document.createElement('div');
+      avatar.className = 'nakai-chat__avatar';
+      avatar.innerHTML = AI_STAR_SVG;
+      var bubble = document.createElement('div');
+      bubble.className = 'nakai-chat__message-content';
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      msgDiv.appendChild(row);
+      self.messagesContainer.appendChild(msgDiv);
+
+      // Simulate token-by-token streaming
+      var fullText = '';
+      var chars = mockResponse.split('');
+      var idx = 0;
+
+      function tick() {
+        if (idx >= chars.length) {
+          self.finishStreamMessage(msgDiv, bubble, fullText, mockSources, mockSuggestions);
+          return;
         }
-        html += '</div>';
+        // Send ~3 chars per tick for speed
+        var chunk = chars.slice(idx, idx + 3).join('');
+        idx += 3;
+        fullText += chunk;
+        bubble.innerHTML = self.formatMarkdown(fullText);
+        self.scrollToBottom();
+        setTimeout(tick, 25);
       }
 
-      // Meta row with timestamp + AI tag
-      var now = new Date();
-      var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-      html += '<div class="nakai-chat__message-meta">' +
-        '<span class="nakai-chat__timestamp">' + timeStr + '</span>' +
-        '<span class="nakai-chat__ai-tag">AI</span>' +
-        '</div>';
+      tick();
+    }, 600);
+  };
 
-      div.innerHTML = html;
-    } else {
-      // User message (no avatar)
-      div.innerHTML = '<div class="nakai-chat__message-content">' + contentHtml + '</div>';
-    }
-
+  // ---- Message Helpers ----
+  NakaiChat.prototype.addUserMessage = function (content) {
+    var div = document.createElement('div');
+    div.className = 'nakai-chat__message nakai-chat__message--user';
+    div.innerHTML = '<div class="nakai-chat__message-content">' + this.escapeHtml(content) + '</div>';
     this.messagesContainer.appendChild(div);
+    this.scrollToBottom();
+  };
+
+  NakaiChat.prototype.addBotMessage = function (content, sources, suggestions) {
+    sources = sources || [];
+    suggestions = suggestions || [];
+
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'nakai-chat__message nakai-chat__message--bot';
+
+    var row = document.createElement('div');
+    row.className = 'nakai-chat__message-row';
+    row.innerHTML =
+      '<div class="nakai-chat__avatar">' + AI_STAR_SVG + '</div>' +
+      '<div class="nakai-chat__message-content">' + this.formatMarkdown(content) + '</div>';
+    msgDiv.appendChild(row);
+
+    var bubble = row.querySelector('.nakai-chat__message-content');
+    this.messagesContainer.appendChild(msgDiv);
+    this.finishStreamMessage(msgDiv, bubble, content, sources, suggestions);
+  };
+
+  NakaiChat.prototype.addBotError = function () {
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'nakai-chat__message nakai-chat__message--bot';
+    var row = document.createElement('div');
+    row.className = 'nakai-chat__message-row';
+    row.innerHTML =
+      '<div class="nakai-chat__avatar">' + AI_STAR_SVG + '</div>' +
+      '<div class="nakai-chat__message-content">' + this.getErrorHtml() + '</div>';
+    msgDiv.appendChild(row);
+    this.messagesContainer.appendChild(msgDiv);
+    this.bindRetry(msgDiv);
     this.scrollToBottom();
   };
 
   NakaiChat.prototype.showTyping = function () {
     var div = document.createElement('div');
-    div.className =
-      'nakai-chat__message nakai-chat__message--bot nakai-chat__typing-wrapper';
+    div.className = 'nakai-chat__message nakai-chat__message--bot nakai-chat__typing-wrapper';
 
     var typingLabel = this.language === 'ja' ? 'AIが回答を作成中...' : 'AI is composing...';
 
@@ -205,9 +563,7 @@
   };
 
   NakaiChat.prototype.removeTyping = function () {
-    var typing = this.messagesContainer.querySelector(
-      '.nakai-chat__typing-wrapper'
-    );
+    var typing = this.messagesContainer.querySelector('.nakai-chat__typing-wrapper');
     if (typing) typing.remove();
   };
 
@@ -215,10 +571,15 @@
     this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
   };
 
+  // ---- Markdown — improved with lists ----
   NakaiChat.prototype.formatMarkdown = function (text) {
+    if (!text) return '';
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
+      .replace(/\[(.*?)\]\(\/(.*?)\)/g, '<a href="' + SHOP_URL + '/$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/^- (.*?)$/gm, '<li>$1</li>')
+      .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
       .replace(/\n/g, '<br>');
   };
 
@@ -228,15 +589,14 @@
     return div.innerHTML;
   };
 
+  // ---- History ----
   NakaiChat.prototype.saveHistory = function () {
     try {
       sessionStorage.setItem(
         'nakai_chat_history',
         JSON.stringify(this.history.slice(-MAX_HISTORY))
       );
-    } catch (e) {
-      /* storage full */
-    }
+    } catch (e) { /* storage full */ }
   };
 
   NakaiChat.prototype.loadHistory = function () {
@@ -246,38 +606,44 @@
         this.history = JSON.parse(stored);
         var self = this;
         this.history.forEach(function (msg) {
-          self.addMessage(
-            msg.role === 'assistant' ? 'bot' : 'user',
-            msg.content
-          );
+          if (msg.role === 'user') {
+            self.addUserMessage(msg.content);
+          } else {
+            // For restored messages, use simple rendering (no sources/suggestions)
+            var div = document.createElement('div');
+            div.className = 'nakai-chat__message nakai-chat__message--bot';
+            div.innerHTML =
+              '<div class="nakai-chat__message-row">' +
+              '<div class="nakai-chat__avatar">' + AI_STAR_SVG + '</div>' +
+              '<div class="nakai-chat__message-content">' + self.formatMarkdown(msg.content) + '</div>' +
+              '</div>';
+            self.messagesContainer.appendChild(div);
+          }
         });
+        this.scrollToBottom();
       }
-    } catch (e) {
-      /* corrupted */
-    }
+    } catch (e) { /* corrupted */ }
   };
 
   // ---- Initialize ----
   function init() {
-    // Floating widget (all pages except dedicated chat page)
     if (document.getElementById('nakai-chat-widget')) {
       new NakaiChat({
         containerId: 'nakai-chat-widget',
         messagesId: 'nakai-chat-messages',
         formId: 'nakai-chat-form',
         inputId: 'nakai-chat-input',
-        isFullPage: false,
+        isFullPage: false
       });
     }
 
-    // Dedicated chat page
     if (document.getElementById('nakai-chatpage-container')) {
       new NakaiChat({
         containerId: 'nakai-chatpage-container',
         messagesId: 'nakai-chatpage-messages',
         formId: 'nakai-chatpage-form',
         inputId: 'nakai-chatpage-input',
-        isFullPage: true,
+        isFullPage: true
       });
     }
   }
