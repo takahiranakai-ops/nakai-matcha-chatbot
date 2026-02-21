@@ -901,7 +901,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
         reader.read().then(function(result){{
           if(result.done)return finish();
           buf+=decoder.decode(result.value,{{stream:true}});
-          var lines=buf.split('\n');buf=lines.pop();
+          var lines=buf.split('\\n');buf=lines.pop();
           lines.forEach(function(line){{
             if(!line.startsWith('data: '))return;
             try{{var ev=JSON.parse(line.slice(6))}}catch(e){{return}}
