@@ -405,6 +405,11 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-suggestion{{font-family:inherit;font-size:.76rem;font-weight:400;color:var(--green);background:var(--g03);border:none;border-radius:20px;padding:10px 16px;cursor:pointer;transition:all .4s var(--ease);text-align:left;line-height:1.4;-webkit-tap-highlight-color:transparent}}
 .nc-suggestion:hover{{background:var(--g06)}}
 .nc-suggestion:active{{background:var(--g12);transform:scale(.97);transition-duration:.12s}}
+.nc-choices{{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}}
+.nc-choice-btn{{font-family:inherit;font-size:.88rem;font-weight:500;color:var(--green);background:var(--cream);border:1.5px solid var(--green);border-radius:20px;padding:8px 18px;cursor:pointer;transition:all .25s var(--ease);-webkit-tap-highlight-color:transparent}}
+.nc-choice-btn:hover{{background:var(--green);color:#fff}}
+.nc-choice-btn--selected{{background:var(--green);color:#fff}}
+.nc-choice-btn--disabled{{opacity:.45;pointer-events:none}}
 .nc-msg__sources{{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}}
 .nc-msg__source{{font-size:.68rem;color:var(--green);text-decoration:none;background:var(--g03);border:none;border-radius:10px;padding:8px 14px;transition:background .4s var(--ease);-webkit-tap-highlight-color:transparent}}
 .nc-msg__source:hover{{background:var(--g06)}}
@@ -860,12 +865,21 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   function formatMd(s){{
     if(!s)return'';
     return s
+      .replace(/^#{{1,4}}\s*.*$/gm,'')
+      .replace(/^-{{3,}}$/gm,'')
+      .replace(/^\*{{3,}}$/gm,'')
+      .replace(/^\|.*\|$/gm,'')
       .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
       .replace(/\[(.*?)\]\(\/(.*?)\)/g,'<a href="'+SHOP+'/$2" target="_blank" rel="noopener">$1</a>')
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
       .replace(/^- (.*?)$/gm,'<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>')
-      .replace(/\\n/g,'<br>');
+      .replace(/^\d+\.\s+(.*?)$/gm,'<li>$1</li>')
+      .replace(/\n{{3,}}/g,'\\n\\n')
+      .replace(/\\n/g,'<br>')
+      .replace(/(<br>){{3,}}/g,'<br><br>')
+      .replace(/^(<br>)+/,'')
+      .replace(/(<br>)+$/,'');
   }}
   function scroll(){{var m=$('nc-messages');if(m)m.scrollTop=m.scrollHeight}}
 
@@ -950,7 +964,13 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
               }});
               /* Clean [SUGGESTIONS] block from visible text */
               var raw=fullText;var si=raw.indexOf('[SUGGESTIONS]');
-              if(si>-1){{fullText=raw.substring(0,si).trim();bubble.innerHTML=formatMd(fullText)}}
+              if(si>-1){{fullText=raw.substring(0,si).trim()}}
+              /* Clean [CHOICES] block and extract options */
+              var choices=[];var ci=fullText.indexOf('[CHOICES]');
+              if(ci>-1){{var ce=fullText.indexOf('[/CHOICES]');if(ce>-1){{var choiceStr=fullText.substring(ci+9,ce).trim();choices=choiceStr.split('|').map(function(c){{return c.trim()}}).filter(Boolean);fullText=fullText.substring(0,ci).trim()+fullText.substring(ce+10).trim()}}}}
+              bubble.innerHTML=formatMd(fullText);
+              /* Render choice buttons */
+              if(choices.length>0){{var choiceDiv=document.createElement('div');choiceDiv.className='nc-choices';choices.forEach(function(txt){{var btn=document.createElement('button');btn.className='nc-choice-btn';btn.type='button';btn.textContent=txt;btn.addEventListener('click',function(){{$('nc-input').value=txt;sendMessage();choiceDiv.querySelectorAll('.nc-choice-btn').forEach(function(b){{b.disabled=true;b.classList.add('nc-choice-btn--disabled')}});btn.classList.add('nc-choice-btn--selected')}});choiceDiv.appendChild(btn)}});d.appendChild(choiceDiv)}}
               chatHistory.push({{role:'assistant',content:fullText}});saveHistory();
               scroll();
             }}
