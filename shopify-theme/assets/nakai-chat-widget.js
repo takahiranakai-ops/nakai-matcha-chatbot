@@ -277,7 +277,43 @@
     var si = fullText.indexOf('[SUGGESTIONS]');
     if (si > -1) {
       fullText = fullText.substring(0, si).trim();
-      bubble.innerHTML = this.formatMarkdown(fullText);
+    }
+
+    // Strip [CHOICES] block from visible text and extract options
+    var choices = [];
+    var ci = fullText.indexOf('[CHOICES]');
+    if (ci > -1) {
+      var ce = fullText.indexOf('[/CHOICES]');
+      if (ce > -1) {
+        var choiceStr = fullText.substring(ci + 9, ce).trim();
+        choices = choiceStr.split('|').map(function (c) { return c.trim(); }).filter(Boolean);
+        fullText = fullText.substring(0, ci).trim() + fullText.substring(ce + 10).trim();
+      }
+    }
+
+    bubble.innerHTML = this.formatMarkdown(fullText);
+
+    // Choice buttons (Matcha Finder interactive options)
+    if (choices.length > 0) {
+      var choiceDiv = document.createElement('div');
+      choiceDiv.className = 'nakai-chat__choices';
+      var self2 = this;
+      choices.forEach(function (text) {
+        var btn = document.createElement('button');
+        btn.className = 'nakai-chat__choice-btn';
+        btn.type = 'button';
+        btn.textContent = text;
+        btn.addEventListener('click', function () {
+          self2.sendMessage(text);
+          choiceDiv.querySelectorAll('.nakai-chat__choice-btn').forEach(function (b) {
+            b.disabled = true;
+            b.classList.add('nakai-chat__choice-btn--disabled');
+          });
+          btn.classList.add('nakai-chat__choice-btn--selected');
+        });
+        choiceDiv.appendChild(btn);
+      });
+      msgDiv.appendChild(choiceDiv);
     }
 
     // Source links
@@ -613,16 +649,36 @@
     this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
   };
 
-  // ---- Markdown — improved with lists ----
+  // ---- Markdown — improved with lists, strips headers/rules ----
   NakaiChat.prototype.formatMarkdown = function (text) {
     if (!text) return '';
     return text
+      // Strip markdown headers (# ## ### etc)
+      .replace(/^#{1,4}\s*.*$/gm, '')
+      // Strip horizontal rules
+      .replace(/^-{3,}$/gm, '')
+      .replace(/^\*{3,}$/gm, '')
+      // Strip table rows
+      .replace(/^\|.*\|$/gm, '')
+      // Bold
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      // Relative links
       .replace(/\[(.*?)\]\(\/(.*?)\)/g, '<a href="' + SHOP_URL + '/$2" target="_blank" rel="noopener">$1</a>')
+      // External links
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      // Lists
       .replace(/^- (.*?)$/gm, '<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
-      .replace(/\n/g, '<br>');
+      // Numbered lists
+      .replace(/^\d+\.\s+(.*?)$/gm, '<li>$1</li>')
+      // Clean up excessive blank lines
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/\n/g, '<br>')
+      // Clean up excessive br tags
+      .replace(/(<br>){3,}/g, '<br><br>')
+      // Remove leading/trailing br
+      .replace(/^(<br>)+/, '')
+      .replace(/(<br>)+$/, '');
   };
 
   NakaiChat.prototype.escapeHtml = function (text) {

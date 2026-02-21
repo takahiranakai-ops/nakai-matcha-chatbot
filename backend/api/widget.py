@@ -112,12 +112,21 @@ WIDGET_JS = r"""
   function formatMarkdown(text) {
     if (!text) return '';
     return text
+      .replace(/^#{1,4}\s*.*$/gm, '')
+      .replace(/^-{3,}$/gm, '')
+      .replace(/^\*{3,}$/gm, '')
+      .replace(/^\|.*\|$/gm, '')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\[(.*?)\]\(\/(.*?)\)/g, '<a href="' + SHOP_URL + '/$2" target="_blank" rel="noopener">$1</a>')
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
       .replace(/^- (.*?)$/gm, '<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
-      .replace(/\n/g, '<br>');
+      .replace(/^\d+\.\s+(.*?)$/gm, '<li>$1</li>')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/\n/g, '<br>')
+      .replace(/(<br>){3,}/g, '<br><br>')
+      .replace(/^(<br>)+/, '')
+      .replace(/(<br>)+$/, '');
   }
 
   function scrollToBottom() {
@@ -309,7 +318,43 @@ WIDGET_JS = r"""
     var si = fullText.indexOf('[SUGGESTIONS]');
     if (si > -1) {
       fullText = fullText.substring(0, si).trim();
-      bubble.innerHTML = formatMarkdown(fullText);
+    }
+
+    // Strip [CHOICES] block and extract options
+    var choices = [];
+    var ci = fullText.indexOf('[CHOICES]');
+    if (ci > -1) {
+      var ce = fullText.indexOf('[/CHOICES]');
+      if (ce > -1) {
+        var choiceStr = fullText.substring(ci + 9, ce).trim();
+        choices = choiceStr.split('|').map(function (c) { return c.trim(); }).filter(Boolean);
+        fullText = fullText.substring(0, ci).trim() + fullText.substring(ce + 10).trim();
+      }
+    }
+
+    bubble.innerHTML = formatMarkdown(fullText);
+
+    // Choice buttons
+    if (choices.length > 0) {
+      var choiceDiv = document.createElement('div');
+      choiceDiv.className = 'nakai-chat__choices';
+      choices.forEach(function (text) {
+        var btn = document.createElement('button');
+        btn.className = 'nakai-chat__choice-btn';
+        btn.type = 'button';
+        btn.textContent = text;
+        btn.addEventListener('click', function () {
+          inputEl.value = text;
+          formEl.dispatchEvent(new Event('submit'));
+          choiceDiv.querySelectorAll('.nakai-chat__choice-btn').forEach(function (b) {
+            b.disabled = true;
+            b.classList.add('nakai-chat__choice-btn--disabled');
+          });
+          btn.classList.add('nakai-chat__choice-btn--selected');
+        });
+        choiceDiv.appendChild(btn);
+      });
+      msgDiv.appendChild(choiceDiv);
     }
 
     // Source links
@@ -793,6 +838,12 @@ WIDGET_JS = r"""
 .nakai-chat__product-card--loading .nakai-chat__product-card-title{height:14px;width:80%}
 .nakai-chat__product-card--loading .nakai-chat__product-card-price{height:12px;width:50%}
 @keyframes nakaiShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.nakai-chat__choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-left:36px}
+.nakai-chat__choice-btn{font-family:'Work Sans',sans-serif;font-size:.92rem;font-weight:500;color:var(--nc-g1);background:var(--nc-s1);border:1.5px solid var(--nc-g1);border-radius:var(--nc-rr);padding:8px 18px;cursor:pointer;letter-spacing:.02em;transition:all .25s var(--nc-e);position:relative;overflow:hidden}
+.nakai-chat__choice-btn:hover{background:var(--nc-g1);color:#fff;transform:translateY(-1px);box-shadow:0 4px 14px rgba(61,97,66,.18)}
+.nakai-chat__choice-btn--selected{background:var(--nc-g1);color:#fff;border-color:var(--nc-g1)}
+.nakai-chat__choice-btn--disabled{opacity:.45;cursor:default;pointer-events:none}
+.nakai-chat__choice-btn--disabled.nakai-chat__choice-btn--selected{opacity:1}
 .nakai-chat__suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-left:36px}
 .nakai-chat__suggestion-btn{font-family:'Work Sans',sans-serif;font-size:.88rem;font-weight:400;color:var(--nc-g1);background:var(--nc-s1);border:1px solid var(--nc-ln2);border-radius:var(--nc-rr);padding:6px 13px;cursor:pointer;letter-spacing:.03em;transition:all .35s var(--nc-e);position:relative;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .nakai-chat__suggestion-btn::before{content:'';position:absolute;inset:0;background:var(--nc-g1);border-radius:var(--nc-rr);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--nc-e)}
@@ -819,6 +870,8 @@ WIDGET_JS = r"""
 [data-scheme="dark"] .nakai-chat__quick-btn{color:var(--nc-g2);border-color:rgba(123,160,109,.15)}
 [data-scheme="dark"] .nakai-chat__quick-btn::before{background:var(--nc-g2)}
 [data-scheme="dark"] .nakai-chat__quick-btn:hover{color:#0C0E0C;border-color:var(--nc-g2)}
+[data-scheme="dark"] .nakai-chat__choice-btn{color:var(--nc-g2);border-color:var(--nc-g2);background:transparent}
+[data-scheme="dark"] .nakai-chat__choice-btn:hover,[data-scheme="dark"] .nakai-chat__choice-btn--selected{background:var(--nc-g2);color:#0C0E0C}
 [data-scheme="dark"] .nakai-chat__suggestion-btn{color:var(--nc-g2);border-color:rgba(123,160,109,.15)}
 [data-scheme="dark"] .nakai-chat__suggestion-btn::before{background:var(--nc-g2)}
 [data-scheme="dark"] .nakai-chat__suggestion-btn:hover{color:#0C0E0C;border-color:var(--nc-g2)}

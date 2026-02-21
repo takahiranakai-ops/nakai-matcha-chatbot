@@ -1144,6 +1144,54 @@
   100% { background-position: -200% 0; }
 }
 
+/* ===== Choice Buttons (Matcha Finder) ===== */
+.nakai-chat__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding-left: 36px;
+}
+
+.nakai-chat__choice-btn {
+  font-family: var(--font-body-family, 'Work Sans', sans-serif);
+  font-size: .92rem;
+  font-weight: 500;
+  color: var(--nc-g1);
+  background: var(--nc-s1);
+  border: 1.5px solid var(--nc-g1);
+  border-radius: var(--nc-rr);
+  padding: 8px 18px;
+  cursor: pointer;
+  letter-spacing: .02em;
+  transition: all .25s var(--nc-e);
+  position: relative;
+  overflow: hidden;
+}
+
+.nakai-chat__choice-btn:hover {
+  background: var(--nc-g1);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(61, 97, 66, .18);
+}
+
+.nakai-chat__choice-btn--selected {
+  background: var(--nc-g1);
+  color: #fff;
+  border-color: var(--nc-g1);
+}
+
+.nakai-chat__choice-btn--disabled {
+  opacity: .45;
+  cursor: default;
+  pointer-events: none;
+}
+
+.nakai-chat__choice-btn--disabled.nakai-chat__choice-btn--selected {
+  opacity: 1;
+}
+
 /* ===== Dynamic Suggestions ===== */
 .nakai-chat__suggestions {
   display: flex;
@@ -1293,6 +1341,18 @@
 [data-scheme="dark"] .nakai-chat__product-card-cta {
   background: var(--nc-g2);
   color: #1a1a1a;
+}
+
+[data-scheme="dark"] .nakai-chat__choice-btn {
+  color: var(--nc-g2);
+  border-color: var(--nc-g2);
+  background: transparent;
+}
+
+[data-scheme="dark"] .nakai-chat__choice-btn:hover,
+[data-scheme="dark"] .nakai-chat__choice-btn--selected {
+  background: var(--nc-g2);
+  color: #0C0E0C;
 }
 
 [data-scheme="dark"] .nakai-chat__suggestion-btn {
