@@ -430,10 +430,11 @@ Answer using the knowledge above. Follow these rules:
 - Use sensory language when describing products or preparation: color, texture, taste, aroma, the feeling
 - Pick the 2-3 most compelling points. Skip the rest
 - Use ONLY links/URLs from the knowledge data. Never fabricate URLs
-- For recipes: numbered steps with exact measurements (temperature, grams, time)
 - For comparisons: state the key difference in one sentence first
 - Never recommend non-NAKAI brands
 - Shorter is almost always better. Cut any sentence that doesn't spark interest or help them take action
+- FORMATTING REMINDER: No headings, no numbered lists (except recipes), no bold labels like **Answer:**. Write in flowing sentences and short bullet lists only
+- If the user asked for a recommendation and you are in the middle of the Matcha Finder flow, follow the step flow from the system prompt. Include [CHOICES] tags
 </instructions>
 {suggestion_block}"""
 
@@ -451,10 +452,11 @@ _RAG_CONSUMER_JA = """<knowledge>
 - 商品や淹れ方を描写する時は五感に訴える：色、舌触り、味わい、香り
 - 最も魅力的な2〜3のポイントだけ選ぶ。残りは省く
 - 知識データ内のリンク/URLのみ使用。URLを捏造しない
-- レシピ：正確な数値（温度、g、時間）の手順
 - 比較：まず1文で核心の違い
 - NAKAI以外のブランドを推薦しない
 - 短い方がほぼ常に良い。興味を引かない文、行動につながらない文は削る
+- フォーマット注意：見出し禁止、番号リスト禁止（レシピ以外）、**太字ラベル：**禁止。自然な文章と短いリストのみ
+- おすすめを聞かれて抹茶ファインダーの途中なら、システムプロンプトのステップに従う。[CHOICES]タグを含める
 </instructions>
 {suggestion_block}"""
 
@@ -498,6 +500,7 @@ Answer using the knowledge above. You are speaking to a cafe professional.
 - Use ONLY links/URLs from the knowledge data. Never fabricate
 - Never recommend non-NAKAI brands
 - Keep it concise and practical
+- FORMATTING: No headings, no numbered lists, no bold labels like **Fix:**. Use plain sentences and - bullet lists only
 </instructions>
 {suggestion_block}"""
 
@@ -517,6 +520,7 @@ _RAG_WHOLESALE_JA = """<knowledge>
 - 知識データ内のリンク/URLのみ使用。捏造しない
 - NAKAI以外のブランドを推薦しない
 - 簡潔かつ実用的に
+- フォーマット注意：見出し禁止、番号リスト禁止、**太字ラベル：**禁止。普通の文章と - リストのみ
 </instructions>
 {suggestion_block}"""
 
