@@ -7,6 +7,15 @@
   var MAX_HISTORY = 20;
   var AI_STAR_SVG = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>';
 
+  // ---- Known product name → handle mapping ----
+  var PRODUCT_MAP = {
+    'revi': '/products/revi-organic-matcha-20g-ss-grade-plus',
+    'ikigai': '/products/ikigai-organic-matcha-40g-ss-grade',
+    'exquisite matcha set': '/products/the-exquisite-matcha-set',
+    'エクスキジット抹茶セット': '/products/the-exquisite-matcha-set',
+    '抹茶セット': '/products/the-exquisite-matcha-set'
+  };
+
   // ---- Session ID ----
   function getSessionId() {
     var key = 'nakai_session_id';
@@ -294,8 +303,8 @@
       msgDiv.appendChild(srcDiv);
     }
 
-    // Product cards for product sources
-    this.renderProductCards(sources, msgDiv);
+    // Product cards from sources + text mentions
+    this.renderProductCards(sources, msgDiv, fullText);
 
     // Dynamic suggestions
     if (suggestions.length > 0) {
@@ -334,26 +343,58 @@
     this.setSendLoading(false);
   };
 
+  // ---- Detect product mentions in text ----
+  NakaiChat.prototype.detectProductsInText = function (text) {
+    var found = [];
+    var lowerText = text.toLowerCase();
+    var keys = Object.keys(PRODUCT_MAP);
+    for (var i = 0; i < keys.length; i++) {
+      if (lowerText.indexOf(keys[i]) > -1) {
+        var path = PRODUCT_MAP[keys[i]];
+        if (found.indexOf(path) === -1) found.push(path);
+      }
+    }
+    return found;
+  };
+
   // ---- Product Cards ----
-  NakaiChat.prototype.renderProductCards = function (sources, parentDiv) {
-    var productSources = sources.filter(function (s) {
-      return s.indexOf('/products/') > -1;
+  NakaiChat.prototype.renderProductCards = function (sources, parentDiv, textContent) {
+    // Combine product URLs from sources + text mentions (deduplicated)
+    var productPaths = [];
+    var seen = {};
+
+    // From RAG sources
+    sources.forEach(function (s) {
+      if (s.indexOf('/products/') > -1) {
+        var path = s.startsWith('http') ? new URL(s).pathname : s;
+        if (!seen[path]) { seen[path] = true; productPaths.push(path); }
+      }
     });
-    if (productSources.length === 0) return;
+
+    // From text mentions
+    if (textContent) {
+      var detected = this.detectProductsInText(textContent);
+      detected.forEach(function (path) {
+        if (!seen[path]) { seen[path] = true; productPaths.push(path); }
+      });
+    }
+
+    if (productPaths.length === 0) return;
 
     var grid = document.createElement('div');
     grid.className = 'nakai-chat__product-grid';
     var self = this;
+    var viewLabel = this.language === 'ja' ? '商品を見る' : 'View Product';
 
-    productSources.forEach(function (s) {
-      var handle = s.split('/products/')[1];
+    productPaths.forEach(function (path) {
+      var handle = path.split('/products/')[1];
       if (!handle) return;
       handle = handle.split('?')[0].split('#')[0];
 
       // Create placeholder card with shimmer
       var card = document.createElement('a');
       card.className = 'nakai-chat__product-card nakai-chat__product-card--loading';
-      card.href = (s.startsWith('/') ? SHOP_URL : '') + s;
+      card.href = SHOP_URL + path;
       card.target = '_blank';
       card.rel = 'noopener';
       card.innerHTML =
@@ -361,6 +402,7 @@
         '<div class="nakai-chat__product-card-body">' +
         '<div class="nakai-chat__product-card-title">Loading...</div>' +
         '<div class="nakai-chat__product-card-price">...</div>' +
+        '<div class="nakai-chat__product-card-cta">' + viewLabel + '</div>' +
         '</div>';
       grid.appendChild(card);
 

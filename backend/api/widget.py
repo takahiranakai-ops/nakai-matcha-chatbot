@@ -23,6 +23,15 @@ WIDGET_JS = r"""
   var MAX_HISTORY = 20;
   var STAR_SVG = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>';
 
+  // Known product name → handle mapping
+  var PRODUCT_MAP = {
+    'revi': '/products/revi-organic-matcha-20g-ss-grade-plus',
+    'ikigai': '/products/ikigai-organic-matcha-40g-ss-grade',
+    'exquisite matcha set': '/products/the-exquisite-matcha-set',
+    '\u30a8\u30af\u30b9\u30ad\u30b8\u30c3\u30c8\u62b9\u8336\u30bb\u30c3\u30c8': '/products/the-exquisite-matcha-set',
+    '\u62b9\u8336\u30bb\u30c3\u30c8': '/products/the-exquisite-matcha-set'
+  };
+
   // Detect language
   var PAGE_LANG = (document.documentElement.lang || 'en').substring(0, 2);
 
@@ -324,8 +333,8 @@ WIDGET_JS = r"""
       msgDiv.appendChild(srcDiv);
     }
 
-    // Product cards
-    renderProductCards(sources, msgDiv);
+    // Product cards from sources + text mentions
+    renderProductCards(sources, msgDiv, fullText);
 
     // Dynamic suggestions
     if (suggestions.length > 0) {
@@ -362,24 +371,53 @@ WIDGET_JS = r"""
     setSendLoading(false);
   }
 
+  // ---- Detect product mentions in text ----
+  function detectProductsInText(text) {
+    var found = [];
+    var lowerText = text.toLowerCase();
+    var keys = Object.keys(PRODUCT_MAP);
+    for (var i = 0; i < keys.length; i++) {
+      if (lowerText.indexOf(keys[i]) > -1) {
+        var path = PRODUCT_MAP[keys[i]];
+        if (found.indexOf(path) === -1) found.push(path);
+      }
+    }
+    return found;
+  }
+
   // ---- Product Cards ----
-  function renderProductCards(sources, parentDiv) {
-    var productSources = sources.filter(function (s) {
-      return s.indexOf('/products/') > -1;
+  function renderProductCards(sources, parentDiv, textContent) {
+    var productPaths = [];
+    var seen = {};
+
+    sources.forEach(function (s) {
+      if (s.indexOf('/products/') > -1) {
+        var path = s.startsWith('http') ? new URL(s).pathname : s;
+        if (!seen[path]) { seen[path] = true; productPaths.push(path); }
+      }
     });
-    if (productSources.length === 0) return;
+
+    if (textContent) {
+      var detected = detectProductsInText(textContent);
+      detected.forEach(function (path) {
+        if (!seen[path]) { seen[path] = true; productPaths.push(path); }
+      });
+    }
+
+    if (productPaths.length === 0) return;
 
     var grid = document.createElement('div');
     grid.className = 'nakai-chat__product-grid';
+    var viewLabel = PAGE_LANG === 'ja' ? '\u5546\u54c1\u3092\u898b\u308b' : 'View Product';
 
-    productSources.forEach(function (s) {
-      var handle = s.split('/products/')[1];
+    productPaths.forEach(function (path) {
+      var handle = path.split('/products/')[1];
       if (!handle) return;
       handle = handle.split('?')[0].split('#')[0];
 
       var card = document.createElement('a');
       card.className = 'nakai-chat__product-card nakai-chat__product-card--loading';
-      card.href = (s.startsWith('/') ? SHOP_URL : '') + s;
+      card.href = SHOP_URL + path;
       card.target = '_blank';
       card.rel = 'noopener';
       card.innerHTML =
@@ -387,6 +425,7 @@ WIDGET_JS = r"""
         + '<div class="nakai-chat__product-card-body">'
         + '<div class="nakai-chat__product-card-title">Loading...</div>'
         + '<div class="nakai-chat__product-card-price">...</div>'
+        + '<div class="nakai-chat__product-card-cta">' + viewLabel + '</div>'
         + '</div>';
       grid.appendChild(card);
 
@@ -747,6 +786,9 @@ WIDGET_JS = r"""
 .nakai-chat__product-card-body{padding:10px;display:flex;flex-direction:column;gap:4px}
 .nakai-chat__product-card-title{font-size:.82rem;font-weight:450;line-height:1.3;color:var(--nc-tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .nakai-chat__product-card-price{font-size:.78rem;font-weight:500;color:var(--nc-g1);letter-spacing:.02em}
+.nakai-chat__product-card-cta{font-size:.7rem;font-weight:600;color:#fff;background:var(--nc-g1);border-radius:6px;padding:5px 0;text-align:center;margin-top:6px;letter-spacing:.03em;transition:background .2s ease}
+.nakai-chat__product-card:hover .nakai-chat__product-card-cta{background:var(--nc-g3)}
+.nakai-chat__product-card--loading .nakai-chat__product-card-cta{display:none}
 .nakai-chat__product-card--loading .nakai-chat__product-card-img,.nakai-chat__product-card--loading .nakai-chat__product-card-title,.nakai-chat__product-card--loading .nakai-chat__product-card-price{background:linear-gradient(90deg,var(--nc-s0) 25%,var(--nc-ln) 50%,var(--nc-s0) 75%);background-size:200% 100%;animation:nakaiShimmer 1.5s infinite;border-radius:4px;color:transparent}
 .nakai-chat__product-card--loading .nakai-chat__product-card-title{height:14px;width:80%}
 .nakai-chat__product-card--loading .nakai-chat__product-card-price{height:12px;width:50%}
@@ -788,6 +830,7 @@ WIDGET_JS = r"""
 [data-scheme="dark"] .nakai-chat__product-card{background:var(--nc-s0);border-color:var(--nc-ln2)}
 [data-scheme="dark"] .nakai-chat__product-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.3);border-color:rgba(123,160,109,.2)}
 [data-scheme="dark"] .nakai-chat__product-card-price{color:var(--nc-g2)}
+[data-scheme="dark"] .nakai-chat__product-card-cta{background:var(--nc-g2);color:#1a1a1a}
 [data-scheme="dark"] .nakai-chat__header-dot{background:#7ED67E;box-shadow:0 0 8px rgba(126,214,126,.3)}
 @media(prefers-reduced-motion:reduce){.nakai-chat__toggle,.nakai-chat__panel,.nakai-chat__message,.nakai-chat__quick-btn,.nakai-chat__quick-btn::before,.nakai-chat__suggestion-btn,.nakai-chat__suggestion-btn::before,.nakai-chat__send,.nakai-chat__retry-btn,.nakai-chat__product-card,.nakai-chat__form,.nakai-chat__header-close,.nakai-chat__message-content a,.nakai-chat__source-link{transition:none!important;animation:none!important}.nakai-chat__toggle-dot,.nakai-chat__header-dot,.nakai-chat__typing span{animation:none!important}.nakai-chat__typing span{opacity:.5}.nakai-chat:not(.nakai-chat--open) .nakai-chat__toggle{animation:none!important}.nakai-chat__messages{scroll-behavior:auto}}
 @media screen and (max-width:749px){

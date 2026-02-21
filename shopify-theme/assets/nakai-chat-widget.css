@@ -1097,6 +1097,27 @@
   letter-spacing: .02em;
 }
 
+.nakai-chat__product-card-cta {
+  font-size: .7rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--nc-g1);
+  border-radius: 6px;
+  padding: 5px 0;
+  text-align: center;
+  margin-top: 6px;
+  letter-spacing: .03em;
+  transition: background .2s ease;
+}
+
+.nakai-chat__product-card:hover .nakai-chat__product-card-cta {
+  background: var(--nc-g3);
+}
+
+.nakai-chat__product-card--loading .nakai-chat__product-card-cta {
+  display: none;
+}
+
 /* Product card shimmer placeholder */
 .nakai-chat__product-card--loading .nakai-chat__product-card-img,
 .nakai-chat__product-card--loading .nakai-chat__product-card-title,
@@ -1267,6 +1288,11 @@
 
 [data-scheme="dark"] .nakai-chat__product-card-price {
   color: var(--nc-g2);
+}
+
+[data-scheme="dark"] .nakai-chat__product-card-cta {
+  background: var(--nc-g2);
+  color: #1a1a1a;
 }
 
 [data-scheme="dark"] .nakai-chat__suggestion-btn {
