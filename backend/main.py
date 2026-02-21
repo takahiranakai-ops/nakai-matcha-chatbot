@@ -10,6 +10,7 @@ from api.widget import widget_router
 from api.pwa import pwa_router
 from api.admin_routes import admin_api_router
 from api.admin_page import admin_page_router
+from api.wholesale import wholesale_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -55,6 +56,7 @@ app.include_router(admin_api_router)
 app.include_router(admin_page_router)
 app.include_router(widget_router)
 app.include_router(pwa_router)
+app.include_router(wholesale_router)
 
 
 @app.get("/health")

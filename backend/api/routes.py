@@ -90,6 +90,7 @@ async def chat(request: Request, body: ChatRequest):
             user_message=body.message,
             conversation_history=body.history,
             language=body.language,
+            source=body.source,
         )
 
         elapsed_ms = int((time.time() - start_time) * 1000)
@@ -131,6 +132,7 @@ async def chat_stream(request: Request, body: ChatRequest):
                 user_message=body.message,
                 conversation_history=body.history,
                 language=body.language,
+                source=body.source,
             ):
                 if event_type == "text":
                     full_response.append(data)

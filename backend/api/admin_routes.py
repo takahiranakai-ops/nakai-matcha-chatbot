@@ -53,6 +53,17 @@ async def admin_login(body: AdminLoginRequest):
     raise HTTPException(status_code=401, detail="Invalid password")
 
 
+class WholesaleLoginRequest(BaseModel):
+    password: str
+
+
+@admin_api_router.post("/wholesale/login")
+async def wholesale_login(body: WholesaleLoginRequest):
+    if body.password == settings.wholesale_password:
+        return {"authenticated": True}
+    raise HTTPException(status_code=401, detail="Invalid password")
+
+
 @admin_api_router.get("/articles")
 async def list_articles(
     language: str = None,

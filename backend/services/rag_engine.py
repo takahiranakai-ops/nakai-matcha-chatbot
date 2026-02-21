@@ -96,8 +96,9 @@ class RAGEngine:
         user_message: str,
         conversation_history: Optional[List[Dict]] = None,
         language: str = "en",
+        source: str = "pwa",
     ) -> dict:
-        system_prompt = build_system_prompt(language=language)
+        system_prompt = build_system_prompt(language=language, source=source)
         msg_stripped = user_message.strip()
 
         # For greetings / small talk, skip RAG entirely (faster + more natural)
@@ -189,9 +190,10 @@ class RAGEngine:
         user_message: str,
         conversation_history: Optional[List[Dict]] = None,
         language: str = "en",
+        source: str = "pwa",
     ):
         """Yield (event_type, data) tuples for SSE streaming."""
-        system_prompt = build_system_prompt(language=language)
+        system_prompt = build_system_prompt(language=language, source=source)
         msg_stripped = user_message.strip()
 
         # Greetings — skip RAG, non-streaming (fast enough)

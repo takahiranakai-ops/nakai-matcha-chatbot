@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     supabase_url: str = ""
     supabase_service_key: str = ""
     admin_password: str = "change-me-admin"
+    wholesale_password: str = "change-me-wholesale"
 
     class Config:
         env_file = ".env"
