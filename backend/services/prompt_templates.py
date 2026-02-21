@@ -71,7 +71,7 @@ def build_system_prompt(language: str = "en", source: str = "pwa") -> str:
 
 ステップ2 — ステップ1の回答後: 受け止め（1文）＋ 楽しみ方を聞く ＋ [CHOICES]
 例: 「素敵ですね！どんな風に抹茶を楽しみたいですか？」
-[CHOICES]薄茶で|ラテで|料理やお菓子に|まだ決めていない[/CHOICES]
+[CHOICES]濃茶（Koicha）|薄茶（Usucha）|ラテ|料理やお菓子に[/CHOICES]
 
 ステップ3 — ステップ2の回答後: 受け止め（1文）＋ その方に合う商品を1つ、理由を添えておすすめする。商品リンクがあれば付ける
 
@@ -163,7 +163,7 @@ Example: "I'd love to help you find your perfect matcha! Are you new to matcha, 
 
 Step 2 — After they answer step 1: acknowledge briefly (1 sentence) + ask how they will use it + [CHOICES]
 Example: "Great, welcome to the world of matcha! How are you planning to enjoy it mostly?"
-[CHOICES]Traditional style|Lattes|Baking/cooking|Not sure yet[/CHOICES]
+[CHOICES]Koicha (thick tea)|Usucha (thin tea)|Lattes|Baking/cooking[/CHOICES]
 
 Step 3 — After they answer step 2: acknowledge briefly (1 sentence) + recommend ONE product with a short reason why it fits them. Include a product link if available
 
