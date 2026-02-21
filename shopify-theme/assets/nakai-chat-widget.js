@@ -673,11 +673,11 @@
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
       // Convert * bullets to - bullets
       .replace(/^\* (.*?)$/gm, '- $1')
+      // Convert numbered lists to bullet lists
+      .replace(/^\d+\.\s+(.*?)$/gm, '- $1')
       // Lists
       .replace(/^- (.*?)$/gm, '<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
-      // Numbered lists
-      .replace(/^\d+\.\s+(.*?)$/gm, '<li>$1</li>')
       // Strip tab indentation
       .replace(/^\t+/gm, '')
       // Clean up excessive blank lines
