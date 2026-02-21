@@ -404,16 +404,18 @@ def _build_wholesale_prompt(language: str) -> str:
 # ---------------------------------------------------------------------------
 _SUGGESTION_INSTRUCTION_JA = """
 
-回答の最後に [SUGGESTIONS] タグで次の質問候補を2つ書く。短く、会話から自然に続く内容にする。
+回答の最後に、会話から自然に続く短い質問を2つ [SUGGESTIONS] タグ内に書く：
 [SUGGESTIONS]
-（短い質問を2つ、各行1つ、装飾なし）
+質問1をここに書く
+質問2をここに書く
 [/SUGGESTIONS]"""
 
 _SUGGESTION_INSTRUCTION_EN = """
 
-At the end, add 2 short follow-up questions in [SUGGESTIONS] tags. They should flow naturally from this conversation.
+At the end, add 2 short follow-up questions inside [SUGGESTIONS] tags:
 [SUGGESTIONS]
-(2 short questions, one per line, plain text only)
+Write question 1 here
+Write question 2 here
 [/SUGGESTIONS]"""
 
 

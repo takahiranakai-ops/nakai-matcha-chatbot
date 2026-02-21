@@ -24,6 +24,21 @@ _SUGGESTIONS_RE = re.compile(
     re.DOTALL,
 )
 
+# Detect Matcha Finder mid-flow: assistant's last message had [CHOICES]
+_CHOICES_RE = re.compile(r"\[CHOICES\]")
+
+
+def _is_matcha_finder_flow(conversation_history: Optional[List[Dict]]) -> bool:
+    """Return True if the last assistant message contained [CHOICES] tags,
+    meaning we're in a guided recommendation flow and should skip RAG."""
+    if not conversation_history:
+        return False
+    for msg in reversed(conversation_history):
+        if msg.get("role") == "assistant":
+            return bool(_CHOICES_RE.search(msg.get("content", "")))
+    return False
+
+
 # Cosine distance threshold — lower = stricter, higher = more permissive
 _RELEVANCE_THRESHOLD = 0.82
 
@@ -125,6 +140,30 @@ class RAGEngine:
                 "sources": [],
                 "context_chunks": 0,
                 "suggestions": [],
+            }
+
+        # Matcha Finder mid-flow: skip RAG so model follows step flow
+        if _is_matcha_finder_flow(conversation_history):
+            messages = [{"role": "system", "content": system_prompt}]
+            if conversation_history:
+                messages.extend(conversation_history[-8:])
+            messages.append({"role": "user", "content": msg_stripped})
+            try:
+                raw_response = await chat_completion(
+                    messages, temperature=0.45, max_tokens=400, language=language
+                )
+            except Exception as e:
+                logger.error(f"Matcha Finder chat completion failed: {e}")
+                return {
+                    "response": "I'm sorry, I'm having trouble right now. Please try again.",
+                    "sources": [], "context_chunks": 0, "suggestions": [],
+                }
+            response, suggestions = _parse_suggestions(raw_response)
+            return {
+                "response": response,
+                "sources": [],
+                "context_chunks": 0,
+                "suggestions": suggestions,
             }
 
         # 1. Build enriched search query using conversation context
@@ -235,6 +274,30 @@ class RAGEngine:
                     break
             yield ("text", response.strip())
             yield ("done", {"sources": [], "suggestions": []})
+            return
+
+        # Matcha Finder mid-flow: skip RAG, stream directly
+        if _is_matcha_finder_flow(conversation_history):
+            messages = [{"role": "system", "content": system_prompt}]
+            if conversation_history:
+                messages.extend(conversation_history[-8:])
+            messages.append({"role": "user", "content": msg_stripped})
+            full_response = []
+            try:
+                async for chunk in chat_completion_stream(
+                    messages, temperature=0.45, max_tokens=400, language=language
+                ):
+                    full_response.append(chunk)
+                    yield ("text", chunk)
+            except Exception as e:
+                logger.error(f"Matcha Finder streaming failed: {e}")
+                if not full_response:
+                    yield ("text", "I'm sorry, I'm having trouble right now. Please try again.")
+                yield ("done", {"sources": [], "suggestions": []})
+                return
+            raw = "".join(full_response)
+            _, suggestions = _parse_suggestions(raw)
+            yield ("done", {"sources": [], "suggestions": suggestions})
             return
 
         # 1-4: Same RAG retrieval as non-streaming
