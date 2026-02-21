@@ -273,21 +273,21 @@
     sources = sources || [];
     suggestions = suggestions || [];
 
-    // Strip [SUGGESTIONS] block from visible text
-    var si = fullText.indexOf('[SUGGESTIONS]');
-    if (si > -1) {
-      fullText = fullText.substring(0, si).trim();
+    // Strip [SUGGESTIONS] block from visible text (handles **[SUGGESTIONS]** too)
+    var sugM = fullText.match(/\*{0,2}\[SUGGESTIONS\]\*{0,2}/);
+    if (sugM) {
+      fullText = fullText.substring(0, sugM.index).trim();
     }
 
-    // Strip [CHOICES] block from visible text and extract options
+    // Strip [CHOICES] block from visible text and extract options (handles **[CHOICES]** too)
     var choices = [];
-    var ci = fullText.indexOf('[CHOICES]');
-    if (ci > -1) {
-      var ce = fullText.indexOf('[/CHOICES]');
-      if (ce > -1) {
-        var choiceStr = fullText.substring(ci + 9, ce).trim();
+    var choiceM = fullText.match(/\*{0,2}\[CHOICES\]\*{0,2}/);
+    if (choiceM) {
+      var choiceEnd = fullText.match(/\*{0,2}\[\/CHOICES\]\*{0,2}/);
+      if (choiceEnd) {
+        var choiceStr = fullText.substring(choiceM.index + choiceM[0].length, choiceEnd.index).trim();
         choices = choiceStr.split('|').map(function (c) { return c.trim(); }).filter(Boolean);
-        fullText = fullText.substring(0, ci).trim() + fullText.substring(ce + 10).trim();
+        fullText = fullText.substring(0, choiceM.index).trim() + fullText.substring(choiceEnd.index + choiceEnd[0].length).trim();
       }
     }
 

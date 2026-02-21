@@ -662,14 +662,14 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 
   var i18n={{
     en:{{
-      greeting:"Welcome! I'm your AI Matcha Concierge. How can I help you today?",
+      greeting:"Hi there! I'm your matcha concierge. Whether you're new to matcha or a daily drinker, I'm here to help you find the perfect cup.",
       placeholder:'Ask about matcha...',
       typing:'Thinking...',
       banner:'AI-powered answers based on our matcha expertise',
-      q1:'How to brew',q1m:'How do I brew the perfect cup of matcha?',
-      q2:'Health benefits',q2m:'What are the health benefits of matcha?',
-      q3:'Matcha vs coffee',q3m:'How does matcha compare to coffee?',
-      q4:'Recommend',q4m:'What matcha products do you recommend?',
+      q1:'Find my matcha',q1m:"I'd like to find the right matcha for me. Can you help?",
+      q2:'Make a matcha latte',q2m:'How do I make the perfect matcha latte at home?',
+      q3:'Why NAKAI?',q3m:'What makes NAKAI matcha different from other matcha brands?',
+      q4:'Health benefits',q4m:'What are the health benefits of drinking matcha daily?',
       error:"Connection issue. Please try again.",
       sub:'AI Matcha Concierge',homeGreeting:'What can I help you with?',
       findCta:'Find My Matcha',
@@ -689,7 +689,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       rIced:'Iced Matcha',rIcedDesc:'Refreshing, bright, and easy to make',rIcedMsg:'How do I make iced matcha? Step by step please.',
       rAffogato:'Affogato',rAffogatoDesc:'Matcha meets vanilla ice cream',rAffogatoMsg:'How do I make a matcha affogato?',
       rBarista:'Barista Tips',rBaristaDesc:'Water temp, whisking, milk pairing',rBaristaMsg:'What are the essential barista tips for working with matcha? Cover water temperature, whisking technique, and milk pairing.',
-      heroSub:'Your private matcha concierge',heroGreeting:'Shall we talk about matcha?',
+      heroSub:'Your private matcha concierge',heroGreeting:'Discover your perfect matcha',
       tFind:'Find My Matcha',tBrew:'Barista Guide',tProduct:'Recipes',tFaq:'About Matcha',
       pAsk:'Ask about this',
       inviteHeadline:'Share matcha with someone you love',inviteBody:'Invite a close friend and they\u2019ll receive a special matcha gift.',
@@ -704,14 +704,14 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       toastCopied:'Link copied to clipboard',
     }},
     ja:{{
-      greeting:'ようこそ！AI抹茶コンシェルジュです。何かお手伝いできることはありますか？',
+      greeting:'こんにちは！抹茶コンシェルジュです。初めての方も毎日飲む方も、あなたにぴったりの一杯を一緒に見つけましょう。',
       placeholder:'抹茶について質問する...',
       typing:'考え中...',
       banner:'AIが抹茶の専門知識に基づいて回答します',
-      q1:'点て方',q1m:'美味しい抹茶の点て方を教えてください',
-      q2:'健康効果',q2m:'抹茶の健康効果について教えてください',
-      q3:'抹茶 vs コーヒー',q3m:'抹茶とコーヒーの違いを教えてください',
-      q4:'おすすめ',q4m:'おすすめの抹茶商品を教えてください',
+      q1:'自分に合う抹茶',q1m:'自分に合う抹茶を探しています。いくつか質問してもらえますか？',
+      q2:'抹茶ラテの作り方',q2m:'自宅で美味しい抹茶ラテを作る方法を教えてください',
+      q3:'NAKAIの特別さ',q3m:'NAKAIの抹茶は他の抹茶と何が違うのですか？',
+      q4:'健康効果',q4m:'抹茶を毎日飲むとどんな健康効果がありますか？',
       error:'接続に問題が発生しました。もう一度お試しください。',
       sub:'AI 抹茶コンシェルジュ',homeGreeting:'何をお手伝いしましょうか？',
       findCta:'自分に合った抹茶を探す',
@@ -731,7 +731,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       rIced:'\u30a2\u30a4\u30b9\u62b9\u8336',rIcedDesc:'\u723d\u3084\u304b\u3067\u4f5c\u308a\u3084\u3059\u3044',rIcedMsg:'\u30a2\u30a4\u30b9\u62b9\u8336\u306e\u4f5c\u308a\u65b9\u3092\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u3067\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
       rAffogato:'\u30a2\u30d5\u30a9\u30ac\u30fc\u30c8',rAffogatoDesc:'\u62b9\u8336\u3068\u30d0\u30cb\u30e9\u30a2\u30a4\u30b9\u306e\u30cf\u30fc\u30e2\u30cb\u30fc',rAffogatoMsg:'\u62b9\u8336\u30a2\u30d5\u30a9\u30ac\u30fc\u30c8\u306e\u4f5c\u308a\u65b9\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
       rBarista:'\u30d0\u30ea\u30b9\u30bf Tips',rBaristaDesc:'\u6c34\u6e29\u3001\u8336\u7b45\u306e\u4f7f\u3044\u65b9\u3001\u30df\u30eb\u30af\u9078\u3073',rBaristaMsg:'\u62b9\u8336\u3092\u6271\u3046\u30d0\u30ea\u30b9\u30bf\u306e\u5fc5\u9808\u30c6\u30af\u30cb\u30c3\u30af\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u6c34\u6e29\u3001\u8336\u7b45\u306e\u4f7f\u3044\u65b9\u3001\u30df\u30eb\u30af\u306e\u76f8\u6027\u3092\u30ab\u30d0\u30fc\u3057\u3066\u304f\u3060\u3055\u3044\u3002',
-      heroSub:'\u3042\u306a\u305f\u306e\u62b9\u8336\u30b3\u30f3\u30b7\u30a7\u30eb\u30b8\u30e5',heroGreeting:'\u62b9\u8336\u306b\u3064\u3044\u3066\u8a71\u3057\u307e\u305b\u3093\u304b\uff1f',
+      heroSub:'\u3042\u306a\u305f\u306e\u62b9\u8336\u30b3\u30f3\u30b7\u30a7\u30eb\u30b8\u30e5',heroGreeting:'\u3042\u306a\u305f\u306b\u3074\u3063\u305f\u308a\u306e\u62b9\u8336\u3092\u898b\u3064\u3051\u3088\u3046',
       tFind:'\u81ea\u5206\u306b\u5408\u3046\u62b9\u8336\u3092\u63a2\u3059',tBrew:'\u30d0\u30ea\u30b9\u30bf\u30ac\u30a4\u30c9',tProduct:'\u30ec\u30b7\u30d4',tFaq:'\u62b9\u8336\u306b\u3064\u3044\u3066',
       pAsk:'\u8a73\u3057\u304f\u805e\u304f',
       inviteHeadline:'\u5927\u5207\u306a\u4eba\u306b\u62b9\u8336\u3092\u8d08\u308d\u3046',inviteBody:'\u53cb\u4eba\u3092\u62db\u5f85\u3059\u308b\u3068\u3001\u7279\u5225\u306a\u62b9\u8336\u30ae\u30d5\u30c8\u304c\u5c4a\u304d\u307e\u3059\u3002',
@@ -966,12 +966,12 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
               d.querySelectorAll('.nc-suggestion').forEach(function(btn){{
                 btn.addEventListener('click',function(){{var q=this.textContent;$('nc-input').value=q;sendMessage();var sc=d.querySelector('.nc-suggestions');if(sc)sc.remove()}});
               }});
-              /* Clean [SUGGESTIONS] block from visible text */
-              var raw=fullText;var si=raw.indexOf('[SUGGESTIONS]');
-              if(si>-1){{fullText=raw.substring(0,si).trim()}}
-              /* Clean [CHOICES] block and extract options */
-              var choices=[];var ci=fullText.indexOf('[CHOICES]');
-              if(ci>-1){{var ce=fullText.indexOf('[/CHOICES]');if(ce>-1){{var choiceStr=fullText.substring(ci+9,ce).trim();choices=choiceStr.split('|').map(function(c){{return c.trim()}}).filter(Boolean);fullText=fullText.substring(0,ci).trim()+fullText.substring(ce+10).trim()}}}}
+              /* Clean [SUGGESTIONS] block from visible text (handles **[SUGGESTIONS]** too) */
+              var raw=fullText;var sugM=raw.match(/\*{{0,2}}\[SUGGESTIONS\]\*{{0,2}}/);
+              if(sugM){{fullText=raw.substring(0,sugM.index).trim()}}
+              /* Clean [CHOICES] block and extract options (handles **[CHOICES]** too) */
+              var choices=[];var choiceM=fullText.match(/\*{{0,2}}\[CHOICES\]\*{{0,2}}/);
+              if(choiceM){{var choiceEnd=fullText.match(/\*{{0,2}}\[\/CHOICES\]\*{{0,2}}/);if(choiceEnd){{var choiceStr=fullText.substring(choiceM.index+choiceM[0].length,choiceEnd.index).trim();choices=choiceStr.split('|').map(function(c){{return c.trim()}}).filter(Boolean);fullText=fullText.substring(0,choiceM.index).trim()+fullText.substring(choiceEnd.index+choiceEnd[0].length).trim()}}}}
               bubble.innerHTML=formatMd(fullText);
               /* Render choice buttons */
               if(choices.length>0){{var choiceDiv=document.createElement('div');choiceDiv.className='nc-choices';choices.forEach(function(txt){{var btn=document.createElement('button');btn.className='nc-choice-btn';btn.type='button';btn.textContent=txt;btn.addEventListener('click',function(){{$('nc-input').value=txt;sendMessage();choiceDiv.querySelectorAll('.nc-choice-btn').forEach(function(b){{b.disabled=true;b.classList.add('nc-choice-btn--disabled')}});btn.classList.add('nc-choice-btn--selected')}});choiceDiv.appendChild(btn)}});d.appendChild(choiceDiv)}}

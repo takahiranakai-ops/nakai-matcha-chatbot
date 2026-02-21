@@ -56,18 +56,18 @@ WIDGET_JS = r"""
   // i18n
   var i18n = {
     en: {
-      greeting: "Welcome to NAKAI! I'm your AI Matcha Concierge. Ask me anything — from brewing tips and health benefits to finding your perfect matcha.",
-      placeholder: 'Ask about our matcha...',
+      greeting: "Hi there! I'm your matcha concierge. Whether you're new to matcha or a daily drinker, I'm here to help you find the perfect cup.",
+      placeholder: 'Ask about matcha...',
       typing: 'AI is composing...',
-      aiBanner: 'AI-powered answers based on our product knowledge',
-      q1: 'Help me find the right matcha',
-      q1msg: "I'd like to find the right matcha for me. Could you ask me a few questions to help narrow it down?",
-      q2: 'Shipping & returns',
-      q2msg: 'What are your shipping and return policies?',
-      q3: 'Matcha health benefits',
-      q3msg: 'What are the health benefits of matcha?',
-      q4: 'How to prepare matcha',
-      q4msg: 'How do I prepare matcha properly?',
+      aiBanner: 'AI-powered answers based on our matcha expertise',
+      q1: 'Find my matcha',
+      q1msg: "I'd like to find the right matcha for me. Can you help?",
+      q2: 'Make a matcha latte',
+      q2msg: 'How do I make the perfect matcha latte at home?',
+      q3: 'Why NAKAI?',
+      q3msg: 'What makes NAKAI matcha different from other matcha brands?',
+      q4: 'Health benefits',
+      q4msg: 'What are the health benefits of drinking matcha daily?',
       error: "Sorry, I'm having trouble connecting right now.",
       errorRetry: 'Retry',
       online: 'Online',
@@ -76,18 +76,18 @@ WIDGET_JS = r"""
       learnMore: 'Learn more',
     },
     ja: {
-      greeting: 'NAKAIへようこそ！AI抹茶コンシェルジュです。点て方や健康効果、あなたにぴったりの抹茶探しまで、何でもお気軽にお尋ねください。',
+      greeting: 'こんにちは！抹茶コンシェルジュです。初めての方も毎日飲む方も、あなたにぴったりの一杯を一緒に見つけましょう。',
       placeholder: '抹茶について質問する...',
       typing: 'AIが回答を作成中...',
-      aiBanner: 'AI が商品知識に基づいて回答します',
-      q1: '自分に合う抹茶を探す',
+      aiBanner: 'AIが抹茶の専門知識に基づいて回答します',
+      q1: '自分に合う抹茶',
       q1msg: '自分に合う抹茶を探しています。いくつか質問してもらえますか？',
-      q2: '配送・返品について',
-      q2msg: '配送と返品のポリシーを教えてください',
-      q3: '抹茶の健康効果',
-      q3msg: '抹茶の健康効果について教えてください',
-      q4: '抹茶の点て方',
-      q4msg: '美味しい抹茶の点て方を教えてください',
+      q2: '抹茶ラテの作り方',
+      q2msg: '自宅で美味しい抹茶ラテを作る方法を教えてください',
+      q3: 'NAKAIの特別さ',
+      q3msg: 'NAKAIの抹茶は他の抹茶と何が違うのですか？',
+      q4: '健康効果',
+      q4msg: '抹茶を毎日飲むとどんな健康効果がありますか？',
       error: '接続に問題が発生しました。',
       errorRetry: '再試行',
       online: 'オンライン',
@@ -318,21 +318,21 @@ WIDGET_JS = r"""
     sources = sources || [];
     suggestions = suggestions || [];
 
-    // Strip [SUGGESTIONS] block
-    var si = fullText.indexOf('[SUGGESTIONS]');
-    if (si > -1) {
-      fullText = fullText.substring(0, si).trim();
+    // Strip [SUGGESTIONS] block (handles **[SUGGESTIONS]** too)
+    var sugM = fullText.match(/\*{0,2}\[SUGGESTIONS\]\*{0,2}/);
+    if (sugM) {
+      fullText = fullText.substring(0, sugM.index).trim();
     }
 
-    // Strip [CHOICES] block and extract options
+    // Strip [CHOICES] block and extract options (handles **[CHOICES]** too)
     var choices = [];
-    var ci = fullText.indexOf('[CHOICES]');
-    if (ci > -1) {
-      var ce = fullText.indexOf('[/CHOICES]');
-      if (ce > -1) {
-        var choiceStr = fullText.substring(ci + 9, ce).trim();
+    var choiceM = fullText.match(/\*{0,2}\[CHOICES\]\*{0,2}/);
+    if (choiceM) {
+      var choiceEnd = fullText.match(/\*{0,2}\[\/CHOICES\]\*{0,2}/);
+      if (choiceEnd) {
+        var choiceStr = fullText.substring(choiceM.index + choiceM[0].length, choiceEnd.index).trim();
         choices = choiceStr.split('|').map(function (c) { return c.trim(); }).filter(Boolean);
-        fullText = fullText.substring(0, ci).trim() + fullText.substring(ce + 10).trim();
+        fullText = fullText.substring(0, choiceM.index).trim() + fullText.substring(choiceEnd.index + choiceEnd[0].length).trim();
       }
     }
 

@@ -18,8 +18,9 @@ _GREETING_RE = re.compile(
 )
 
 # Extract [SUGGESTIONS]...[/SUGGESTIONS] from response (closing tag optional)
+# Permissive: handles **[SUGGESTIONS]**, whitespace, missing closing tag
 _SUGGESTIONS_RE = re.compile(
-    r"\[SUGGESTIONS\]\s*\n(.*?)(?:\n?\[/SUGGESTIONS\]|$)",
+    r"\*{0,2}\[SUGGESTIONS\]\*{0,2}\s*\n(.*?)(?:\n?\*{0,2}\[/SUGGESTIONS\]\*{0,2}|$)",
     re.DOTALL,
 )
 
@@ -173,11 +174,13 @@ class RAGEngine:
         if context_texts:
             context = "\n---\n".join(context_texts)
             rag_context = build_rag_prompt(
-                context=context, question=user_message, language=language
+                context=context, question=user_message, language=language,
+                source=source,
             )
         else:
             rag_context = build_rag_prompt(
-                context="", question=user_message, language=language
+                context="", question=user_message, language=language,
+                source=source,
             )
 
         messages = [{"role": "system", "content": system_prompt}]
@@ -273,11 +276,13 @@ class RAGEngine:
         if context_texts:
             context = "\n---\n".join(context_texts)
             rag_context = build_rag_prompt(
-                context=context, question=user_message, language=language
+                context=context, question=user_message, language=language,
+                source=source,
             )
         else:
             rag_context = build_rag_prompt(
-                context="", question=user_message, language=language
+                context="", question=user_message, language=language,
+                source=source,
             )
 
         messages = [{"role": "system", "content": system_prompt}]
