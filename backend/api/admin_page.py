@@ -114,6 +114,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     <div class="tab active" data-tab="knowledge">Knowledge Base</div>
     <div class="tab" data-tab="history">Chat History</div>
     <div class="tab" data-tab="analytics">Analytics</div>
+    <div class="tab" data-tab="leads">Wholesale Leads</div>
   </div>
   <div class="panel active" id="panel-knowledge">
     <div class="toolbar">
@@ -152,6 +153,13 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
         <div id="lang-breakdown"></div>
       </div>
     </div>
+  </div>
+  <div class="panel" id="panel-leads">
+    <div class="toolbar">
+      <button class="btn btn-outline" onclick="loadLeads()">Refresh</button>
+      <span id="leads-count" style="font-size:.85rem;color:var(--gray)"></span>
+    </div>
+    <table><thead><tr><th>Email</th><th>Session</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="leads-tbody"></tbody></table>
   </div>
 </div>
 <div class="modal-bg" id="article-modal">
@@ -231,6 +239,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
       document.getElementById('panel-'+t.getAttribute('data-tab')).classList.add('active');
       if(t.getAttribute('data-tab')==='history')loadConversations();
       if(t.getAttribute('data-tab')==='analytics')loadAnalytics();
+      if(t.getAttribute('data-tab')==='leads')loadLeads();
     }});
   }});
 
@@ -396,6 +405,32 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
       Object.keys(langs).forEach(function(l){{lb.innerHTML+='<div class="breakdown-row"><span>'+esc(l)+'</span><strong>'+langs[l]+'</strong></div>'}});
     }})
     .catch(function(){{}});
+  }};
+
+  window.loadLeads=function(){{
+    fetch('/api/admin/wholesale/leads',{{headers:hdrs()}})
+    .then(function(r){{return r.json()}})
+    .then(function(d){{
+      var leads=d.leads||[];
+      var tb=document.getElementById('leads-tbody');tb.innerHTML='';
+      document.getElementById('leads-count').textContent=leads.length+' lead'+(leads.length!==1?'s':'');
+      leads.forEach(function(l){{
+        var tr=document.createElement('tr');
+        var dt=l.created_at?l.created_at.substring(0,16).replace('T',' '):'\u2014';
+        var sid=l.session_id?(l.session_id.substring(0,8)+'...'):'\u2014';
+        var st='<span class="badge badge-active">'+esc(l.status||'new')+'</span>';
+        tr.innerHTML='<td>'+esc(l.email)+'</td><td style="font-size:.78rem">'+sid+'</td><td style="font-size:.78rem">'+dt+'</td><td>'+st+'</td>'
+          +'<td><button class="btn btn-red btn-sm" onclick="deleteLead(\\''+l.id+'\\')">Delete</button></td>';
+        tb.appendChild(tr);
+      }});
+    }})
+    .catch(function(){{}});
+  }};
+
+  window.deleteLead=function(id){{
+    if(!confirm('Delete this lead permanently?'))return;
+    fetch('/api/admin/wholesale/leads/'+id,{{method:'DELETE',headers:hdrs()}})
+    .then(function(){{loadLeads()}});
   }};
 }})();
 </script>

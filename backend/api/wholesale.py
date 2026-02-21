@@ -996,6 +996,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       if(!email)return;
       sessionStorage.setItem('ws_partner_verified','interested');
       sessionStorage.setItem('ws_lead_email',email);
+      fetch('/api/admin/wholesale/leads',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{email:email,session_id:SESSION_ID}})}}).catch(function(){{}});
       $('ws-gate').classList.add('ws-hidden');
       $('ws-app').classList.remove('ws-hidden');
       $('ws-app').classList.add('ws-active');

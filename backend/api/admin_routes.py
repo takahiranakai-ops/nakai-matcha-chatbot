@@ -64,6 +64,20 @@ async def wholesale_login(body: WholesaleLoginRequest):
     raise HTTPException(status_code=401, detail="Invalid password")
 
 
+class WholesaleLeadCreate(BaseModel):
+    email: str = Field(..., min_length=3, max_length=254)
+    session_id: str = Field(default="", max_length=100)
+
+
+@admin_api_router.post("/wholesale/leads")
+async def create_wholesale_lead(body: WholesaleLeadCreate):
+    """Public endpoint — called from the wholesale gate."""
+    await supabase_client.create_wholesale_lead(
+        email=body.email, session_id=body.session_id,
+    )
+    return {"ok": True}
+
+
 @admin_api_router.get("/articles")
 async def list_articles(
     language: str = None,
@@ -218,3 +232,21 @@ async def get_messages(conversation_id: str, _auth: bool = Depends(verify_admin)
 async def get_analytics(_auth: bool = Depends(verify_admin)):
     summary = await supabase_client.get_analytics_summary()
     return summary
+
+
+# ----------------------------------------------------------------
+# WHOLESALE LEADS (admin-protected)
+# ----------------------------------------------------------------
+
+@admin_api_router.get("/wholesale/leads")
+async def list_wholesale_leads(_auth: bool = Depends(verify_admin)):
+    leads = await supabase_client.list_wholesale_leads()
+    return {"leads": leads}
+
+
+@admin_api_router.delete("/wholesale/leads/{lead_id}")
+async def delete_wholesale_lead(lead_id: str, _auth: bool = Depends(verify_admin)):
+    success = await supabase_client.delete_wholesale_lead(lead_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete lead")
+    return {"deleted": True}

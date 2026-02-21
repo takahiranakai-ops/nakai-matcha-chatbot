@@ -395,3 +395,63 @@ async def get_analytics_summary() -> dict:
     except Exception as e:
         logger.warning(f"Analytics summary failed: {e}")
     return summary
+
+
+# ----------------------------------------------------------------
+# WHOLESALE LEADS
+# ----------------------------------------------------------------
+
+async def create_wholesale_lead(email: str, session_id: str = "") -> Optional[dict]:
+    """Insert a wholesale lead. Duplicate emails are silently ignored."""
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                f"{_BASE_URL}/wholesale_leads",
+                headers={**_HEADERS, "Prefer": "return=representation,resolution=ignore-duplicates"},
+                json={"email": email, "session_id": session_id},
+            )
+            resp.raise_for_status()
+            rows = resp.json()
+            return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to create wholesale lead: {e}")
+        return None
+
+
+async def list_wholesale_leads() -> list[dict]:
+    if not _is_configured():
+        return []
+    _init()
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                f"{_BASE_URL}/wholesale_leads",
+                headers=_HEADERS,
+                params={"order": "created_at.desc", "limit": "500"},
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except Exception as e:
+        logger.warning(f"Failed to list wholesale leads: {e}")
+        return []
+
+
+async def delete_wholesale_lead(lead_id: str) -> bool:
+    if not _is_configured():
+        return False
+    _init()
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.delete(
+                f"{_BASE_URL}/wholesale_leads",
+                headers=_HEADERS,
+                params={"id": f"eq.{lead_id}"},
+            )
+            resp.raise_for_status()
+            return True
+    except Exception as e:
+        logger.warning(f"Failed to delete wholesale lead: {e}")
+        return False
