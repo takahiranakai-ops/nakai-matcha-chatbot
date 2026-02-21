@@ -28,15 +28,18 @@ _SUGGESTIONS_RE = re.compile(
 _CHOICES_RE = re.compile(r"\[CHOICES\]")
 
 
-def _is_matcha_finder_flow(conversation_history: Optional[List[Dict]]) -> bool:
-    """Return True if the last assistant message contained [CHOICES] tags,
-    meaning we're in a guided recommendation flow and should skip RAG."""
+def _is_matcha_finder_mid_flow(conversation_history: Optional[List[Dict]]) -> bool:
+    """Return True only when exactly 1 [CHOICES] exchange has occurred
+    (step 1 answered, step 2 question needed). When 2+ [CHOICES] have
+    been sent, the model should recommend a product using RAG data."""
     if not conversation_history:
         return False
-    for msg in reversed(conversation_history):
-        if msg.get("role") == "assistant":
-            return bool(_CHOICES_RE.search(msg.get("content", "")))
-    return False
+    choices_count = sum(
+        1 for msg in conversation_history
+        if msg.get("role") == "assistant" and _CHOICES_RE.search(msg.get("content", ""))
+    )
+    # Skip RAG only when exactly 1 CHOICES exchange — need step 2 question
+    return choices_count == 1
 
 
 # Cosine distance threshold — lower = stricter, higher = more permissive
@@ -143,7 +146,7 @@ class RAGEngine:
             }
 
         # Matcha Finder mid-flow: skip RAG so model follows step flow
-        if _is_matcha_finder_flow(conversation_history):
+        if _is_matcha_finder_mid_flow(conversation_history):
             messages = [{"role": "system", "content": system_prompt}]
             if conversation_history:
                 messages.extend(conversation_history[-8:])
@@ -277,7 +280,7 @@ class RAGEngine:
             return
 
         # Matcha Finder mid-flow: skip RAG, stream directly
-        if _is_matcha_finder_flow(conversation_history):
+        if _is_matcha_finder_mid_flow(conversation_history):
             messages = [{"role": "system", "content": system_prompt}]
             if conversation_history:
                 messages.extend(conversation_history[-8:])
