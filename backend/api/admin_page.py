@@ -84,6 +84,10 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
 .bar-label{{font-size:.65rem;color:var(--gray)}}
 .bar-value{{font-size:.7rem;font-weight:600;color:var(--green)}}
 .breakdown-row{{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:.88rem}}
+#upload-zone{{border:2px dashed #ddd;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s}}
+#upload-zone:hover,#upload-zone.drag-over{{border-color:var(--green);background:rgba(64,101,70,.03)}}
+.upload-clear{{display:inline-block;margin-top:8px;padding:2px 10px;font-size:.75rem;border:1px solid #ddd;border-radius:4px;cursor:pointer;background:transparent;color:var(--gray)}}
+.upload-clear:hover{{border-color:var(--red);color:var(--red)}}
 </style>
 </head>
 <body>
@@ -157,7 +161,8 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     <div class="form-group"><label>Title</label><input id="art-title" /></div>
     <div class="form-group"><label>Language</label><select id="art-lang"><option value="en">English</option><option value="ja">Japanese</option></select></div>
     <div class="form-group"><label>Category</label><select id="art-cat"><option value="general">General</option><option value="product">Product</option><option value="faq">FAQ</option><option value="brewing">Brewing</option><option value="science">Science</option><option value="shipping">Shipping</option><option value="recipe">Recipe</option></select></div>
-    <div class="form-group"><label>Content</label><textarea id="art-content"></textarea></div>
+    <div class="form-group" id="upload-group"><label>Upload File (.txt or .pdf)</label><div id="upload-zone"><input type="file" id="art-file" accept=".txt,.pdf" style="display:none" /><div id="upload-label" style="color:var(--gray);font-size:.85rem">Click to select a file or drag &amp; drop<br><span style="font-size:.75rem">.txt or .pdf (max 5 MB)</span></div><div id="upload-info" style="display:none;color:var(--green);font-size:.85rem"></div></div></div>
+    <div class="form-group"><label>Content <span id="content-source" style="font-size:.75rem;color:var(--gray)"></span></label><textarea id="art-content"></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
       <button class="btn btn-green" onclick="saveArticle()">Save</button>
@@ -170,6 +175,34 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
   var adminPw='';
   function hdrs(){{return{{'Content-Type':'application/json','X-Admin-Password':adminPw}}}}
   function esc(s){{if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML}}
+
+  var selectedFile=null;
+  var fileInput=document.getElementById('art-file');
+  var uploadZone=document.getElementById('upload-zone');
+  uploadZone.addEventListener('click',function(){{if(!selectedFile)fileInput.click()}});
+  uploadZone.addEventListener('dragover',function(e){{e.preventDefault();uploadZone.classList.add('drag-over')}});
+  uploadZone.addEventListener('dragleave',function(){{uploadZone.classList.remove('drag-over')}});
+  uploadZone.addEventListener('drop',function(e){{e.preventDefault();uploadZone.classList.remove('drag-over');if(e.dataTransfer.files.length)handleFileSelect(e.dataTransfer.files[0])}});
+  fileInput.addEventListener('change',function(){{if(fileInput.files.length)handleFileSelect(fileInput.files[0])}});
+  function handleFileSelect(f){{
+    var ext=f.name.split('.').pop().toLowerCase();
+    if(ext!=='txt'&&ext!=='pdf'){{alert('Only .txt and .pdf files are supported');return}}
+    if(f.size>5*1024*1024){{alert('File too large. Maximum size is 5 MB.');return}}
+    selectedFile=f;
+    document.getElementById('upload-label').style.display='none';
+    var info=document.getElementById('upload-info');
+    info.style.display='block';
+    info.innerHTML=esc(f.name)+' ('+(f.size/1024).toFixed(1)+' KB)<br><button type="button" class="upload-clear" onclick="clearFile(event)">Remove</button>';
+    document.getElementById('content-source').textContent='(will be replaced by file content)';
+    var ti=document.getElementById('art-title');
+    if(!ti.value.trim())ti.value=f.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
+  }}
+  window.clearFile=function(e){{
+    e.stopPropagation();selectedFile=null;fileInput.value='';
+    document.getElementById('upload-label').style.display='block';
+    document.getElementById('upload-info').style.display='none';
+    document.getElementById('content-source').textContent='';
+  }};
 
   document.getElementById('login-form').addEventListener('submit',function(e){{
     e.preventDefault();
@@ -229,6 +262,11 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     document.getElementById('art-content').value='';
     document.getElementById('art-lang').value='en';
     document.getElementById('art-cat').value='general';
+    selectedFile=null;fileInput.value='';
+    document.getElementById('upload-label').style.display='block';
+    document.getElementById('upload-info').style.display='none';
+    document.getElementById('content-source').textContent='';
+    document.getElementById('upload-group').style.display='block';
     document.getElementById('article-modal').classList.add('show');
   }};
 
@@ -242,19 +280,34 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
       document.getElementById('art-content').value=a.content||'';
       document.getElementById('art-lang').value=a.language||'en';
       document.getElementById('art-cat').value=a.category||'general';
+      document.getElementById('upload-group').style.display='none';
+      document.getElementById('content-source').textContent='';
+      selectedFile=null;
       document.getElementById('article-modal').classList.add('show');
     }});
   }};
 
   window.saveArticle=function(){{
     var id=document.getElementById('edit-id').value;
-    var data={{title:document.getElementById('art-title').value,content:document.getElementById('art-content').value,language:document.getElementById('art-lang').value,category:document.getElementById('art-cat').value}};
-    var url=id?'/api/admin/articles/'+id:'/api/admin/articles';
-    var method=id?'PATCH':'POST';
-    fetch(url,{{method:method,headers:hdrs(),body:JSON.stringify(data)}})
-    .then(function(r){{if(!r.ok)throw new Error();return r.json()}})
-    .then(function(){{closeModal();loadArticles()}})
-    .catch(function(){{alert('Failed to save article')}});
+    if(!id&&selectedFile){{
+      var fd=new FormData();
+      fd.append('file',selectedFile);
+      fd.append('title',document.getElementById('art-title').value);
+      fd.append('language',document.getElementById('art-lang').value);
+      fd.append('category',document.getElementById('art-cat').value);
+      fetch('/api/admin/articles/upload',{{method:'POST',headers:{{'X-Admin-Password':adminPw}},body:fd}})
+      .then(function(r){{if(!r.ok)return r.json().then(function(d){{throw new Error(d.detail||'Upload failed')}});return r.json()}})
+      .then(function(){{closeModal();loadArticles()}})
+      .catch(function(e){{alert('Upload failed: '+e.message)}});
+    }}else{{
+      var data={{title:document.getElementById('art-title').value,content:document.getElementById('art-content').value,language:document.getElementById('art-lang').value,category:document.getElementById('art-cat').value}};
+      var url=id?'/api/admin/articles/'+id:'/api/admin/articles';
+      var method=id?'PATCH':'POST';
+      fetch(url,{{method:method,headers:hdrs(),body:JSON.stringify(data)}})
+      .then(function(r){{if(!r.ok)throw new Error();return r.json()}})
+      .then(function(){{closeModal();loadArticles()}})
+      .catch(function(){{alert('Failed to save article')}});
+    }}
   }};
 
   window.toggleArticle=function(id,newState){{

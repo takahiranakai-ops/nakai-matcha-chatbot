@@ -4,7 +4,12 @@ import asyncio
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Header, Depends, Request
+import io
+
+from fastapi import (
+    APIRouter, HTTPException, Header, Depends, Request,
+    UploadFile, File, Form,
+)
 from pydantic import BaseModel, Field
 
 from config import settings
@@ -77,6 +82,68 @@ async def create_article(body: ArticleCreate, _auth: bool = Depends(verify_admin
         content=body.content,
         language=body.language,
         category=body.category,
+    )
+    if not article:
+        raise HTTPException(status_code=500, detail="Failed to create article")
+    return article
+
+
+def _extract_pdf_text(pdf_bytes: bytes) -> str:
+    """Extract text from PDF bytes using pypdf."""
+    from pypdf import PdfReader
+
+    reader = PdfReader(io.BytesIO(pdf_bytes))
+    pages_text = []
+    for page in reader.pages:
+        page_text = page.extract_text()
+        if page_text:
+            pages_text.append(page_text)
+    return "\n\n".join(pages_text)
+
+
+@admin_api_router.post("/articles/upload")
+async def upload_article(
+    file: UploadFile = File(...),
+    title: str = Form(""),
+    language: str = Form("en"),
+    category: str = Form("general"),
+    x_admin_password: str = Header(...),
+):
+    if x_admin_password != settings.admin_password:
+        raise HTTPException(status_code=401, detail="Invalid admin password")
+
+    filename = file.filename or ""
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if ext not in ("txt", "pdf"):
+        raise HTTPException(status_code=400, detail="Only .txt and .pdf files are supported")
+
+    MAX_SIZE = 5 * 1024 * 1024
+    content_bytes = await file.read()
+    if len(content_bytes) > MAX_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5 MB.")
+
+    try:
+        if ext == "txt":
+            text = content_bytes.decode("utf-8")
+        else:
+            text = _extract_pdf_text(content_bytes)
+    except UnicodeDecodeError as exc:
+        raise HTTPException(status_code=400, detail="Could not decode text file. Ensure it is UTF-8 encoded.") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Failed to extract text from file: {exc}") from exc
+
+    text = text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="File contains no extractable text")
+
+    if not title.strip():
+        title = filename.rsplit(".", 1)[0].replace("_", " ").replace("-", " ").title()
+
+    article = await supabase_client.create_article(
+        title=title,
+        content=text,
+        language=language,
+        category=category,
     )
     if not article:
         raise HTTPException(status_code=500, detail="Failed to create article")
