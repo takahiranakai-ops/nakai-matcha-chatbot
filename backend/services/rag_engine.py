@@ -27,6 +27,42 @@ _SUGGESTIONS_RE = re.compile(
 # Detect Matcha Finder mid-flow: assistant's last message had [CHOICES]
 _CHOICES_RE = re.compile(r"\[CHOICES\]")
 
+# Product name → Shopify handle mapping for [PRODUCT] tag injection
+_PRODUCT_HANDLE_MAP = {
+    "revi": "revi-organic-matcha-20g-ss-grade-plus",
+    "ikigai": "ikigai-organic-matcha-40g-ss-grade",
+    "exquisite matcha set": "the-exquisite-matcha-set-limited-edition",
+    "matcha set": "the-exquisite-matcha-set-limited-edition",
+}
+_PRODUCT_TAG_RE = re.compile(r"\[PRODUCT:[a-z0-9-]+\]", re.IGNORECASE)
+
+
+def _inject_product_tags(response: str, conversation_history: Optional[List[Dict]]) -> str:
+    """If this is Matcha Finder step 3 and the model mentioned a product
+    but didn't output [PRODUCT:handle] tags, inject them automatically."""
+    if not conversation_history:
+        return response
+    # Count CHOICES in history — step 3 happens when 2+ CHOICES have been sent
+    choices_count = sum(
+        1 for msg in conversation_history
+        if msg.get("role") == "assistant" and _CHOICES_RE.search(msg.get("content", ""))
+    )
+    if choices_count < 2:
+        return response
+    # Already has [PRODUCT] tags — don't double up
+    if _PRODUCT_TAG_RE.search(response):
+        return response
+    # Find mentioned products and inject tags
+    lower = response.lower()
+    handles = []
+    for name, handle in _PRODUCT_HANDLE_MAP.items():
+        if name in lower and handle not in handles:
+            handles.append(handle)
+    if handles:
+        tags = "\n".join(f"[PRODUCT:{h}]" for h in handles)
+        response = response.rstrip() + "\n" + tags
+    return response
+
 
 def _is_matcha_finder_mid_flow(conversation_history: Optional[List[Dict]]) -> bool:
     """Return True only when exactly 1 [CHOICES] exchange has occurred
@@ -243,6 +279,9 @@ class RAGEngine:
         # 7. Parse out follow-up suggestions
         response, suggestions = _parse_suggestions(raw_response)
 
+        # 8. Inject [PRODUCT] tags for Matcha Finder step 3
+        response = _inject_product_tags(response, conversation_history)
+
         return {
             "response": response,
             "sources": list(source_urls),
@@ -374,6 +413,14 @@ class RAGEngine:
         # 6. Parse suggestions from full response
         raw = "".join(full_response)
         _, suggestions = _parse_suggestions(raw)
+
+        # 7. Inject [PRODUCT] tags for Matcha Finder step 3
+        injected = _inject_product_tags(raw, conversation_history)
+        if injected != raw:
+            # Emit the product tags as additional text so frontend can parse them
+            extra = injected[len(raw):]
+            if extra:
+                yield ("text", extra)
 
         yield ("done", {
             "sources": list(source_urls),
