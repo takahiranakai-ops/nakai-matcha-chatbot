@@ -96,6 +96,19 @@ def _clean_history_for_llm(conversation_history: Optional[List[Dict]]) -> List[D
     return cleaned
 
 
+def _matcha_finder_step(conversation_history: Optional[List[Dict]]) -> int:
+    """Return the current Matcha Finder step (0 if not in flow, 1-3 otherwise)."""
+    if not conversation_history:
+        return 0
+    choices_count = sum(
+        1 for msg in conversation_history
+        if msg.get("role") == "assistant" and _CHOICES_RE.search(msg.get("content", ""))
+    )
+    if choices_count == 0:
+        return 0
+    return choices_count + 1  # 1 CHOICES = step 2, 2 CHOICES = step 3
+
+
 def _is_matcha_finder_mid_flow(conversation_history: Optional[List[Dict]]) -> bool:
     """Return True only when exactly 1 [CHOICES] exchange has occurred
     (step 1 answered, step 2 question needed). When 2+ [CHOICES] have
@@ -281,16 +294,17 @@ class RAGEngine:
                 source_urls.add(url)
 
         # 5. Build messages — always use RAG prompt format
+        mf_step = _matcha_finder_step(conversation_history)
         if context_texts:
             context = "\n---\n".join(context_texts)
             rag_context = build_rag_prompt(
                 context=context, question=user_message, language=language,
-                source=source,
+                source=source, matcha_finder_step=mf_step,
             )
         else:
             rag_context = build_rag_prompt(
                 context="", question=user_message, language=language,
-                source=source,
+                source=source, matcha_finder_step=mf_step,
             )
 
         messages = [{"role": "system", "content": system_prompt}]
@@ -410,16 +424,17 @@ class RAGEngine:
             if url:
                 source_urls.add(url)
 
+        mf_step = _matcha_finder_step(conversation_history)
         if context_texts:
             context = "\n---\n".join(context_texts)
             rag_context = build_rag_prompt(
                 context=context, question=user_message, language=language,
-                source=source,
+                source=source, matcha_finder_step=mf_step,
             )
         else:
             rag_context = build_rag_prompt(
                 context="", question=user_message, language=language,
-                source=source,
+                source=source, matcha_finder_step=mf_step,
             )
 
         messages = [{"role": "system", "content": system_prompt}]

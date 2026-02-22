@@ -472,7 +472,7 @@ Answer using the knowledge above. Follow these rules:
 - Use ONLY links/URLs from the knowledge data. Never fabricate URLs
 - Shorter is better. 3-5 sentences for most answers. Cut anything that doesn't spark interest or help them act
 - FORMAT: No headings, no numbered lists (except recipes), no bold labels. Flowing sentences and short bullet lists (3 items max) only
-- If the user asked for a recommendation and you are in the Matcha Finder flow, follow the step flow. Include [CHOICES] tags. In Step 3, include [PRODUCT:handle] tag
+{matcha_finder_instruction}
 </instructions>
 {suggestion_block}"""
 
@@ -491,7 +491,7 @@ _RAG_CONSUMER_JA = """<knowledge>
 - 知識データ内のURL/リンクのみ。捏造しない
 - 3〜5文が目安。短い方がほぼ常に良い
 - FORMAT: NEVER use headings, numbered lists (except recipes), or bold labels. 自然な文章と - リスト（3項目まで）のみ
-- CRITICAL: If the user asks for a recommendation or help choosing — do NOT recommend directly. Start Matcha Finder from STEP 1. Include [CHOICES] tags. ステップ3では [PRODUCT:handle] タグを含める
+{matcha_finder_instruction}
 </instructions>
 {suggestion_block}"""
 
@@ -579,17 +579,31 @@ _RAG_WHOLESALE_NO_CTX_JA = """<question>{question}</question>
 # ---------------------------------------------------------------------------
 # build_rag_prompt (public API)
 # ---------------------------------------------------------------------------
+# Matcha Finder instructions — context-dependent
+_MF_START_EN = "- If the user asked for a recommendation and you are in the Matcha Finder flow, follow the step flow. Include [CHOICES] tags"
+_MF_START_JA = "- CRITICAL: If the user asks for a recommendation or help choosing — do NOT recommend directly. Start Matcha Finder from STEP 1. Include [CHOICES] tags"
+_MF_STEP3_EN = "- You are in Matcha Finder STEP 3. Recommend ONE product with a compelling reason based on the knowledge above. Keep it to 2-3 sentences"
+_MF_STEP3_JA = "- あなたは抹茶ファインダーのステップ3にいます。上記の知識を使って1つの商品を2〜3文で温かくおすすめしてください"
+
+
 def build_rag_prompt(
     context: str,
     question: str,
     language: str = "en",
     source: str = "pwa",
+    matcha_finder_step: int = 0,
 ) -> str:
     suggestion_block = (
         _SUGGESTION_INSTRUCTION_JA if language == "ja" else _SUGGESTION_INSTRUCTION_EN
     )
 
     is_wholesale = source == "wholesale"
+
+    # Select Matcha Finder instruction based on step
+    if matcha_finder_step >= 3:
+        mf_instruction = _MF_STEP3_JA if language == "ja" else _MF_STEP3_EN
+    else:
+        mf_instruction = _MF_START_JA if language == "ja" else _MF_START_EN
 
     if context:
         if is_wholesale:
@@ -614,4 +628,5 @@ def build_rag_prompt(
         context=context,
         question=question,
         suggestion_block=suggestion_block,
+        matcha_finder_instruction=mf_instruction,
     )
