@@ -291,7 +291,15 @@
       }
     }
 
+    // Extract [PRODUCT:handle] tags
+    var prodResult = this.extractProducts(fullText);
+    fullText = prodResult.text;
     bubble.innerHTML = this.formatMarkdown(fullText);
+
+    // Product carousel
+    if (prodResult.handles.length > 0) {
+      this.fetchAndRenderProducts(prodResult.handles, msgDiv);
+    }
 
     // Choice buttons (Matcha Finder interactive options)
     if (choices.length > 0) {
@@ -478,6 +486,36 @@
       .catch(function () {
         card.classList.remove('nakai-chat__product-card--loading');
       });
+  };
+
+  // ---- Extract [PRODUCT:handle] tags ----
+  NakaiChat.prototype.extractProducts = function (text) {
+    var re = /\[PRODUCT:([a-z0-9-]+)\]/gi; var handles = []; var m;
+    while ((m = re.exec(text)) !== null) handles.push(m[1]);
+    var cleaned = text.replace(/\[PRODUCT:[a-z0-9-]+\]/gi, '').trim();
+    return { handles: handles, text: cleaned };
+  };
+
+  NakaiChat.prototype.fetchAndRenderProducts = function (handles, parentEl) {
+    if (!handles.length) return;
+    var self = this;
+    var grid = document.createElement('div');
+    grid.className = 'nakai-chat__product-grid';
+    var lang = document.documentElement.lang || 'en';
+    handles.forEach(function (handle) {
+      var card = document.createElement('a');
+      card.className = 'nakai-chat__product-card nakai-chat__product-card--loading';
+      card.href = SHOP_URL + '/products/' + handle;
+      card.target = '_blank'; card.rel = 'noopener';
+      card.innerHTML = '<div class="nakai-chat__product-card-img"></div>'
+        + '<div class="nakai-chat__product-card-body">'
+        + '<div class="nakai-chat__product-card-title" style="height:2.6em;background:rgba(61,97,66,.04);border-radius:4px"></div>'
+        + '</div>';
+      grid.appendChild(card);
+      self.fetchProductCard(handle, card);
+    });
+    parentEl.appendChild(grid);
+    self.scrollToBottom();
   };
 
   // ---- Retry Binding ----
@@ -682,9 +720,10 @@
       .replace(/^\t+/gm, '')
       // Clean up excessive blank lines
       .replace(/\n{3,}/g, '\n\n')
-      .replace(/\n/g, '<br>')
+      .replace(/\n\n+/g, '<br>')
+      .replace(/\n/g, ' ')
       // Clean up excessive br tags
-      .replace(/(<br>){3,}/g, '<br><br>')
+      .replace(/(<br>){3,}/g, '<br>')
       // Remove leading/trailing br
       .replace(/^(<br>)+/, '')
       .replace(/(<br>)+$/, '');

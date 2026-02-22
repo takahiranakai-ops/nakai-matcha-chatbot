@@ -128,8 +128,9 @@ WIDGET_JS = r"""
       .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
       .replace(/^\t+/gm, '')
       .replace(/\n{3,}/g, '\n\n')
-      .replace(/\n/g, '<br>')
-      .replace(/(<br>){3,}/g, '<br><br>')
+      .replace(/\n\n+/g, '<br>')
+      .replace(/\n/g, ' ')
+      .replace(/(<br>){3,}/g, '<br>')
       .replace(/^(<br>)+/, '')
       .replace(/(<br>)+$/, '');
   }
@@ -137,6 +138,43 @@ WIDGET_JS = r"""
   function scrollToBottom() {
     var mc = $('nakai-chat-messages');
     if (mc) mc.scrollTop = mc.scrollHeight;
+  }
+
+  function extractProducts(text) {
+    var re = /\[PRODUCT:([a-z0-9-]+)\]/gi; var handles = []; var m;
+    while ((m = re.exec(text)) !== null) handles.push(m[1]);
+    var cleaned = text.replace(/\[PRODUCT:[a-z0-9-]+\]/gi, '').trim();
+    return { handles: handles, text: cleaned };
+  }
+
+  function fetchAndRenderProducts(handles, parentEl) {
+    if (!handles.length) return;
+    var carousel = document.createElement('div');
+    carousel.className = 'nakai-chat__product-grid';
+    handles.forEach(function(handle) {
+      var card = document.createElement('a');
+      card.className = 'nakai-chat__product-card';
+      card.href = SHOP_URL + '/products/' + handle;
+      card.target = '_blank'; card.rel = 'noopener';
+      card.innerHTML = '<div class="nakai-chat__product-card-img" style="background:linear-gradient(90deg,rgba(61,97,66,.04) 25%,rgba(61,97,66,.08) 50%,rgba(61,97,66,.04) 75%);background-size:200% 100%;animation:nakaiShimmer 1.5s infinite"></div><div class="nakai-chat__product-card-body"><div class="nakai-chat__product-card-title" style="height:2.6em;background:rgba(61,97,66,.04);border-radius:4px"></div></div>';
+      carousel.appendChild(card);
+      fetch('https://nakaimatcha.com/products/' + handle + '.json')
+        .then(function(r) { if (!r.ok) throw new Error('err'); return r.json(); })
+        .then(function(data) {
+          var p = data.product;
+          var img = p.images && p.images.length ? p.images[0].src : '';
+          var price = p.variants && p.variants.length ? p.variants[0].price : '';
+          card.innerHTML = (img ? '<img class="nakai-chat__product-card-img" src="' + img + '" alt="' + escapeHtml(p.title) + '" loading="lazy">' : '<div class="nakai-chat__product-card-img"></div>')
+            + '<div class="nakai-chat__product-card-body">'
+            + '<div class="nakai-chat__product-card-title">' + escapeHtml(p.title) + '</div>'
+            + (price ? '<div class="nakai-chat__product-card-price">AED ' + price + '</div>' : '')
+            + '<div style="font-size:.7rem;font-weight:500;color:var(--nc-g1);margin-top:4px">' + (PAGE_LANG === 'ja' ? '商品を見る →' : 'View Product →') + '</div>'
+            + '</div>';
+        })
+        .catch(function() { card.querySelector('.nakai-chat__product-card-title').textContent = PAGE_LANG === 'ja' ? '商品を見る' : 'View Product'; });
+    });
+    parentEl.appendChild(carousel);
+    scrollToBottom();
   }
 
   // ---- Inject CSS ----
@@ -337,7 +375,15 @@ WIDGET_JS = r"""
       }
     }
 
+    // Extract [PRODUCT:handle] tags
+    var prodResult = extractProducts(fullText);
+    fullText = prodResult.text;
     bubble.innerHTML = formatMarkdown(fullText);
+
+    // Product carousel
+    if (prodResult.handles.length > 0) {
+      fetchAndRenderProducts(prodResult.handles, msgDiv);
+    }
 
     // Choice buttons
     if (choices.length > 0) {
@@ -779,7 +825,7 @@ WIDGET_JS = r"""
 .nakai-chat__message--bot .nakai-chat__message-row{display:flex;align-items:flex-start;gap:10px}
 .nakai-chat__avatar{width:26px;height:26px;border-radius:10px;flex-shrink:0;margin-top:1px;background:linear-gradient(145deg,rgba(61,97,66,.08),rgba(123,160,109,.06));border:1px solid var(--nc-ln);display:flex;align-items:center;justify-content:center}
 .nakai-chat__avatar svg{width:12px;height:12px;color:var(--nc-g2);opacity:.75}
-.nakai-chat__message--bot .nakai-chat__message-content{background:var(--nc-s2);color:var(--nc-tx);border-radius:4px 20px 20px 20px;padding:12px 15px;font-size:1.05rem;font-weight:400;line-height:1.65;letter-spacing:.008em;word-wrap:break-word}
+.nakai-chat__message--bot .nakai-chat__message-content{background:var(--nc-s2);color:var(--nc-tx);border-radius:4px 20px 20px 20px;padding:12px 15px;font-size:1.05rem;font-weight:400;line-height:1.55;letter-spacing:.008em;word-wrap:break-word}
 .nakai-chat__message--user .nakai-chat__message-content{background:linear-gradient(145deg,#4A7350,var(--nc-g1));color:rgba(255,255,255,.94);border-radius:20px 20px 4px 20px;padding:12px 15px;font-size:1.05rem;font-weight:400;line-height:1.65;letter-spacing:.008em;word-wrap:break-word;box-shadow:0 2px 12px rgba(61,97,66,.1),inset 0 1px 0 rgba(255,255,255,.06)}
 .nakai-chat__message-content a{color:var(--nc-g3);text-decoration:none;font-weight:450;background:linear-gradient(to right,var(--nc-g2),var(--nc-g2)) no-repeat 0 100%/100% 1px;transition:all .3s var(--nc-e);padding-bottom:1px}
 .nakai-chat__message-content a:hover{color:var(--nc-g1);background-size:100% 1.5px}
@@ -898,7 +944,7 @@ WIDGET_JS = r"""
   .nakai-chat--open .nakai-chat__panel{transform:translateY(0)}
   .nakai-chat--open .nakai-chat__toggle{display:none}
   .nakai-chat__messages{padding:16px}
-  .nakai-chat__message--bot .nakai-chat__message-content,.nakai-chat__message--user .nakai-chat__message-content{font-size:1.05rem;line-height:1.6;padding:10px 14px}
+  .nakai-chat__message--bot .nakai-chat__message-content,.nakai-chat__message--user .nakai-chat__message-content{font-size:1.05rem;line-height:1.55;padding:10px 14px}
   .nakai-chat__ai-intro{font-size:.85rem;padding:6px 10px;margin:0 0 10px}
   .nakai-chat__quick-actions{padding-left:36px;gap:5px}
   .nakai-chat__quick-btn{font-size:.88rem;padding:6px 12px}

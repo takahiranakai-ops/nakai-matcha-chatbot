@@ -390,7 +390,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-msg{{display:flex;flex-direction:column;animation:ncMsgIn .5s var(--ease) both}}
 @keyframes ncMsgIn{{from{{opacity:0;transform:translateY(8px) scale(.98)}}to{{opacity:1;transform:translateY(0) scale(1)}}}}
 .nc-msg--bot{{align-items:flex-start;padding-right:48px}}
-.nc-msg--bot .nc-msg__bubble{{background:var(--white);border-radius:20px 20px 20px 6px;padding:18px 22px;font-size:.88rem;font-weight:400;line-height:1.85;color:var(--green);box-shadow:var(--shadow-s)}}
+.nc-msg--bot .nc-msg__bubble{{background:var(--white);border-radius:20px 20px 20px 6px;padding:14px 18px;font-size:.88rem;font-weight:400;line-height:1.55;color:var(--green);box-shadow:var(--shadow-s)}}
 .nc-msg__bubble a{{color:var(--green);font-weight:500;text-decoration:underline;text-decoration-color:var(--g12);text-underline-offset:3px;transition:text-decoration-color .3s}}
 .nc-msg__bubble a:hover{{text-decoration-color:var(--green)}}
 .nc-msg__bubble strong{{font-weight:600}}
@@ -410,6 +410,17 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-choice-btn:hover{{background:var(--green);color:#fff}}
 .nc-choice-btn--selected{{background:var(--green);color:#fff}}
 .nc-choice-btn--disabled{{opacity:.45;pointer-events:none}}
+.nc-product-carousel{{margin-top:12px;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:2px 0 6px;scrollbar-width:none}}
+.nc-product-carousel::-webkit-scrollbar{{display:none}}
+.nc-product-card{{flex:0 0 150px;scroll-snap-align:start;border-radius:14px;background:var(--white);box-shadow:var(--shadow-s);overflow:hidden;cursor:pointer;transition:all .3s var(--ease);text-decoration:none;color:inherit;display:block}}
+.nc-product-card:hover{{box-shadow:var(--shadow-m);transform:translateY(-2px)}}
+.nc-product-card__img{{width:100%;height:110px;object-fit:cover;background:linear-gradient(145deg,var(--g03),var(--g06));display:block}}
+.nc-product-card__body{{padding:10px 12px}}
+.nc-product-card__name{{font-size:.72rem;font-weight:500;color:var(--green);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.nc-product-card__price{{font-size:.68rem;font-weight:600;color:var(--g50);margin-top:4px}}
+.nc-product-card__cta{{font-size:.62rem;font-weight:500;color:var(--green);margin-top:6px;letter-spacing:.04em}}
+.nc-product-card--loading .nc-product-card__img{{background:linear-gradient(90deg,var(--g03) 25%,var(--g06) 50%,var(--g03) 75%);background-size:200% 100%;animation:ncShimmer 1.5s infinite}}
+@keyframes ncShimmer{{from{{background-position:200% 0}}to{{background-position:-200% 0}}}}
 .nc-msg__sources{{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}}
 .nc-msg__source{{font-size:.68rem;color:var(--green);text-decoration:none;background:var(--g03);border:none;border-radius:10px;padding:8px 14px;transition:background .4s var(--ease);-webkit-tap-highlight-color:transparent}}
 .nc-msg__source:hover{{background:var(--g06)}}
@@ -881,12 +892,49 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       .replace(/((?:<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>')
       .replace(/^\t+/gm,'')
       .replace(/\\n{{3,}}/g,'\\n\\n')
-      .replace(/\\n/g,'<br>')
-      .replace(/(<br>){{3,}}/g,'<br><br>')
+      .replace(/\\n\\n+/g,'<br>')
+      .replace(/\\n/g,' ')
+      .replace(/(<br>){{3,}}/g,'<br>')
       .replace(/^(<br>)+/,'')
       .replace(/(<br>)+$/,'');
   }}
   function scroll(){{var m=$('nc-messages');if(m)m.scrollTop=m.scrollHeight}}
+
+  function extractProducts(text){{
+    var re=/\[PRODUCT:([a-z0-9-]+)\]/gi;var handles=[];var m;
+    while((m=re.exec(text))!==null)handles.push(m[1]);
+    var cleaned=text.replace(/\[PRODUCT:[a-z0-9-]+\]/gi,'').trim();
+    return{{handles:handles,text:cleaned}};
+  }}
+
+  function fetchAndRenderProducts(handles,parentEl){{
+    if(!handles.length)return;
+    var carousel=document.createElement('div');carousel.className='nc-product-carousel';
+    handles.forEach(function(handle){{
+      var card=document.createElement('a');card.className='nc-product-card nc-product-card--loading';
+      card.href=SHOP+'/products/'+handle;card.target='_blank';card.rel='noopener';
+      card.innerHTML='<div class="nc-product-card__img"></div><div class="nc-product-card__body"><div class="nc-product-card__name" style="height:2.6em;background:var(--g03);border-radius:4px"></div></div>';
+      carousel.appendChild(card);
+      fetch('https://nakaimatcha.com/products/'+handle+'.json')
+        .then(function(r){{if(!r.ok)throw new Error('err');return r.json()}})
+        .then(function(data){{
+          var p=data.product;
+          var img=p.images&&p.images.length?p.images[0].src:'';
+          var price=p.variants&&p.variants.length?p.variants[0].price:'';
+          var currency='AED ';
+          card.classList.remove('nc-product-card--loading');
+          card.innerHTML=(img?'<img class="nc-product-card__img" src="'+img+'" alt="'+escapeHtml(p.title)+'" loading="lazy">':'<div class="nc-product-card__img"></div>')
+            +'<div class="nc-product-card__body">'
+            +'<div class="nc-product-card__name">'+escapeHtml(p.title)+'</div>'
+            +(price?'<div class="nc-product-card__price">'+currency+price+'</div>':'')
+            +'<div class="nc-product-card__cta">'+(lang==='ja'?'商品を見る →':'View Product →')+'</div>'
+            +'</div>';
+        }})
+        .catch(function(){{card.classList.remove('nc-product-card--loading');card.querySelector('.nc-product-card__name').textContent=(lang==='ja'?'商品を見る':'View Product')}});
+    }});
+    parentEl.appendChild(carousel);
+    scroll();
+  }}
 
   function addMsg(role,text,sources,suggestions){{
     sources=sources||[];suggestions=suggestions||[];var m=$('nc-messages');if(!m)return;
@@ -973,7 +1021,11 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
               /* Clean [CHOICES] block and extract options (handles **[CHOICES]** too) */
               var choices=[];var choiceM=fullText.match(/\*{{0,2}}\[CHOICES\]\*{{0,2}}/);
               if(choiceM){{var choiceEnd=fullText.match(/\*{{0,2}}\[\/CHOICES\]\*{{0,2}}/);if(choiceEnd){{var choiceStr=fullText.substring(choiceM.index+choiceM[0].length,choiceEnd.index).trim();choices=choiceStr.split('|').map(function(c){{return c.trim()}}).filter(Boolean);fullText=fullText.substring(0,choiceM.index).trim()+fullText.substring(choiceEnd.index+choiceEnd[0].length).trim()}}}}
+              /* Extract [PRODUCT:handle] tags */
+              var prodResult=extractProducts(fullText);fullText=prodResult.text;
               bubble.innerHTML=formatMd(fullText);
+              /* Render product carousel */
+              if(prodResult.handles.length>0){{fetchAndRenderProducts(prodResult.handles,d)}}
               /* Render choice buttons */
               if(choices.length>0){{var choiceDiv=document.createElement('div');choiceDiv.className='nc-choices';choices.forEach(function(txt){{var btn=document.createElement('button');btn.className='nc-choice-btn';btn.type='button';btn.textContent=txt;btn.addEventListener('click',function(){{$('nc-input').value=txt;sendMessage();choiceDiv.querySelectorAll('.nc-choice-btn').forEach(function(b){{b.disabled=true;b.classList.add('nc-choice-btn--disabled')}});btn.classList.add('nc-choice-btn--selected')}});choiceDiv.appendChild(btn)}});d.appendChild(choiceDiv)}}
               chatHistory.push({{role:'assistant',content:fullText}});saveHistory();
