@@ -64,6 +64,27 @@ def _inject_product_tags(response: str, conversation_history: Optional[List[Dict
     return response
 
 
+_CHOICES_BLOCK_RE = re.compile(r"\s*\*{0,2}\[CHOICES\]\*{0,2}.*?\*{0,2}\[/CHOICES\]\*{0,2}\s*", re.DOTALL)
+_SUGGESTIONS_BLOCK_RE = re.compile(r"\s*\*{0,2}\[SUGGESTIONS\]\*{0,2}.*?(?:\*{0,2}\[/SUGGESTIONS\]\*{0,2}|$)", re.DOTALL)
+
+
+def _clean_history_for_llm(conversation_history: Optional[List[Dict]]) -> List[Dict]:
+    """Strip [CHOICES] and [SUGGESTIONS] blocks from history messages
+    to prevent the model from echoing them back."""
+    if not conversation_history:
+        return []
+    cleaned = []
+    for msg in conversation_history:
+        content = msg.get("content", "")
+        role = msg.get("role", "")
+        if role == "assistant":
+            content = _CHOICES_BLOCK_RE.sub("", content)
+            content = _SUGGESTIONS_BLOCK_RE.sub("", content)
+            content = content.strip()
+        cleaned.append({"role": role, "content": content})
+    return cleaned
+
+
 def _is_matcha_finder_mid_flow(conversation_history: Optional[List[Dict]]) -> bool:
     """Return True only when exactly 1 [CHOICES] exchange has occurred
     (step 1 answered, step 2 question needed). When 2+ [CHOICES] have
@@ -263,8 +284,8 @@ class RAGEngine:
 
         messages = [{"role": "system", "content": system_prompt}]
         if conversation_history:
-            # Include more history for better multi-turn understanding
-            messages.extend(conversation_history[-8:])
+            # Clean [CHOICES]/[SUGGESTIONS] from history to prevent echoing
+            messages.extend(_clean_history_for_llm(conversation_history[-8:]))
         messages.append({"role": "user", "content": rag_context})
 
         # 6. Generate response with tuned parameters
@@ -392,7 +413,7 @@ class RAGEngine:
 
         messages = [{"role": "system", "content": system_prompt}]
         if conversation_history:
-            messages.extend(conversation_history[-8:])
+            messages.extend(_clean_history_for_llm(conversation_history[-8:]))
         messages.append({"role": "user", "content": rag_context})
 
         # 5. Stream LLM response
