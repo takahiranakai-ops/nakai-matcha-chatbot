@@ -68,9 +68,20 @@ _CHOICES_BLOCK_RE = re.compile(r"\s*\*{0,2}\[CHOICES\]\*{0,2}.*?\*{0,2}\[/CHOICE
 _SUGGESTIONS_BLOCK_RE = re.compile(r"\s*\*{0,2}\[SUGGESTIONS\]\*{0,2}.*?(?:\*{0,2}\[/SUGGESTIONS\]\*{0,2}|$)", re.DOTALL)
 
 
+def _choices_to_text(match: re.Match) -> str:
+    """Convert [CHOICES]a|b|c[/CHOICES] to plain text options."""
+    inner = match.group(0)
+    # Extract the pipe-separated options
+    m = re.search(r"\[CHOICES\]\*{0,2}\s*(.*?)\s*\*{0,2}\[/CHOICES\]", inner, re.DOTALL)
+    if m:
+        options = [o.strip() for o in m.group(1).split("|") if o.strip()]
+        return "\n(Options: " + " / ".join(options) + ")"
+    return ""
+
+
 def _clean_history_for_llm(conversation_history: Optional[List[Dict]]) -> List[Dict]:
-    """Strip [CHOICES] and [SUGGESTIONS] blocks from history messages
-    to prevent the model from echoing them back."""
+    """Replace [CHOICES]/[SUGGESTIONS] blocks in history with plain text
+    to preserve context while preventing the model from echoing tags."""
     if not conversation_history:
         return []
     cleaned = []
@@ -78,7 +89,7 @@ def _clean_history_for_llm(conversation_history: Optional[List[Dict]]) -> List[D
         content = msg.get("content", "")
         role = msg.get("role", "")
         if role == "assistant":
-            content = _CHOICES_BLOCK_RE.sub("", content)
+            content = _CHOICES_BLOCK_RE.sub(_choices_to_text, content)
             content = _SUGGESTIONS_BLOCK_RE.sub("", content)
             content = content.strip()
         cleaned.append({"role": role, "content": content})
