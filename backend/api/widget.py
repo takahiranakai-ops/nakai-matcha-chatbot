@@ -112,19 +112,16 @@ WIDGET_JS = r"""
   function formatMarkdown(text) {
     if (!text) return '';
     return text
-      .replace(/^#{1,6}\s*.*$/gm, '')
+      .replace(/^#{1,6}\s+(.*?)$/gm, '<strong>$1</strong>')
       .replace(/^\s*-{3,}\s*$/gm, '')
       .replace(/^\s*\*{3,}\s*$/gm, '')
       .replace(/^\s*_{3,}\s*$/gm, '')
       .replace(/^\|.*\|$/gm, '')
-      .replace(/^\*\*[^*]+\*\*\s*$/gm, '')
-      .replace(/^\*\*[^*]+:\*\*\s*$/gm, '')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\[(.*?)\]\(\/(.*?)\)/g, '<a href="' + SHOP_URL + '/$2" target="_blank" rel="noopener">$1</a>')
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-      .replace(/^\* (.*?)$/gm, '- $1')
-      .replace(/^\d+\.\s+(.*?)$/gm, '- $1')
-      .replace(/^- (.*?)$/gm, '<li>$1</li>')
+      .replace(/^\s*[*+-]\s+(.*?)$/gm, '<li>$1</li>')
+      .replace(/^\d+\.\s+(.*?)$/gm, '<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
       .replace(/^\t+/gm, '')
       .replace(/\n{2,}/g, ' ')

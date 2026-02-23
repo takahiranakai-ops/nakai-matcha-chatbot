@@ -691,30 +691,24 @@
   NakaiChat.prototype.formatMarkdown = function (text) {
     if (!text) return '';
     return text
-      // Strip markdown headers (# ## ### #### etc)
-      .replace(/^#{1,6}\s*.*$/gm, '')
+      // Convert markdown headers to bold (fallback if model outputs them)
+      .replace(/^#{1,6}\s+(.*?)$/gm, '<strong>$1</strong>')
       // Strip horizontal rules (---, ***, ___)
       .replace(/^\s*-{3,}\s*$/gm, '')
       .replace(/^\s*\*{3,}\s*$/gm, '')
       .replace(/^\s*_{3,}\s*$/gm, '')
       // Strip table rows
       .replace(/^\|.*\|$/gm, '')
-      // Strip bold-only lines (pseudo-headers like "**Title**")
-      .replace(/^\*\*[^*]+\*\*\s*$/gm, '')
-      // Strip bold label lines (like "**Solution:**")
-      .replace(/^\*\*[^*]+:\*\*\s*$/gm, '')
       // Bold (inline)
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       // Relative links
       .replace(/\[(.*?)\]\(\/(.*?)\)/g, '<a href="' + SHOP_URL + '/$2" target="_blank" rel="noopener">$1</a>')
       // External links
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-      // Convert * bullets to - bullets
-      .replace(/^\* (.*?)$/gm, '- $1')
-      // Convert numbered lists to bullet lists
-      .replace(/^\d+\.\s+(.*?)$/gm, '- $1')
-      // Lists
-      .replace(/^- (.*?)$/gm, '<li>$1</li>')
+      // Convert all bullet styles (*, +, -) and numbered lists to <li>
+      .replace(/^\s*[*+-]\s+(.*?)$/gm, '<li>$1</li>')
+      .replace(/^\d+\.\s+(.*?)$/gm, '<li>$1</li>')
+      // Wrap consecutive <li> in <ul>
       .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
       // Strip tab indentation
       .replace(/^\t+/gm, '')
