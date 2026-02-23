@@ -76,6 +76,8 @@ _JA_FIXES = [
     ("抹 tea", "抹茶"), ("薄 tea", "薄茶"), ("濃 tea", "濃茶"),
     ("みるく", "ミルク"), ("らて", "ラテ"),
 ]
+# Buffer size for streaming fix — must be >= longest wrong pattern
+_JA_FIX_BUF = max(len(w) for w, _ in _JA_FIXES)
 
 
 def _fix_japanese(text: str) -> str:
@@ -148,6 +150,7 @@ async def chat_completion_stream(
         ) as response:
             response.raise_for_status()
             in_think = False
+            ja_buf = ""  # buffer for cross-chunk JA fix
             async for line in response.aiter_lines():
                 if not line.startswith("data: "):
                     continue
@@ -174,8 +177,18 @@ async def chat_completion_stream(
                 if not text:
                     continue
                 if language == "ja":
-                    text = _fix_japanese(text)
-                yield text
+                    # Buffer to catch patterns split across chunks
+                    ja_buf += text
+                    ja_buf = _fix_japanese(ja_buf)
+                    if len(ja_buf) > _JA_FIX_BUF:
+                        emit = ja_buf[:-_JA_FIX_BUF]
+                        ja_buf = ja_buf[-_JA_FIX_BUF:]
+                        yield emit
+                else:
+                    yield text
+            # Flush remaining JA buffer
+            if language == "ja" and ja_buf:
+                yield _fix_japanese(ja_buf)
     except httpx.TimeoutException as exc:
         raise RuntimeError("Streaming service timed out. Please try again.") from exc
     except httpx.HTTPStatusError as exc:

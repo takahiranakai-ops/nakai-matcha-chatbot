@@ -718,15 +718,14 @@
       .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
       // Strip tab indentation
       .replace(/^\t+/gm, '')
-      // Clean up excessive blank lines
-      .replace(/\n{3,}/g, '\n\n')
-      .replace(/\n\n+/g, '<br>')
+      // Collapse all newlines to spaces (compact flow)
+      .replace(/\n{2,}/g, ' ')
       .replace(/\n/g, ' ')
-      // Clean up excessive br tags
-      .replace(/(<br>){3,}/g, '<br>')
-      // Remove leading/trailing br
-      .replace(/^(<br>)+/, '')
-      .replace(/(<br>)+$/, '');
+      .replace(/ {2,}/g, ' ')
+      // Safety: collapse any stray br tags
+      .replace(/(<br>){2,}/g, '<br>')
+      .replace(/^(<br>| )+/, '')
+      .replace(/(<br>| )+$/, '');
   };
 
   NakaiChat.prototype.escapeHtml = function (text) {

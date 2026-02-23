@@ -394,8 +394,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .nc-msg__bubble a{{color:var(--green);font-weight:500;text-decoration:underline;text-decoration-color:var(--g12);text-underline-offset:3px;transition:text-decoration-color .3s}}
 .nc-msg__bubble a:hover{{text-decoration-color:var(--green)}}
 .nc-msg__bubble strong{{font-weight:600}}
-.nc-msg__bubble ul,.nc-msg__bubble ol{{margin:10px 0;padding-left:20px}}
-.nc-msg__bubble li{{margin:5px 0}}
+.nc-msg__bubble ul,.nc-msg__bubble ol{{margin:4px 0 2px;padding-left:18px;list-style:none}}
+.nc-msg__bubble li{{margin:1px 0;position:relative;padding-left:2px}}
+.nc-msg__bubble li::before{{content:'';position:absolute;left:-12px;top:.55em;width:4px;height:4px;border-radius:50%;background:var(--green);opacity:.45}}
 .nc-msg--user{{align-items:flex-end;padding-left:48px;margin-top:4px}}
 .nc-msg--user .nc-msg__bubble{{background:var(--green);color:var(--cream);border-radius:20px 20px 6px 20px;padding:14px 20px;font-size:.88rem;font-weight:400;line-height:1.7;box-shadow:0 2px 8px rgba(64,101,70,.15)}}
 .nc-msg--bot+.nc-msg--user,.nc-msg--user+.nc-msg--bot{{margin-top:16px}}
@@ -891,12 +892,12 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       .replace(/^- (.*?)$/gm,'<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>')
       .replace(/^\t+/gm,'')
-      .replace(/\\n{{3,}}/g,'\\n\\n')
-      .replace(/\\n\\n+/g,'<br>')
+      .replace(/\\n{{2,}}/g,' ')
       .replace(/\\n/g,' ')
-      .replace(/(<br>){{3,}}/g,'<br>')
-      .replace(/^(<br>)+/,'')
-      .replace(/(<br>)+$/,'');
+      .replace(/ {{2,}}/g,' ')
+      .replace(/(<br>){{2,}}/g,'<br>')
+      .replace(/^(<br>| )+/,'')
+      .replace(/(<br>| )+$/,'');
   }}
   function scroll(){{var m=$('nc-messages');if(m)m.scrollTop=m.scrollHeight}}
 
@@ -921,7 +922,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           var p=data.product;
           var img=p.images&&p.images.length?p.images[0].src:'';
           var price=p.variants&&p.variants.length?p.variants[0].price:'';
-          var currency='AED ';
+          var currency='$';
           card.classList.remove('nc-product-card--loading');
           card.innerHTML=(img?'<img class="nc-product-card__img" src="'+img+'" alt="'+escapeHtml(p.title)+'" loading="lazy">':'<div class="nc-product-card__img"></div>')
             +'<div class="nc-product-card__body">'

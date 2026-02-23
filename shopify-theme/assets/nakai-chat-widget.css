@@ -1295,7 +1295,7 @@
 
 /* ===== Markdown Lists in Messages ===== */
 .nakai-chat__message-content ul {
-  margin: 6px 0;
+  margin: 4px 0 2px;
   padding-left: 18px;
   list-style: none;
 }
@@ -1303,8 +1303,8 @@
 .nakai-chat__message-content li {
   position: relative;
   padding-left: 2px;
-  margin-bottom: 3px;
-  line-height: 1.55;
+  margin-bottom: 1px;
+  line-height: 1.5;
 }
 
 .nakai-chat__message-content li::before {

@@ -127,12 +127,12 @@ WIDGET_JS = r"""
       .replace(/^- (.*?)$/gm, '<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>')
       .replace(/^\t+/gm, '')
-      .replace(/\n{3,}/g, '\n\n')
-      .replace(/\n\n+/g, '<br>')
+      .replace(/\n{2,}/g, ' ')
       .replace(/\n/g, ' ')
-      .replace(/(<br>){3,}/g, '<br>')
-      .replace(/^(<br>)+/, '')
-      .replace(/(<br>)+$/, '');
+      .replace(/ {2,}/g, ' ')
+      .replace(/(<br>){2,}/g, '<br>')
+      .replace(/^(<br>| )+/, '')
+      .replace(/(<br>| )+$/, '');
   }
 
   function scrollToBottom() {
@@ -167,7 +167,7 @@ WIDGET_JS = r"""
           card.innerHTML = (img ? '<img class="nakai-chat__product-card-img" src="' + img + '" alt="' + escapeHtml(p.title) + '" loading="lazy">' : '<div class="nakai-chat__product-card-img"></div>')
             + '<div class="nakai-chat__product-card-body">'
             + '<div class="nakai-chat__product-card-title">' + escapeHtml(p.title) + '</div>'
-            + (price ? '<div class="nakai-chat__product-card-price">AED ' + price + '</div>' : '')
+            + (price ? '<div class="nakai-chat__product-card-price">$' + price + '</div>' : '')
             + '<div style="font-size:.7rem;font-weight:500;color:var(--nc-g1);margin-top:4px">' + (PAGE_LANG === 'ja' ? '商品を見る →' : 'View Product →') + '</div>'
             + '</div>';
         })
@@ -831,8 +831,8 @@ WIDGET_JS = r"""
 .nakai-chat__message-content a:hover{color:var(--nc-g1);background-size:100% 1.5px}
 .nakai-chat__message--user .nakai-chat__message-content a{color:rgba(255,255,255,.88);background-image:linear-gradient(to right,rgba(255,255,255,.3),rgba(255,255,255,.3))}
 .nakai-chat__message-content strong{font-weight:500}
-.nakai-chat__message-content ul{margin:6px 0;padding-left:18px;list-style:none}
-.nakai-chat__message-content li{position:relative;padding-left:2px;margin-bottom:3px;line-height:1.55}
+.nakai-chat__message-content ul{margin:4px 0 2px;padding-left:18px;list-style:none}
+.nakai-chat__message-content li{position:relative;padding-left:2px;margin-bottom:1px;line-height:1.5}
 .nakai-chat__message-content li::before{content:'';position:absolute;left:-12px;top:.6em;width:4px;height:4px;border-radius:50%;background:var(--nc-g2);opacity:.6}
 .nakai-chat__message--user .nakai-chat__message-content li::before{background:rgba(255,255,255,.5)}
 .nakai-chat__message-meta{display:flex;align-items:center;gap:6px;margin-top:5px;padding:0 0 0 36px}
