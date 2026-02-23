@@ -284,8 +284,10 @@ class RAGEngine:
             return _error_result
 
         # 3. Retrieve extra candidates for better filtering
+        # Wholesale product queries need more context for comprehensive specs
+        _max_chunks = 10 if "wholesale" in source else settings.max_context_chunks
         n_retrieve = min(
-            settings.max_context_chunks * _RETRIEVAL_MULTIPLIER,
+            _max_chunks * _RETRIEVAL_MULTIPLIER,
             max(self.vector_store.count(), 1),
         )
         try:
@@ -303,7 +305,7 @@ class RAGEngine:
         for result in results:
             if result["distance"] > _RELEVANCE_THRESHOLD:
                 continue
-            if len(context_texts) >= settings.max_context_chunks:
+            if len(context_texts) >= _max_chunks:
                 break
             context_texts.append(result["text"])
             url = result["metadata"].get("url")
@@ -417,8 +419,9 @@ class RAGEngine:
             yield ("done", {"sources": [], "suggestions": []})
             return
 
+        _max_chunks = 10 if "wholesale" in source else settings.max_context_chunks
         n_retrieve = min(
-            settings.max_context_chunks * _RETRIEVAL_MULTIPLIER,
+            _max_chunks * _RETRIEVAL_MULTIPLIER,
             max(self.vector_store.count(), 1),
         )
         try:
@@ -435,7 +438,7 @@ class RAGEngine:
         for result in results:
             if result["distance"] > _RELEVANCE_THRESHOLD:
                 continue
-            if len(context_texts) >= settings.max_context_chunks:
+            if len(context_texts) >= _max_chunks:
                 break
             context_texts.append(result["text"])
             url = result["metadata"].get("url")
