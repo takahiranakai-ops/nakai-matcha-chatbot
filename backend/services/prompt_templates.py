@@ -305,6 +305,15 @@ NAKAI's lineup — recommend by use case:
 - Quick fix: 2-3 sentences
 - Medium (product rec, recipe): 3-5 sentences
 - Complex (menu planning, full troubleshooting): up to 8 sentences
+- **Product Deep Dive** (when asked about a specific product number like 111, 101, etc.): provide COMPREHENSIVE detail. Include ALL of the following from the knowledge base:
+  - Grade, origin, cultivar composition, processing method
+  - Flavor profile with scores (e.g. Sweetness 4/5, Umami 3/5)
+  - Each cultivar's role and contribution to the blend
+  - Professional profile: why this matters for cafe operations (dispersibility, consistency, temperature behavior)
+  - Menu applications with specific serving suggestions (temperature, grams, format)
+  - Commercial data: stock availability, servings per 1,000g
+  - Terroir story: what makes the origin special
+  This is B2B — cafe owners need full specs to make purchasing decisions. Be thorough.
 - Lead with the practical answer. Every sentence should help them take action
 
 ## Product Scope (ABSOLUTE)
@@ -410,6 +419,15 @@ RIGHT（いつもこう）:
 - 簡単な修正：2〜3文
 - 中程度（商品、レシピ）：3〜5文
 - 複雑（メニュー計画）：最大8文
+- **商品ディープダイブ**（111、101等の特定商品について聞かれた時）：ナレッジベースから**包括的**に詳細を出す。以下すべてを含める：
+  - グレード、産地、品種構成、加工方法
+  - 風味プロファイルとスコア（例：甘み 4/5、旨み 3/5）
+  - 各品種の役割とブレンドへの貢献
+  - プロフェッショナル・プロファイル：カフェ運営で重要な特性（分散性、安定性、温度による変化）
+  - メニュー展開と具体的な提供方法（温度、グラム数、フォーマット）
+  - 商業データ：在庫状況、1,000gあたりの提供杯数
+  - テロワール：産地が特別な理由
+  B2Bの顧客は購買判断のためにフルスペックが必要。徹底的に
 - 実用的な回答から。すべての文が行動につながるように
 
 ## 取り扱い商品（絶対厳守）
@@ -532,8 +550,9 @@ Answer using the knowledge above. You're speaking to a cafe professional — be 
 - Relate to real cafe operations: consistency, speed, drink building
 - Problems: empathize briefly, then diagnose and fix
 - Use ONLY links/URLs from knowledge data. Never fabricate
-- 3-5 sentences for most answers. Every sentence should help them take action
-- FORMAT: No headings, no numbered lists, no bold labels. Plain sentences and - bullet lists (3 items max) only
+- PRODUCT DEEP DIVE: When asked about a SPECIFIC product (111, 101, 102, 103, 211, 212), provide FULL detail from the knowledge. Include: grade, origin, all cultivar names and their roles, flavor profile with scores, processing method, professional profile (dispersibility, temperature behavior, texture), menu applications with serving specs (temperature, grams), commercial data (stock availability, servings per 1,000g), and terroir story. B2B buyers need comprehensive specs. Use bullet lists to organize
+- For general questions: 3-5 sentences. For product deep dives: be thorough — include everything relevant from the knowledge
+- FORMAT: No headings, no numbered lists, no bold labels. Plain sentences and - bullet lists only
 </instructions>
 {suggestion_block}"""
 
@@ -550,8 +569,9 @@ _RAG_WHOLESALE_JA = """<knowledge>
 - カフェ業務に関連付ける：一貫性、スピード、ドリンク構成
 - 問題 → まず共感、次に原因と解決策
 - 知識データ内のURL/リンクのみ。捏造しない
-- 3〜5文が目安。すべての文が行動につながるように
-- FORMAT: NEVER use headings, numbered lists, or bold labels. 自然な文章と - リスト（3項目まで）のみ
+- **商品ディープダイブ**：特定の商品（111、101、102、103、211、212）について聞かれたら、知識から**すべての詳細**を出す。含める内容：グレード、産地、全品種名とその役割、風味プロファイル（スコア付き）、加工方法、プロフェッショナル・プロファイル（分散性、温度特性、テクスチャー）、メニュー展開（温度、グラム数）、商業データ（在庫、1,000gあたり杯数）、テロワールストーリー。B2Bバイヤーはフルスペックが必要。- リストで整理する
+- 一般的な質問：3〜5文。商品ディープダイブ：徹底的に。知識の関連情報はすべて含める
+- FORMAT: NEVER use headings, numbered lists, or bold labels. 自然な文章と - リストのみ
 </instructions>
 {suggestion_block}"""
 

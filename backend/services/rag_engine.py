@@ -331,9 +331,10 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 6. Generate response with tuned parameters
+        _max_tok = 1500 if "wholesale" in source else 800
         try:
             raw_response = await chat_completion(
-                messages, temperature=0.45, max_tokens=800, language=language
+                messages, temperature=0.45, max_tokens=_max_tok, language=language
             )
         except Exception as e:
             logger.error(f"Chat completion failed: {e}")
@@ -460,10 +461,11 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 5. Stream LLM response
+        _max_tok = 1500 if "wholesale" in source else 800
         full_response = []
         try:
             async for chunk in chat_completion_stream(
-                messages, temperature=0.45, max_tokens=800, language=language
+                messages, temperature=0.45, max_tokens=_max_tok, language=language
             ):
                 full_response.append(chunk)
                 yield ("text", chunk)
