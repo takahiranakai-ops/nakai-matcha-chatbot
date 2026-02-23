@@ -27,6 +27,15 @@ _SUGGESTIONS_RE = re.compile(
 # Detect Matcha Finder mid-flow: assistant's last message had [CHOICES]
 _CHOICES_RE = re.compile(r"\[CHOICES\]")
 
+# Detect a NEW recommendation/matcha-finder start request
+# (as opposed to a short step answer like "Totally new" or "ラテ")
+_RECOMMENDATION_START_RE = re.compile(
+    r"(find.*(matcha|right one)|recommend|help me (choose|pick|find)|which matcha|"
+    r"what matcha.*(should|for me|best)|best matcha|right matcha|matcha finder|"
+    r"おすすめ|探し|選んで|合った抹茶|どの抹茶|どれがいい|ぴったり)",
+    re.IGNORECASE,
+)
+
 # Product name → Shopify handle mapping for [PRODUCT] tag injection
 _PRODUCT_HANDLE_MAP = {
     "revi": "revi-organic-matcha-20g-ss-grade-plus",
@@ -96,8 +105,9 @@ def _clean_history_for_llm(conversation_history: Optional[List[Dict]]) -> List[D
     return cleaned
 
 
-def _matcha_finder_step(conversation_history: Optional[List[Dict]]) -> int:
-    """Return the current Matcha Finder step (0 if not in flow, 1-3 otherwise)."""
+def _matcha_finder_step(conversation_history: Optional[List[Dict]], current_message: str = "") -> int:
+    """Return the current Matcha Finder step (0 if not in flow, 1-3 otherwise).
+    If current_message is a new recommendation request, treat as fresh start (0)."""
     if not conversation_history:
         return 0
     choices_count = sum(
@@ -106,14 +116,21 @@ def _matcha_finder_step(conversation_history: Optional[List[Dict]]) -> int:
     )
     if choices_count == 0:
         return 0
+    # If user is starting a NEW recommendation request, reset the flow
+    if current_message and _RECOMMENDATION_START_RE.search(current_message):
+        return 0
     return choices_count + 1  # 1 CHOICES = step 2, 2 CHOICES = step 3
 
 
-def _is_matcha_finder_mid_flow(conversation_history: Optional[List[Dict]]) -> bool:
+def _is_matcha_finder_mid_flow(conversation_history: Optional[List[Dict]], current_message: str = "") -> bool:
     """Return True only when exactly 1 [CHOICES] exchange has occurred
     (step 1 answered, step 2 question needed). When 2+ [CHOICES] have
-    been sent, the model should recommend a product using RAG data."""
+    been sent, the model should recommend a product using RAG data.
+    Returns False if current_message is a new recommendation request."""
     if not conversation_history:
+        return False
+    # If user is restarting the flow, don't treat as mid-flow
+    if current_message and _RECOMMENDATION_START_RE.search(current_message):
         return False
     choices_count = sum(
         1 for msg in conversation_history
@@ -227,10 +244,10 @@ class RAGEngine:
             }
 
         # Matcha Finder mid-flow: skip RAG so model follows step flow
-        if _is_matcha_finder_mid_flow(conversation_history):
+        if _is_matcha_finder_mid_flow(conversation_history, msg_stripped):
             messages = [{"role": "system", "content": system_prompt}]
             if conversation_history:
-                messages.extend(conversation_history[-8:])
+                messages.extend(_clean_history_for_llm(conversation_history[-8:]))
             messages.append({"role": "user", "content": msg_stripped})
             try:
                 raw_response = await chat_completion(
@@ -294,7 +311,7 @@ class RAGEngine:
                 source_urls.add(url)
 
         # 5. Build messages — always use RAG prompt format
-        mf_step = _matcha_finder_step(conversation_history)
+        mf_step = _matcha_finder_step(conversation_history, msg_stripped)
         if context_texts:
             context = "\n---\n".join(context_texts)
             rag_context = build_rag_prompt(
@@ -365,10 +382,10 @@ class RAGEngine:
             return
 
         # Matcha Finder mid-flow: skip RAG, stream directly
-        if _is_matcha_finder_mid_flow(conversation_history):
+        if _is_matcha_finder_mid_flow(conversation_history, msg_stripped):
             messages = [{"role": "system", "content": system_prompt}]
             if conversation_history:
-                messages.extend(conversation_history[-8:])
+                messages.extend(_clean_history_for_llm(conversation_history[-8:]))
             messages.append({"role": "user", "content": msg_stripped})
             full_response = []
             try:
@@ -424,7 +441,7 @@ class RAGEngine:
             if url:
                 source_urls.add(url)
 
-        mf_step = _matcha_finder_step(conversation_history)
+        mf_step = _matcha_finder_step(conversation_history, msg_stripped)
         if context_texts:
             context = "\n---\n".join(context_texts)
             rag_context = build_rag_prompt(
