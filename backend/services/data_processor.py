@@ -218,7 +218,12 @@ def process_policy(policy: dict) -> list:
 
 
 def process_knowledge_file(filepath: str) -> list:
-    """Convert a plain-text knowledge base file into documents."""
+    """Convert a plain-text knowledge base file into documents.
+
+    If the file contains ``===`` section separators, each section is
+    chunked independently with a larger chunk window so that a single
+    product / topic stays inside one chunk wherever possible.
+    """
     from pathlib import Path
 
     path = Path(filepath)
@@ -230,6 +235,11 @@ def process_knowledge_file(filepath: str) -> list:
         return []
 
     title = path.stem.replace("_", " ").title()
+
+    # Section-aware chunking for files with === separators
+    if "\n===\n" in text or "\n===\n" in text.replace("\r\n", "\n"):
+        return _process_sectioned_knowledge(text, title)
+
     metadata = {
         "type": "knowledge",
         "title": title,
@@ -240,6 +250,46 @@ def process_knowledge_file(filepath: str) -> list:
         {"text": chunk, "metadata": metadata}
         for chunk in chunk_text(text)
     ]
+
+
+def _process_sectioned_knowledge(text: str, base_title: str) -> list:
+    """Process knowledge files with ``===`` section separators.
+
+    Each section is chunked independently with a generous window so that
+    a single product / topic fits in one chunk (typical wholesale product
+    entries are 400-700 words EN / 1500-2500 chars JA).
+    """
+    sections = re.split(r"\n*={3,}\n*", text)
+    docs: list[dict] = []
+    for section in sections:
+        section = section.strip()
+        if not section:
+            continue
+        # Use the first line as a section-specific title
+        first_line = section.split("\n", 1)[0].strip()
+        section_title = (
+            f"{base_title} — {first_line}" if first_line else base_title
+        )
+        metadata = {"type": "knowledge", "title": section_title, "url": ""}
+
+        # Larger chunk window to keep each product/section intact
+        if _is_cjk_heavy(section):
+            chunks = _chunk_by_chars(section, max_chars=4000, overlap_chars=200)
+        else:
+            words = section.split()
+            if len(words) <= 1500:
+                # Fits in one chunk — keep together
+                chunks = [section]
+            else:
+                # Very long section — fall back to default chunking
+                chunks = chunk_text(section)
+
+        for chunk in chunks:
+            # Prefix every chunk with the section title for better retrieval
+            prefixed = f"[{section_title}]\n{chunk}"
+            docs.append({"text": prefixed, "metadata": metadata})
+
+    return docs
 
 
 def process_knowledge_article(article: dict) -> list:

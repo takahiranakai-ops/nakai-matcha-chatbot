@@ -312,6 +312,15 @@ class RAGEngine:
             if url:
                 source_urls.add(url)
 
+        logger.info(
+            "RAG retrieval [%s/%s]: %d candidates -> %d chunks (max=%d, threshold=%.2f)",
+            source, language, len(results), len(context_texts),
+            _max_chunks, _RELEVANCE_THRESHOLD,
+        )
+        if "wholesale" in source and context_texts:
+            for i, ct in enumerate(context_texts):
+                logger.info("  chunk %d (%d chars): %.80s...", i, len(ct), ct.replace("\n", " "))
+
         # 5. Build messages — always use RAG prompt format
         mf_step = _matcha_finder_step(conversation_history, msg_stripped)
         if context_texts:
@@ -444,6 +453,11 @@ class RAGEngine:
             url = result["metadata"].get("url")
             if url:
                 source_urls.add(url)
+
+        logger.info(
+            "RAG stream [%s/%s]: %d candidates -> %d chunks (max=%d)",
+            source, language, len(results), len(context_texts), _max_chunks,
+        )
 
         mf_step = _matcha_finder_step(conversation_history, msg_stripped)
         if context_texts:

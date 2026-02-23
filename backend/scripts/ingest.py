@@ -70,7 +70,10 @@ async def run_ingestion(vector_store: VectorStore) -> int:
         print("Loading custom knowledge base...")
         before = len(all_documents)
         for txt_file in sorted(knowledge_dir.glob("*.txt")):
+            file_before = len(all_documents)
             all_documents.extend(process_knowledge_file(str(txt_file)))
+            file_chunks = len(all_documents) - file_before
+            print(f"    {txt_file.name}: {file_chunks} chunks")
         print(f"  -> {len(all_documents) - before} chunks from knowledge base")
 
     # 7. Supabase knowledge articles
