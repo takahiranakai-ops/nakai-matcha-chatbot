@@ -228,7 +228,7 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(
-                messages, temperature=0.6, max_tokens=500, language=language
+                messages, temperature=0.6, max_tokens=800, language=language
             )
             # Truncate after the first question mark to keep greetings short
             for end_char in ("？", "?"):
@@ -382,7 +382,7 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(
-                messages, temperature=0.6, max_tokens=500, language=language
+                messages, temperature=0.6, max_tokens=800, language=language
             )
             for end_char in ("\uff1f", "?"):
                 idx = response.find(end_char)
