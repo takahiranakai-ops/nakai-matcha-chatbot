@@ -54,7 +54,7 @@ MANIFEST_JSON = """{
 
 # ---- Service Worker ----
 SW_JS = """
-var CACHE_NAME='nakai-v1';
+var CACHE_NAME='nakai-v2';
 var PRECACHE=['/app','/manifest.json','/icon-192.png'];
 
 self.addEventListener('install',function(e){
@@ -1143,9 +1143,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   }}
 
   function boot(){{
-    checkInviteParam();
-    setLang(lang);
-    renderInviteSection();
+    try{{checkInviteParam()}}catch(e){{console.error('checkInviteParam error',e)}}
+    try{{setLang(lang)}}catch(e){{console.error('setLang error',e)}}
+    try{{renderInviteSection()}}catch(e){{console.error('renderInviteSection error',e)}}
     $('nc-form').addEventListener('submit',function(e){{e.preventDefault();sendMessage()}});
     $('nc-back').addEventListener('click',showHome);
     $('nc-home-form').addEventListener('submit',function(e){{e.preventDefault();var v=$('nc-home-input').value.trim();if(v)showChat(v)}});
@@ -1181,8 +1181,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     $('nc-sheet-copy').addEventListener('click',function(){{shareInvite(true)}});
     $('nc-coupon-copy').addEventListener('click',copyCouponCode);
     $('nc-coupon-dismiss').addEventListener('click',dismissCoupon);
-    loadHistory();
-    if(chatHistory.length>0)showChat();
+    try{{loadHistory();if(chatHistory.length>0)showChat()}}catch(e){{console.error('loadHistory error',e)}}
     if('serviceWorker' in navigator){{
       navigator.serviceWorker.getRegistrations().then(function(regs){{regs.forEach(function(r){{r.unregister()}})}});
       caches.keys().then(function(ks){{ks.forEach(function(k){{caches.delete(k)}})}});

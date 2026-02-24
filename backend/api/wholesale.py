@@ -1027,23 +1027,23 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     }});
   }}
 
+  function enterApp(){{
+    $('ws-gate').classList.add('ws-hidden');
+    $('ws-app').classList.remove('ws-hidden');
+    $('ws-app').classList.add('ws-active');
+    try{{initApp()}}catch(e){{console.error('initApp error',e)}}
+  }}
+
   function initLogin(){{
     /* Gate: check if already verified */
     if(sessionStorage.getItem('ws_partner_verified')){{
-      $('ws-gate').classList.add('ws-hidden');
-      $('ws-app').classList.remove('ws-hidden');
-      $('ws-app').classList.add('ws-active');
-      initApp();
+      enterApp();
       return;
     }}
-    /* Show gate */
-    setLang(lang);
+    /* Attach button handlers FIRST (before setLang which may fail) */
     $('ws-gate-yes').addEventListener('click',function(){{
       sessionStorage.setItem('ws_partner_verified','yes');
-      $('ws-gate').classList.add('ws-hidden');
-      $('ws-app').classList.remove('ws-hidden');
-      $('ws-app').classList.add('ws-active');
-      initApp();
+      enterApp();
     }});
     $('ws-gate-no').addEventListener('click',function(){{
       $('ws-gate-email').classList.add('ws-gate__email--show');
@@ -1056,16 +1056,15 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       sessionStorage.setItem('ws_partner_verified','interested');
       sessionStorage.setItem('ws_lead_email',email);
       fetch('/api/admin/wholesale/leads',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{email:email,session_id:SESSION_ID}})}}).catch(function(){{}});
-      $('ws-gate').classList.add('ws-hidden');
-      $('ws-app').classList.remove('ws-hidden');
-      $('ws-app').classList.add('ws-active');
-      initApp();
+      enterApp();
     }});
+    /* Now safe to set language (won't block buttons if it throws) */
+    try{{setLang(lang)}}catch(e){{console.error('setLang error',e)}}
   }}
 
   function initApp(){{
-    setLang(lang);
-    loadHistory();
+    try{{setLang(lang)}}catch(e){{console.error('initApp setLang error',e)}}
+    try{{loadHistory()}}catch(e){{console.error('loadHistory error',e)}}
     /* Forms */
     $('ws-form').addEventListener('submit',function(e){{e.preventDefault();sendMessage()}});
     $('ws-back').addEventListener('click',showHome);
