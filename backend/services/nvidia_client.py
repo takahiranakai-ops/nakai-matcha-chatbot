@@ -8,8 +8,9 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
-# Strip <think>...</think> blocks from reasoning models
+# Strip <think>...</think> blocks from reasoning models (also unclosed)
 _THINK_RE = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
+_THINK_UNCLOSED_RE = re.compile(r"<think>.*", re.DOTALL)
 
 # ── Shared HTTP client ──────────────────────────────────────
 _client: httpx.AsyncClient | None = None
@@ -90,7 +91,7 @@ def _fix_japanese(text: str) -> str:
 async def chat_completion(
     messages: list[dict],
     temperature: float = 0.45,
-    max_tokens: int = 800,
+    max_tokens: int = 1600,
     language: str = "en",
 ) -> str:
     """Get chat completion from NVIDIA NIM model."""
@@ -117,8 +118,9 @@ async def chat_completion(
     data = response.json()
     msg = data["choices"][0]["message"]
     content = msg.get("content") or msg.get("reasoning_content") or ""
-    # Strip <think> blocks from reasoning models
-    content = _THINK_RE.sub("", content).strip()
+    # Strip <think> blocks from reasoning models (closed and unclosed)
+    content = _THINK_RE.sub("", content)
+    content = _THINK_UNCLOSED_RE.sub("", content).strip()
     # Fix Japanese tokenization artifacts
     if language == "ja":
         content = _fix_japanese(content)
@@ -128,7 +130,7 @@ async def chat_completion(
 async def chat_completion_stream(
     messages: list[dict],
     temperature: float = 0.45,
-    max_tokens: int = 800,
+    max_tokens: int = 1600,
     language: str = "en",
 ):
     """Yield text chunks from NVIDIA NIM model via streaming."""
