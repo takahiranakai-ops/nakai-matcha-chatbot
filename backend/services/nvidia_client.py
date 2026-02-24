@@ -105,8 +105,7 @@ async def chat_completion(
                 "messages": messages,
                 "temperature": temperature,
                 "max_tokens": max_tokens,
-                "top_p": 0.92,
-                "frequency_penalty": 0.1,
+                "top_p": 0.85,
                 "stream": False,
             },
         )
@@ -145,8 +144,7 @@ async def chat_completion_stream(
                 "messages": messages,
                 "temperature": temperature,
                 "max_tokens": max_tokens,
-                "top_p": 0.92,
-                "frequency_penalty": 0.1,
+                "top_p": 0.85,
                 "stream": True,
             },
         ) as response:

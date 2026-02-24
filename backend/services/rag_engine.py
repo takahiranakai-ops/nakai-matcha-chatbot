@@ -228,7 +228,7 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(
-                messages, temperature=0.6, max_tokens=800, language=language
+                messages, temperature=0.6, max_tokens=600, language=language
             )
             # Truncate after the first question mark to keep greetings short
             for end_char in ("？", "?"):
@@ -251,7 +251,7 @@ class RAGEngine:
             messages.append({"role": "user", "content": msg_stripped})
             try:
                 raw_response = await chat_completion(
-                    messages, temperature=0.45, max_tokens=1200, language=language
+                    messages, temperature=0.45, max_tokens=900, language=language
                 )
             except Exception as e:
                 logger.error(f"Matcha Finder chat completion failed: {e}")
@@ -342,7 +342,7 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 6. Generate response with tuned parameters
-        _max_tok = 2500 if "wholesale" in source else 2000
+        _max_tok = 1800 if "wholesale" in source else 1400
         try:
             raw_response = await chat_completion(
                 messages, temperature=0.45, max_tokens=_max_tok, language=language
@@ -375,21 +375,20 @@ class RAGEngine:
         system_prompt = build_system_prompt(language=language, source=source)
         msg_stripped = user_message.strip()
 
-        # Greetings — skip RAG, non-streaming (fast enough)
+        # Greetings — skip RAG, stream for fast TTFT
         if _GREETING_RE.match(msg_stripped):
             messages = [{"role": "system", "content": system_prompt}]
             if conversation_history:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
-            response = await chat_completion(
-                messages, temperature=0.6, max_tokens=800, language=language
-            )
-            for end_char in ("\uff1f", "?"):
-                idx = response.find(end_char)
-                if idx != -1:
-                    response = response[: idx + 1]
-                    break
-            yield ("text", response.strip())
+            try:
+                async for chunk in chat_completion_stream(
+                    messages, temperature=0.6, max_tokens=600, language=language
+                ):
+                    yield ("text", chunk)
+            except Exception as e:
+                logger.error(f"Greeting streaming failed: {e}")
+                yield ("text", "Hi! How can I help you with matcha today?" if language == "en" else "こんにちは！抹茶について何でもお聞きください。")
             yield ("done", {"sources": [], "suggestions": []})
             return
 
@@ -402,7 +401,7 @@ class RAGEngine:
             full_response = []
             try:
                 async for chunk in chat_completion_stream(
-                    messages, temperature=0.45, max_tokens=1200, language=language
+                    messages, temperature=0.45, max_tokens=900, language=language
                 ):
                     full_response.append(chunk)
                     yield ("text", chunk)
@@ -478,7 +477,7 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 5. Stream LLM response
-        _max_tok = 2500 if "wholesale" in source else 2000
+        _max_tok = 1800 if "wholesale" in source else 1400
         full_response = []
         try:
             async for chunk in chat_completion_stream(
