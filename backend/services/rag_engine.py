@@ -228,7 +228,7 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(
-                messages, temperature=0.6, max_tokens=80, language=language
+                messages, temperature=0.6, max_tokens=500, language=language
             )
             # Truncate after the first question mark to keep greetings short
             for end_char in ("？", "?"):
@@ -251,7 +251,7 @@ class RAGEngine:
             messages.append({"role": "user", "content": msg_stripped})
             try:
                 raw_response = await chat_completion(
-                    messages, temperature=0.45, max_tokens=400, language=language
+                    messages, temperature=0.45, max_tokens=1200, language=language
                 )
             except Exception as e:
                 logger.error(f"Matcha Finder chat completion failed: {e}")
@@ -342,7 +342,7 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 6. Generate response with tuned parameters
-        _max_tok = 1500 if "wholesale" in source else 800
+        _max_tok = 2500 if "wholesale" in source else 2000
         try:
             raw_response = await chat_completion(
                 messages, temperature=0.45, max_tokens=_max_tok, language=language
@@ -382,7 +382,7 @@ class RAGEngine:
                 messages.extend(conversation_history[-6:])
             messages.append({"role": "user", "content": msg_stripped})
             response = await chat_completion(
-                messages, temperature=0.6, max_tokens=80, language=language
+                messages, temperature=0.6, max_tokens=500, language=language
             )
             for end_char in ("\uff1f", "?"):
                 idx = response.find(end_char)
@@ -402,7 +402,7 @@ class RAGEngine:
             full_response = []
             try:
                 async for chunk in chat_completion_stream(
-                    messages, temperature=0.45, max_tokens=400, language=language
+                    messages, temperature=0.45, max_tokens=1200, language=language
                 ):
                     full_response.append(chunk)
                     yield ("text", chunk)
@@ -478,7 +478,7 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 5. Stream LLM response
-        _max_tok = 1500 if "wholesale" in source else 800
+        _max_tok = 2500 if "wholesale" in source else 2000
         full_response = []
         try:
             async for chunk in chat_completion_stream(
