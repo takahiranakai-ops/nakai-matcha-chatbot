@@ -200,6 +200,5 @@ async def refresh(
         if _refresh_running:
             return RefreshResponse(status="already_running", documents_indexed=vector_store.count())
         _refresh_running = True
-
-    asyncio.create_task(_run_ingestion_background())
+        asyncio.create_task(_run_ingestion_background())
     return RefreshResponse(status="started", documents_indexed=vector_store.count())

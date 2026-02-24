@@ -922,10 +922,10 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           var price=p.variants&&p.variants.length?p.variants[0].price:'';
           var currency='$';
           card.classList.remove('nc-product-card--loading');
-          card.innerHTML=(img?'<img class="nc-product-card__img" src="'+img+'" alt="'+escapeHtml(p.title)+'" loading="lazy">':'<div class="nc-product-card__img"></div>')
+          card.innerHTML=(img?'<img class="nc-product-card__img" src="'+escapeHtml(img)+'" alt="'+escapeHtml(p.title)+'" loading="lazy">':'<div class="nc-product-card__img"></div>')
             +'<div class="nc-product-card__body">'
             +'<div class="nc-product-card__name">'+escapeHtml(p.title)+'</div>'
-            +(price?'<div class="nc-product-card__price">'+currency+price+'</div>':'')
+            +(price?'<div class="nc-product-card__price">'+currency+escapeHtml(price)+'</div>':'')
             +'<div class="nc-product-card__cta">'+(lang==='ja'?'商品を見る →':'View Product →')+'</div>'
             +'</div>';
         }})
