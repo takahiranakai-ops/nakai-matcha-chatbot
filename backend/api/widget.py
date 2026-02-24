@@ -194,15 +194,11 @@ WIDGET_JS = r"""
 
   function WIDGET_HTML() {
     return '<div id="nakai-chat-widget" class="nakai-chat">'
-      + '<button id="nakai-chat-toggle" class="nakai-chat__toggle" aria-label="NAKAI Concierge AI" aria-expanded="false">'
+      + '<button id="nakai-chat-toggle" class="nakai-chat__toggle" aria-label="Find My Matcha AI" aria-expanded="false">'
       +   '<div class="nakai-chat__toggle-body">'
-      +     '<span class="nakai-chat__toggle-dot"></span>'
-      +     '<svg class="nakai-chat__toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
-      +     '<div class="nakai-chat__toggle-text">'
-      +       '<span class="nakai-chat__toggle-label">Nakai Concierge</span>'
-      +       '<span class="nakai-chat__toggle-sep"></span>'
-      +       '<span class="nakai-chat__toggle-ai">' + STAR_SVG + ' AI</span>'
-      +     '</div>'
+      +     '<span class="nakai-chat__toggle-label">FIND MY MATCHA</span>'
+      +     '<span class="nakai-chat__toggle-sep"></span>'
+      +     '<span class="nakai-chat__toggle-ai">by AI</span>'
       +   '</div>'
       +   '<div class="nakai-chat__toggle-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></div>'
       + '</button>'
@@ -778,26 +774,20 @@ WIDGET_JS = r"""
   var WIDGET_CSS = `
 .nakai-chat{--nc-g1:#3D6142;--nc-g2:#7BA06D;--nc-g3:#5B8A52;--nc-tp:#9E8471;--nc-sd:#ECDDC7;--nc-pm:#F5EDE1;--nc-bg:#FFF;--nc-s0:#FAFAF6;--nc-s1:#FFF;--nc-s2:rgba(61,97,66,.028);--nc-tx:#161614;--nc-t2:#7A766D;--nc-t3:#B0AAA0;--nc-ln:rgba(61,97,66,.07);--nc-ln2:rgba(61,97,66,.12);--nc-sh:0 0 0 .5px rgba(0,0,0,.03),0 24px 80px -16px rgba(61,97,66,.13),0 8px 24px -12px rgba(0,0,0,.05);--nc-sh2:0 0 0 .5px rgba(0,0,0,.02),0 1px 4px rgba(61,97,66,.04);--nc-rr:9999px;--nc-e:cubic-bezier(.22,1,.36,1);--nc-es:cubic-bezier(.34,1.4,.64,1);--nc-eo:cubic-bezier(.16,1,.3,1);position:fixed;bottom:32px;right:32px;z-index:9990;font-family:'Work Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .nakai-chat *,.nakai-chat *::before,.nakai-chat *::after{box-sizing:border-box;margin:0;padding:0}
-.nakai-chat__toggle{height:48px;border-radius:var(--nc-rr);border:none;cursor:pointer;display:flex;align-items:center;gap:0;background:linear-gradient(145deg,#4A7350 0%,var(--nc-g1) 50%,#325238 100%);color:rgba(255,255,255,.92);box-shadow:var(--nc-sh),inset 0 1px 0 rgba(255,255,255,.1);transition:all .5s var(--nc-es);position:relative;overflow:hidden;padding:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.nakai-chat__toggle::before{content:'';position:absolute;top:-30%;left:-10%;width:50%;height:60%;background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 70%);pointer-events:none}
-.nakai-chat__toggle::after{content:'';position:absolute;inset:0;border-radius:var(--nc-rr);box-shadow:inset 0 -2px 4px rgba(0,0,0,.08);pointer-events:none}
-.nakai-chat:not(.nakai-chat--open) .nakai-chat__toggle{animation:nakaiBreathe 4s ease-in-out infinite}
-@keyframes nakaiBreathe{0%,100%{box-shadow:0 0 0 .5px rgba(0,0,0,.03),0 24px 80px -16px rgba(61,97,66,.13),0 8px 24px -12px rgba(0,0,0,.05),inset 0 1px 0 rgba(255,255,255,.1)}50%{box-shadow:0 0 0 .5px rgba(0,0,0,.03),0 28px 88px -16px rgba(61,97,66,.18),0 10px 28px -12px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.1)}}
-.nakai-chat__toggle:hover{transform:translateY(-2px);box-shadow:0 0 0 .5px rgba(0,0,0,.03),0 28px 88px -12px rgba(61,97,66,.22),0 12px 32px -8px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.1)}
-.nakai-chat__toggle:active{transform:translateY(0) scale(.97);transition-duration:.12s}
-.nakai-chat__toggle-body{display:flex;align-items:center;gap:12px;padding:0 20px 0 16px;height:100%;position:relative;z-index:1}
-.nakai-chat__toggle-icon{width:20px;height:20px;flex-shrink:0;opacity:.85;filter:drop-shadow(0 1px 2px rgba(0,0,0,.1))}
-.nakai-chat__toggle-text{display:flex;align-items:center;gap:8px;line-height:1;white-space:nowrap}
-.nakai-chat__toggle-label{font-size:1.05rem;font-weight:400;letter-spacing:.14em;text-transform:uppercase;opacity:.88}
-.nakai-chat__toggle-sep{width:1px;height:16px;background:rgba(255,255,255,.12);flex-shrink:0}
-.nakai-chat__toggle-ai{display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.08);border-radius:var(--nc-rr);padding:3px 8px 3px 6px;font-size:.9rem;font-weight:450;letter-spacing:.08em;color:rgba(255,255,255,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.nakai-chat__toggle-ai svg{width:9px;height:9px;opacity:.8}
-.nakai-chat__toggle-dot{width:5px;height:5px;border-radius:var(--nc-rr);background:#7ED67E;box-shadow:0 0 6px rgba(126,214,126,.5);flex-shrink:0;animation:nakaiPulse 3s ease-in-out infinite}
-.nakai-chat__toggle-close{display:none;width:48px;height:48px;align-items:center;justify-content:center}
+.nakai-chat__toggle{height:44px;border-radius:var(--nc-rr);border:none;cursor:pointer;display:flex;align-items:center;gap:0;background:var(--nc-g1);color:rgba(255,255,255,.95);box-shadow:0 2px 12px rgba(61,97,66,.25),0 0 0 0 rgba(61,97,66,0);transition:all .4s var(--nc-e);position:relative;overflow:hidden;padding:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.nakai-chat:not(.nakai-chat--open) .nakai-chat__toggle{animation:nakaiGlow 3s ease-in-out infinite}
+@keyframes nakaiGlow{0%,100%{box-shadow:0 2px 12px rgba(61,97,66,.25),0 0 0 0 rgba(126,214,126,0)}50%{box-shadow:0 2px 16px rgba(61,97,66,.35),0 0 0 4px rgba(126,214,126,.15)}}
+.nakai-chat__toggle:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(61,97,66,.35),0 0 0 4px rgba(126,214,126,.18)}
+.nakai-chat__toggle:active{transform:translateY(0) scale(.97);transition-duration:.1s}
+.nakai-chat__toggle-body{display:flex;align-items:center;gap:0;padding:0 18px;height:100%;position:relative;z-index:1}
+.nakai-chat__toggle-label{font-size:.82rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
+.nakai-chat__toggle-sep{width:1px;height:14px;background:rgba(255,255,255,.18);flex-shrink:0;margin:0 10px}
+.nakai-chat__toggle-ai{font-size:.72rem;font-weight:400;letter-spacing:.1em;color:rgba(255,255,255,.6)}
+.nakai-chat__toggle-close{display:none;width:44px;height:44px;align-items:center;justify-content:center}
 .nakai-chat__toggle-close svg{width:14px;height:14px;stroke-width:2}
 .nakai-chat--open .nakai-chat__toggle-body{display:none}
 .nakai-chat--open .nakai-chat__toggle-close{display:flex}
-.nakai-chat--open .nakai-chat__toggle{width:48px;padding:0}
+.nakai-chat--open .nakai-chat__toggle{width:44px;padding:0}
 .nakai-chat__panel{position:absolute;bottom:calc(48px + 16px);right:0;width:380px;height:620px;background:var(--nc-s1);border:1px solid var(--nc-ln);border-radius:28px;box-shadow:var(--nc-sh);display:flex;flex-direction:column;overflow:hidden;opacity:0;transform:translateY(12px) scale(.92);pointer-events:none;transition:opacity .45s var(--nc-eo),transform .55s var(--nc-es)}
 .nakai-chat--open .nakai-chat__panel{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
 .nakai-chat__header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:linear-gradient(180deg,#436E48 0%,var(--nc-g1) 100%);color:rgba(255,255,255,.92);flex-shrink:0;position:relative;box-shadow:0 1px 0 rgba(0,0,0,.06)}
@@ -908,10 +898,9 @@ WIDGET_JS = r"""
 .nakai-chat__retry-btn{font-family:'Work Sans',sans-serif;font-size:.82rem;font-weight:450;color:var(--nc-g1);background:transparent;border:1px solid var(--nc-ln2);border-radius:var(--nc-rr);padding:5px 12px;cursor:pointer;align-self:flex-start;transition:all .3s var(--nc-e);touch-action:manipulation}
 .nakai-chat__retry-btn:hover{background:var(--nc-g1);color:#fff;border-color:var(--nc-g1)}
 [data-scheme="dark"] .nakai-chat{--nc-bg:#0C0E0C;--nc-s0:#131513;--nc-s1:#181B18;--nc-s2:rgba(123,160,109,.04);--nc-tx:#E4E5E0;--nc-t2:#7D807A;--nc-t3:#4E514A;--nc-ln:rgba(255,255,255,.04);--nc-ln2:rgba(255,255,255,.07);--nc-sh:0 0 0 .5px rgba(255,255,255,.03),0 24px 80px -16px rgba(0,0,0,.7);--nc-sh2:0 1px 4px rgba(0,0,0,.3)}
-[data-scheme="dark"] .nakai-chat__toggle{background:linear-gradient(145deg,#8FB87C,var(--nc-g2),#6A9960);color:#0C0E0C;box-shadow:var(--nc-sh),inset 0 1px 0 rgba(255,255,255,.12)}
-[data-scheme="dark"] .nakai-chat__toggle-ai{background:rgba(0,0,0,.15);border-color:rgba(0,0,0,.1);color:rgba(12,14,12,.65)}
-[data-scheme="dark"] .nakai-chat__toggle-sep{background:rgba(0,0,0,.1)}
-[data-scheme="dark"] .nakai-chat__toggle-dot{background:#2D5A2D;box-shadow:0 0 6px rgba(45,90,45,.4)}
+[data-scheme="dark"] .nakai-chat__toggle{background:var(--nc-g2);color:#0C0E0C;box-shadow:0 2px 12px rgba(123,160,109,.3),0 0 0 0 rgba(123,160,109,0)}
+[data-scheme="dark"] .nakai-chat__toggle-ai{color:rgba(12,14,12,.5)}
+[data-scheme="dark"] .nakai-chat__toggle-sep{background:rgba(0,0,0,.12)}
 [data-scheme="dark"] .nakai-chat__header{background:linear-gradient(180deg,#1C201C,#151815);box-shadow:0 1px 0 rgba(255,255,255,.03)}
 [data-scheme="dark"] .nakai-chat__header::before{background:rgba(255,255,255,.04)}
 [data-scheme="dark"] .nakai-chat__ai-badge{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.05)}
@@ -942,7 +931,7 @@ WIDGET_JS = r"""
 @media(prefers-reduced-motion:reduce){.nakai-chat__toggle,.nakai-chat__panel,.nakai-chat__message,.nakai-chat__quick-btn,.nakai-chat__quick-btn::before,.nakai-chat__suggestion-btn,.nakai-chat__suggestion-btn::before,.nakai-chat__send,.nakai-chat__retry-btn,.nakai-chat__product-card,.nakai-chat__form,.nakai-chat__header-close,.nakai-chat__message-content a,.nakai-chat__source-link{transition:none!important;animation:none!important}.nakai-chat__toggle-dot,.nakai-chat__header-dot,.nakai-chat__typing span{animation:none!important}.nakai-chat__typing span{opacity:.5}.nakai-chat:not(.nakai-chat--open) .nakai-chat__toggle{animation:none!important}.nakai-chat__messages{scroll-behavior:auto}}
 @media screen and (max-width:749px){
   .nakai-chat{bottom:20px;right:16px}
-  .nakai-chat__toggle-label{font-size:.95rem;letter-spacing:.12em}
+  .nakai-chat__toggle-label{font-size:.78rem;letter-spacing:.14em}
   .nakai-chat__panel{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;max-height:-webkit-fill-available;border-radius:0;border:none;transform:translateY(100%);opacity:1}
   .nakai-chat--open .nakai-chat__panel{transform:translateY(0)}
   .nakai-chat--open .nakai-chat__toggle{display:none}

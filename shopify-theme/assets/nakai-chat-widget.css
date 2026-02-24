@@ -31,17 +31,17 @@
 
 /* ===== FAB — Branded Pill ===== */
 .nakai-chat__toggle {
-  height: 48px;
+  height: 44px;
   border-radius: var(--nc-rr);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0;
-  background: linear-gradient(145deg, #4A7350 0%, var(--nc-g1) 50%, #325238 100%);
-  color: rgba(255, 255, 255, .92);
-  box-shadow: var(--nc-sh), inset 0 1px 0 rgba(255, 255, 255, .1);
-  transition: all .5s var(--nc-es);
+  background: var(--nc-g1);
+  color: rgba(255, 255, 255, .95);
+  box-shadow: 0 2px 12px rgba(61, 97, 66, .25), 0 0 0 0 rgba(61, 97, 66, 0);
+  transition: all .4s var(--nc-e);
   position: relative;
   overflow: hidden;
   padding: 0;
@@ -49,129 +49,69 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.nakai-chat__toggle::before {
-  content: '';
-  position: absolute;
-  top: -30%;
-  left: -10%;
-  width: 50%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(255, 255, 255, .15) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.nakai-chat__toggle::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: var(--nc-rr);
-  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, .08);
-  pointer-events: none;
-}
-
 .nakai-chat:not(.nakai-chat--open) .nakai-chat__toggle {
-  animation: nakaiBreathe 4s ease-in-out infinite;
+  animation: nakaiGlow 3s ease-in-out infinite;
 }
 
-@keyframes nakaiBreathe {
+@keyframes nakaiGlow {
   0%, 100% {
-    box-shadow: 0 0 0 .5px rgba(0,0,0,.03), 0 24px 80px -16px rgba(61,97,66,.13), 0 8px 24px -12px rgba(0,0,0,.05), inset 0 1px 0 rgba(255,255,255,.1);
+    box-shadow: 0 2px 12px rgba(61, 97, 66, .25), 0 0 0 0 rgba(126, 214, 126, 0);
   }
   50% {
-    box-shadow: 0 0 0 .5px rgba(0,0,0,.03), 0 28px 88px -16px rgba(61,97,66,.18), 0 10px 28px -12px rgba(0,0,0,.07), inset 0 1px 0 rgba(255,255,255,.1);
+    box-shadow: 0 2px 16px rgba(61, 97, 66, .35), 0 0 0 4px rgba(126, 214, 126, .15);
   }
 }
 
 .nakai-chat__toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 0 .5px rgba(0,0,0,.03), 0 28px 88px -12px rgba(61,97,66,.22), 0 12px 32px -8px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(61, 97, 66, .35), 0 0 0 4px rgba(126, 214, 126, .18);
 }
 
 .nakai-chat__toggle:active {
   transform: translateY(0) scale(.97);
-  transition-duration: .12s;
+  transition-duration: .1s;
 }
 
 /* FAB inner layout */
 .nakai-chat__toggle-body {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 20px 0 16px;
+  gap: 0;
+  padding: 0 18px;
   height: 100%;
   position: relative;
   z-index: 1;
 }
 
-.nakai-chat__toggle-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  opacity: .85;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .1));
-}
-
-.nakai-chat__toggle-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-body-family, 'Work Sans', sans-serif);
-  line-height: 1;
-  white-space: nowrap;
-}
-
 .nakai-chat__toggle-label {
-  font-size: 1.05rem;
-  font-weight: 400;
-  letter-spacing: .14em;
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .16em;
   text-transform: uppercase;
-  opacity: .88;
+  font-family: var(--font-body-family, 'Work Sans', sans-serif);
 }
 
 .nakai-chat__toggle-sep {
   width: 1px;
-  height: 16px;
-  background: rgba(255, 255, 255, .12);
+  height: 14px;
+  background: rgba(255, 255, 255, .18);
   flex-shrink: 0;
+  margin: 0 10px;
 }
 
 .nakai-chat__toggle-ai {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  background: rgba(255, 255, 255, .1);
-  border: 1px solid rgba(255, 255, 255, .08);
-  border-radius: var(--nc-rr);
-  padding: 3px 8px 3px 6px;
-  font-size: .9rem;
-  font-weight: 450;
-  letter-spacing: .08em;
-  color: rgba(255, 255, 255, .75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.nakai-chat__toggle-ai svg {
-  width: 9px;
-  height: 9px;
-  opacity: .8;
-}
-
-.nakai-chat__toggle-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: var(--nc-rr);
-  background: #7ED67E;
-  box-shadow: 0 0 6px rgba(126, 214, 126, .5);
-  flex-shrink: 0;
-  animation: nakaiPulse 3s ease-in-out infinite;
+  font-size: .72rem;
+  font-weight: 400;
+  letter-spacing: .1em;
+  color: rgba(255, 255, 255, .6);
+  font-family: var(--font-body-family, 'Work Sans', sans-serif);
 }
 
 /* FAB close state — compact circle */
 .nakai-chat__toggle-close {
   display: none;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   align-items: center;
   justify-content: center;
 }
@@ -191,7 +131,7 @@
 }
 
 .nakai-chat--open .nakai-chat__toggle {
-  width: 48px;
+  width: 44px;
   padding: 0;
 }
 
@@ -847,24 +787,17 @@
 }
 
 [data-scheme="dark"] .nakai-chat__toggle {
-  background: linear-gradient(145deg, #8FB87C, var(--nc-g2), #6A9960);
+  background: var(--nc-g2);
   color: #0C0E0C;
-  box-shadow: var(--nc-sh), inset 0 1px 0 rgba(255, 255, 255, .12);
+  box-shadow: 0 2px 12px rgba(123, 160, 109, .3), 0 0 0 0 rgba(123, 160, 109, 0);
 }
 
 [data-scheme="dark"] .nakai-chat__toggle-ai {
-  background: rgba(0, 0, 0, .15);
-  border-color: rgba(0, 0, 0, .1);
-  color: rgba(12, 14, 12, .65);
+  color: rgba(12, 14, 12, .5);
 }
 
 [data-scheme="dark"] .nakai-chat__toggle-sep {
-  background: rgba(0, 0, 0, .1);
-}
-
-[data-scheme="dark"] .nakai-chat__toggle-dot {
-  background: #2D5A2D;
-  box-shadow: 0 0 6px rgba(45, 90, 45, .4);
+  background: rgba(0, 0, 0, .12);
 }
 
 [data-scheme="dark"] .nakai-chat__header {
@@ -947,8 +880,8 @@
   }
 
   .nakai-chat__toggle-label {
-    font-size: .95rem;
-    letter-spacing: .12em;
+    font-size: .78rem;
+    letter-spacing: .14em;
   }
 
   .nakai-chat__panel {
