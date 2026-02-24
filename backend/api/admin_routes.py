@@ -3,6 +3,7 @@
 import asyncio
 import hmac
 import logging
+import re
 from typing import Optional
 
 import io
@@ -11,7 +12,7 @@ from fastapi import (
     APIRouter, HTTPException, Header, Depends, Request,
     UploadFile, File, Form,
 )
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from api.middleware import limiter
 from config import settings
@@ -68,9 +69,19 @@ async def wholesale_login(request: Request, body: WholesaleLoginRequest):
     raise HTTPException(status_code=401, detail="Invalid password")
 
 
+_EMAIL_RE = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+
+
 class WholesaleLeadCreate(BaseModel):
     email: str = Field(..., min_length=3, max_length=254)
     session_id: str = Field(default="", max_length=100)
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        if not _EMAIL_RE.match(v):
+            raise ValueError("Invalid email address")
+        return v.lower().strip()
 
 
 @admin_api_router.post("/wholesale/leads")

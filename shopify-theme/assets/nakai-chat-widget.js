@@ -690,6 +690,7 @@
   // ---- Markdown — improved with lists, strips headers/rules ----
   NakaiChat.prototype.formatMarkdown = function (text) {
     if (!text) return '';
+    text = this.escapeHtml(text);
     return text
       // Convert markdown headers to bold (fallback if model outputs them)
       .replace(/^#{1,6}\s+(.*?)$/gm, '<strong>$1</strong>')

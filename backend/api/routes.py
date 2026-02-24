@@ -21,6 +21,7 @@ vector_store = VectorStore(settings.chroma_persist_dir)
 rag_engine = RAGEngine(vector_store)
 
 _refresh_running = False
+_refresh_lock = asyncio.Lock()
 
 
 async def _run_ingestion_background():
@@ -117,7 +118,8 @@ async def chat(request: Request, body: ChatRequest):
             suggestions=result.get("suggestions", []),
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Chat error: {e}")
+        raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
 
 
 @router.post("/chat/stream")
@@ -141,7 +143,8 @@ async def chat_stream(request: Request, body: ChatRequest):
                 elif event_type == "done":
                     final_meta = data
         except Exception as e:
-            yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+            logger.error(f"Streaming error: {e}")
+            yield f"data: {json.dumps({'type': 'error', 'content': 'Something went wrong. Please try again.'})}\n\n"
 
         yield f"data: {json.dumps({'type': 'done', 'sources': final_meta.get('sources', []), 'suggestions': final_meta.get('suggestions', [])})}\n\n"
 
@@ -193,10 +196,10 @@ async def refresh(
     if not hmac.compare_digest(x_refresh_secret, settings.refresh_secret):
         raise HTTPException(status_code=403, detail="Invalid refresh secret")
 
-    if _refresh_running:
-        return RefreshResponse(status="already_running", documents_indexed=vector_store.count())
+    async with _refresh_lock:
+        if _refresh_running:
+            return RefreshResponse(status="already_running", documents_indexed=vector_store.count())
+        _refresh_running = True
 
-    _refresh_running = True
     asyncio.create_task(_run_ingestion_background())
-
     return RefreshResponse(status="started", documents_indexed=vector_store.count())

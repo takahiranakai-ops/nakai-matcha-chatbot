@@ -876,6 +876,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   function escapeHtml(s){{var d=document.createElement('div');d.textContent=s;return d.innerHTML}}
   function formatMd(s){{
     if(!s)return'';
+    s=escapeHtml(s);
     return s
       .replace(/^#{{1,6}}\s+(.*?)$/gm,'<strong>$1</strong>')
       .replace(/^\s*-{{3,}}\s*$/gm,'')
@@ -928,7 +929,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
             +'<div class="nc-product-card__cta">'+(lang==='ja'?'商品を見る →':'View Product →')+'</div>'
             +'</div>';
         }})
-        .catch(function(){{card.classList.remove('nc-product-card--loading');card.querySelector('.nc-product-card__name').textContent=(lang==='ja'?'商品を見る':'View Product')}});
+        .catch(function(){{card.classList.remove('nc-product-card--loading');var nm=card.querySelector('.nc-product-card__name');if(nm)nm.textContent=(lang==='ja'?'商品を見る':'View Product')}});
     }});
     parentEl.appendChild(carousel);
     scroll();
@@ -974,7 +975,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     if(!msg||loading)return;inp.value='';
     addMsg('user',msg);chatHistory.push({{role:'user',content:msg}});
     showTyping();loading=true;
-    fetch('/api/chat/stream',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang,session_id:SESSION_ID,source:'pwa'}})}})
+    var abortCtrl=new AbortController();var streamTimeout=setTimeout(function(){{abortCtrl.abort()}},90000);
+    fetch('/api/chat/stream',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang,session_id:SESSION_ID,source:'pwa'}}),signal:abortCtrl.signal}})
     .then(function(r){{
       if(!r.ok)throw new Error('err');
       removeTyping();
@@ -1034,7 +1036,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           read();
         }}).catch(function(){{finish()}});
       }}
-      function finish(){{loading=false;if(!fullText){{bubble.innerHTML=formatMd(t('error'))}}}}
+      function finish(){{clearTimeout(streamTimeout);loading=false;if(!fullText){{bubble.innerHTML=formatMd(t('error'))}}}}
       read();
     }})
     .catch(function(){{removeTyping();addMsg('bot',t('error'));loading=false}});

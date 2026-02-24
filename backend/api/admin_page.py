@@ -390,7 +390,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
         +'<div class="stat-card"><div class="label">Avg Msgs / Conv</div><div class="value">'+(tc?(tm/tc).toFixed(1):'0')+'</div></div>';
       var daily=d.daily_last_7||{{}};
       var chart=document.getElementById('daily-chart');chart.innerHTML='';
-      var vals=Object.values(daily);var maxV=Math.max.apply(null,vals.length?vals:[1]);
+      var vals=Object.values(daily);var maxV=vals.length?Math.max.apply(null,vals):1;
       Object.keys(daily).sort().forEach(function(day){{
         var col=document.createElement('div');col.className='bar-col';
         var h=Math.max((daily[day]/maxV)*120,4);

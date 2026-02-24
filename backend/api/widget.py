@@ -111,6 +111,7 @@ WIDGET_JS = r"""
 
   function formatMarkdown(text) {
     if (!text) return '';
+    text = escapeHtml(text);
     return text
       .replace(/^#{1,6}\s+(.*?)$/gm, '<strong>$1</strong>')
       .replace(/^\s*-{3,}\s*$/gm, '')
@@ -168,7 +169,7 @@ WIDGET_JS = r"""
             + '<div style="font-size:.7rem;font-weight:500;color:var(--nc-g1);margin-top:4px">' + (PAGE_LANG === 'ja' ? '商品を見る →' : 'View Product →') + '</div>'
             + '</div>';
         })
-        .catch(function() { card.querySelector('.nakai-chat__product-card-title').textContent = PAGE_LANG === 'ja' ? '商品を見る' : 'View Product'; });
+        .catch(function() { var t = card.querySelector('.nakai-chat__product-card-title'); if (t) t.textContent = PAGE_LANG === 'ja' ? '商品を見る' : 'View Product'; });
     });
     parentEl.appendChild(carousel);
     scrollToBottom();
@@ -579,7 +580,10 @@ WIDGET_JS = r"""
   }
 
   // ---- SSE Streaming ----
+  var streamAbort = null;
   function streamMessage(message) {
+    streamAbort = new AbortController();
+    var streamTimeout = setTimeout(function () { streamAbort.abort(); }, 90000);
     fetch(API_BASE + '/chat/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -589,7 +593,8 @@ WIDGET_JS = r"""
         language: PAGE_LANG,
         session_id: SESSION_ID,
         source: 'widget'
-      })
+      }),
+      signal: streamAbort.signal
     })
     .then(function (res) {
       if (!res.ok) throw new Error('API error');
@@ -648,6 +653,7 @@ WIDGET_JS = r"""
       }
 
       function finish() {
+        clearTimeout(streamTimeout);
         isLoading = false;
         setSendLoading(false);
         if (!fullText) {
