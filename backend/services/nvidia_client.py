@@ -149,7 +149,8 @@ async def chat_completion_stream(
             },
         ) as response:
             response.raise_for_status()
-            in_think = False
+            think_buf = ""
+            past_think = False
             ja_buf = ""  # buffer for cross-chunk JA fix
             async for line in response.aiter_lines():
                 if not line.startswith("data: "):
@@ -165,17 +166,21 @@ async def chat_completion_stream(
                 text = delta.get("content") or ""
                 if not text:
                     continue
-                # Skip <think> blocks inline
-                if "<think>" in text:
-                    in_think = True
-                if in_think:
-                    if "</think>" in text:
-                        in_think = False
-                        text = text.split("</think>", 1)[-1]
+                # Buffer to strip <think>...</think> across chunk boundaries
+                if not past_think:
+                    think_buf += text
+                    if "</think>" in think_buf:
+                        past_think = True
+                        text = think_buf.split("</think>", 1)[1]
+                        think_buf = ""
+                        if not text.strip():
+                            continue
+                    elif len(think_buf) > 7 and "<think" not in think_buf:
+                        past_think = True
+                        text = think_buf
+                        think_buf = ""
                     else:
                         continue
-                if not text:
-                    continue
                 if language == "ja":
                     # Buffer to catch patterns split across chunks
                     ja_buf += text
