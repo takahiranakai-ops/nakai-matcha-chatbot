@@ -183,6 +183,8 @@
   // ---- SSE Streaming via ReadableStream ----
   NakaiChat.prototype.streamMessage = function (message) {
     var self = this;
+    var abortCtrl = new AbortController();
+    var streamTimeout = setTimeout(function () { abortCtrl.abort(); }, 90000);
 
     fetch(CHAT_API_URL + '/chat/stream', {
       method: 'POST',
@@ -193,7 +195,8 @@
         language: this.language,
         session_id: this.sessionId,
         source: 'widget'
-      })
+      }),
+      signal: abortCtrl.signal
     })
     .then(function (res) {
       if (!res.ok) throw new Error('API error');
@@ -250,6 +253,7 @@
       }
 
       function finish() {
+        clearTimeout(streamTimeout);
         self.isLoading = false;
         self.setSendLoading(false);
         if (!fullText) {

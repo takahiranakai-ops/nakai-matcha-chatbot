@@ -756,12 +756,25 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   function escapeHtml(s){{var d=document.createElement('div');d.textContent=s;return d.innerHTML}}
   function formatMd(s){{
     if(!s)return'';
+    s=escapeHtml(s);
     return s
+      .replace(/^#{{1,6}}\s+(.*?)$/gm,'<strong>$1</strong>')
+      .replace(/^\s*-{{3,}}\s*$/gm,'')
+      .replace(/^\s*\*{{3,}}\s*$/gm,'')
+      .replace(/^\s*_{{3,}}\s*$/gm,'')
+      .replace(/^\|.*\|$/gm,'')
       .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
       .replace(/\[(.*?)\]\((https?:\/\/[^\)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
-      .replace(/^- (.*?)$/gm,'<li>$1</li>')
+      .replace(/^\s*[*+-]\s+(.*?)$/gm,'<li>$1</li>')
+      .replace(/^\d+\.\s+(.*?)$/gm,'<li>$1</li>')
       .replace(/((?:<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>')
-      .replace(/\\n/g,'<br>');
+      .replace(/^\t+/gm,'')
+      .replace(/\n{{2,}}/g,' ')
+      .replace(/\n/g,' ')
+      .replace(/ {{2,}}/g,' ')
+      .replace(/(<br>){{2,}}/g,'<br>')
+      .replace(/^(<br>| )+/,'')
+      .replace(/(<br>| )+$/,'');
   }}
 
   function setLang(l){{
@@ -945,7 +958,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     if(!msg||loading)return;inp.value='';
     addMsg('user',msg);chatHistory.push({{role:'user',content:msg}});
     showTyping();loading=true;
-    fetch('/api/chat/stream',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang,session_id:SESSION_ID,source:'wholesale'}})}})
+    var abortCtrl=new AbortController();var streamTimeout=setTimeout(function(){{abortCtrl.abort()}},90000);
+    fetch('/api/chat/stream',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{message:msg,history:chatHistory.slice(-MAX_H),language:lang,session_id:SESSION_ID,source:'wholesale'}}),signal:abortCtrl.signal}})
     .then(function(r){{
       if(!r.ok)throw new Error('err');
       removeTyping();
@@ -994,10 +1008,10 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           read();
         }}).catch(function(){{finish()}});
       }}
-      function finish(){{loading=false;if(!fullText){{bubble.innerHTML=formatMd(t('error'))}}}}
+      function finish(){{clearTimeout(streamTimeout);loading=false;if(!fullText){{bubble.innerHTML=formatMd(t('error'))}}}}
       read();
     }})
-    .catch(function(){{removeTyping();addMsg('bot',t('error'));loading=false}});
+    .catch(function(){{clearTimeout(streamTimeout);removeTyping();addMsg('bot',t('error'));loading=false}});
   }}
 
   function saveHistory(){{try{{localStorage.setItem('nakai_ws_history',JSON.stringify(chatHistory.slice(-MAX_H)))}}catch(e){{}}}}
