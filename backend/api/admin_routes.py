@@ -143,7 +143,9 @@ def _extract_pdf_text(pdf_bytes: bytes) -> str:
 
 
 @admin_api_router.post("/articles/upload")
+@limiter.limit("10/minute")
 async def upload_article(
+    request: Request,
     file: UploadFile = File(...),
     title: str = Form(""),
     language: str = Form("en"),
@@ -171,7 +173,8 @@ async def upload_article(
     except UnicodeDecodeError as exc:
         raise HTTPException(status_code=400, detail="Could not decode text file. Ensure it is UTF-8 encoded.") from exc
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Failed to extract text from file: {exc}") from exc
+        logger.error(f"File extraction failed: {exc}")
+        raise HTTPException(status_code=400, detail="Failed to extract text from file.") from exc
 
     text = text.strip()
     if not text:

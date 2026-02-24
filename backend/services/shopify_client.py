@@ -1,7 +1,11 @@
+import logging
 import re
+
 import httpx
 
 from config import settings
+
+logger = logging.getLogger(__name__)
 
 BASE_URL = f"https://{settings.shopify_store_url}"
 
@@ -135,11 +139,12 @@ async def fetch_blog_articles() -> list:
                             "handle": path.split("/")[-1],
                             "url": path,
                         })
-                except Exception:
+                except Exception as exc:
+                    logger.debug(f"Blog article parse error: {exc}")
                     continue
 
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning(f"Blog fetch failed: {exc}")
 
     return articles
 
@@ -177,7 +182,8 @@ async def fetch_policies() -> list:
                     "body": body,
                     "url": path,
                 })
-        except Exception:
+        except Exception as exc:
+            logger.debug(f"Policy page parse error for {path}: {exc}")
             continue
 
     return policies

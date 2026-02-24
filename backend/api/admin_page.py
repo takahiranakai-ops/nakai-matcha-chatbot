@@ -255,10 +255,11 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
         var tr=document.createElement('tr');
         var st=a.is_active?'<span class="badge badge-active">Active</span>':'<span class="badge badge-inactive">Inactive</span>';
         var upd=a.updated_at?a.updated_at.substring(0,10):'—';
+        var aid=esc(a.id);
         tr.innerHTML='<td><strong>'+esc(a.title)+'</strong></td><td>'+esc(a.language)+'</td><td>'+esc(a.category)+'</td><td>'+st+'</td><td>'+upd+'</td>'
-          +'<td><button class="btn btn-outline btn-sm" onclick="editArticle(\\''+a.id+'\\')">Edit</button> '
-          +'<button class="btn btn-outline btn-sm" onclick="toggleArticle(\\''+a.id+'\\','+(!a.is_active)+')">'+(a.is_active?'Deactivate':'Activate')+'</button> '
-          +'<button class="btn btn-red btn-sm" onclick="deleteArticle(\\''+a.id+'\\')">Delete</button></td>';
+          +'<td><button class="btn btn-outline btn-sm" onclick="editArticle(\\''+aid+'\\')">Edit</button> '
+          +'<button class="btn btn-outline btn-sm" onclick="toggleArticle(\\''+aid+'\\','+(!a.is_active)+')">'+(a.is_active?'Deactivate':'Activate')+'</button> '
+          +'<button class="btn btn-red btn-sm" onclick="deleteArticle(\\''+aid+'\\')">Delete</button></td>';
         tb.appendChild(tr);
       }});
     }});
@@ -419,8 +420,9 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
         var dt=l.created_at?l.created_at.substring(0,16).replace('T',' '):'\u2014';
         var sid=l.session_id?(l.session_id.substring(0,8)+'...'):'\u2014';
         var st='<span class="badge badge-active">'+esc(l.status||'new')+'</span>';
+        var lid=esc(l.id);
         tr.innerHTML='<td>'+esc(l.email)+'</td><td style="font-size:.78rem">'+sid+'</td><td style="font-size:.78rem">'+dt+'</td><td>'+st+'</td>'
-          +'<td><button class="btn btn-red btn-sm" onclick="deleteLead(\\''+l.id+'\\')">Delete</button></td>';
+          +'<td><button class="btn btn-red btn-sm" onclick="deleteLead(\\''+lid+'\\')">Delete</button></td>';
         tb.appendChild(tr);
       }});
     }})
