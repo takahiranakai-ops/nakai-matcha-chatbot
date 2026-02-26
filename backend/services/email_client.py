@@ -61,7 +61,7 @@ async def send_inquiry_notification(inquiry) -> bool:
 </div>"""
 
     msg = MIMEMultipart("alternative")
-    msg["From"] = settings.smtp_user
+    msg["From"] = f"NAKAI Wholesale <{RECIPIENT}>"
     msg["To"] = RECIPIENT
     msg["Subject"] = subject
     msg["Reply-To"] = inquiry.email
