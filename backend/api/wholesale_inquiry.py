@@ -445,6 +445,9 @@ async def serve_inquiry_page():
 @inquiry_router.post("/api/wholesale-inquiry")
 async def submit_inquiry(body: InquiryBody):
     """Store wholesale inquiry in Supabase and send notification email."""
+    stored = False
+    emailed = False
+
     try:
         await supabase_client.create_wholesale_inquiry(
             company=body.company,
@@ -457,14 +460,17 @@ async def submit_inquiry(body: InquiryBody):
             message=body.message,
             language=body.language,
         )
+        stored = True
     except Exception as e:
         logger.error(f"Failed to store inquiry: {e}")
 
-    # Try to send notification email (non-blocking)
     try:
         from services.email_client import send_inquiry_notification
-        await send_inquiry_notification(body)
+        emailed = await send_inquiry_notification(body)
     except Exception as e:
         logger.warning(f"Email notification skipped: {e}")
+
+    if not stored and not emailed:
+        return JSONResponse({"status": "error"}, status_code=500)
 
     return JSONResponse({"status": "ok"})
