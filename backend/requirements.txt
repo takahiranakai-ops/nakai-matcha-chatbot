@@ -9,3 +9,4 @@ python-dotenv==1.0.1
 slowapi==0.1.9
 pypdf==4.1.0
 python-multipart==0.0.12
+aiosmtplib>=3.0

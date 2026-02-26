@@ -481,3 +481,35 @@ async def delete_wholesale_lead(lead_id: str) -> bool:
     except Exception as e:
         logger.warning(f"Failed to delete wholesale lead: {e}", exc_info=True)
         return False
+
+
+# ----------------------------------------------------------------
+# WHOLESALE INQUIRIES (bulk order form)
+# ----------------------------------------------------------------
+
+async def create_wholesale_inquiry(
+    company: str, name: str, email: str,
+    phone: str = "", country: str = "", quantity: str = "",
+    use_case: str = "", message: str = "", language: str = "en",
+) -> Optional[dict]:
+    """Insert a wholesale inquiry from the bulk order form."""
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.post(
+            f"{_BASE_URL}/wholesale_inquiries",
+            headers={**_HEADERS, "Prefer": "return=representation"},
+            json={
+                "company": company, "name": name, "email": email,
+                "phone": phone, "country": country, "quantity": quantity,
+                "use_case": use_case, "message": message, "language": language,
+            },
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to create wholesale inquiry: {e}", exc_info=True)
+        return None
