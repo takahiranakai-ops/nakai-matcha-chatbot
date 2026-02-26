@@ -236,10 +236,10 @@ body{{
         <div class="field" data-f="quantity">
           <select class="field__select" name="quantity" id="f-qty" required>
             <option value="">Estimated quantity</option>
-            <option value="10-30">10 \\u2013 30 kg</option>
-            <option value="30-100">30 \\u2013 100 kg</option>
-            <option value="100-500">100 \\u2013 500 kg</option>
-            <option value="500-1000">500 kg \\u2013 1 t</option>
+            <option value="10-30">10 &ndash; 30 kg</option>
+            <option value="30-100">30 &ndash; 100 kg</option>
+            <option value="100-500">100 &ndash; 500 kg</option>
+            <option value="500-1000">500 kg &ndash; 1 t</option>
             <option value="1000+">1 t +</option>
           </select>
           <div class="field__error" id="e-qty">Required</div>
@@ -247,7 +247,7 @@ body{{
         <div class="field" data-f="use_case">
           <select class="field__select" name="use_case" id="f-use">
             <option value="">Business type (optional)</option>
-            <option value="cafe">Caf\\u00e9 / Coffee Shop</option>
+            <option value="cafe">Caf&eacute; / Coffee Shop</option>
             <option value="restaurant">Restaurant</option>
             <option value="hotel">Hotel / Hospitality</option>
             <option value="retail">Retail</option>
@@ -288,7 +288,7 @@ body{{
       <div class="form__section-label" id="sec-msg">Message</div>
       <div class="form__row form__row--full">
         <div class="field" data-f="message">
-          <textarea class="field__textarea" name="message" id="f-msg" placeholder="Tell us about your needs, preferred products, timeline\\u2026" rows="4"></textarea>
+          <textarea class="field__textarea" name="message" id="f-msg" placeholder="Tell us about your needs, preferred products, timeline&hellip;" rows="4"></textarea>
         </div>
       </div>
     </div>
@@ -302,8 +302,8 @@ body{{
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
     <h2 class="success__title" id="s-title">Received.</h2>
-    <p class="success__sub" id="s-sub">We'll get back to you within 1\\u20132 business days.</p>
-    <a class="success__link" href="/wholesale" id="s-link">\\u2190 Back to Wholesale Portal</a>
+    <p class="success__sub" id="s-sub">We'll get back to you within 1&ndash;2 business days.</p>
+    <a class="success__link" href="/wholesale" id="s-link">&larr; Back to Wholesale Portal</a>
   </div>
 
   <p class="note" id="note">
