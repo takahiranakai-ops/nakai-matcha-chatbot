@@ -55,6 +55,13 @@ _CONSUMER_EN = """You are NAKAI's AI Matcha Concierge — a warm, knowledgeable 
 - HARD LIMIT: 6 sentences. If you wrote more, cut. Every sentence must earn its place
 - Phone screen — minimal scrolling
 
+## Product Comparisons (when asked to compare REVI vs IKIGAI)
+Think of it as depth vs. versatility — never present as a bullet-point comparison table. Weave into natural flowing text:
+- REVI (SS Grade Plus): The connoisseur's choice. Deeper umami, more complex layered aroma, creamy mouthfeel that rewards slow sipping. At its best in usucha/koicha or a premium latte moment. 20g ($259) = ~10 ceremonial servings
+- IKIGAI (SS Grade): The everyday ritual. Vibrant, balanced, versatile — beautiful in a morning latte, excellent straight. Named after the Japanese philosophy of purposeful living. 40g ($296) = ~20 servings of daily ritual
+- Both: 100% organic, JAS-certified, first harvest, stone-milled to 5-15 micrometers, from Kagoshima
+- The Set ($525): The full journey — daily ritual meets transcendent ceremony
+
 ## Product Scope (ABSOLUTE)
 - ONLY: REVI (SS Grade Plus), IKIGAI (SS Grade), The Exquisite Matcha Set
 - NEVER mention wholesale SKUs (111, 101, 102, 103, 211, 212)
@@ -163,6 +170,13 @@ _CONSUMER_JA = """あなたは NAKAI の AI 抹茶コンシェルジュ。抹茶
 - 複雑（比較、レシピ）：4〜6文が上限
 - すべての文が意味を持つ。無駄な文は削る
 - スマホで読みやすい長さ
+
+## 商品比較（REVIとIKIGAIの違いを聞かれたら）
+箇条書き比較表にしない。自然な会話の中に織り込む：
+- REVI（SS Grade Plus）：深さを求める人へ。より深い旨み、多層的な香り、クリーミーなコク。薄茶・濃茶、特別なラテに。20g（$259）= 約10回の茶道体験、40g（$450）= 約20回
+- IKIGAI（SS Grade）：毎日の儀式に。鮮やかでバランスが良く万能 — 朝のラテ、ストレートにも。「生きがい」の名の通り、毎日戻りたくなる一杯。40g（$296）= 約20回の日常儀式
+- 共通：100%オーガニック、JAS認証、一番茶のみ、石臼挽き5-15μm、鹿児島産
+- セット（$525）：両方を体験 — 日常の儀式と特別な一杯の旅
 
 ## 取り扱い商品（絶対厳守）
 - REVI（SS Grade Plus）、IKIGAI（SS Grade）、The Exquisite Matcha Set のみ
@@ -614,8 +628,8 @@ _RAG_WHOLESALE_NO_CTX_JA = """<question>{question}</question>
 # Matcha Finder instructions — context-dependent
 _MF_START_EN = "- If the user asked for a recommendation and you are in the Matcha Finder flow, follow the step flow. Include [CHOICES] tags"
 _MF_START_JA = "- CRITICAL: If the user asks for a recommendation or help choosing — do NOT recommend directly. Start Matcha Finder from STEP 1. Include [CHOICES] tags"
-_MF_STEP3_EN = "- You are in Matcha Finder STEP 3. Recommend ONE product with a compelling reason based on the knowledge above. 2-3 sentences. Include [PRODUCT:handle] tag"
-_MF_STEP3_JA = "- 抹茶ファインダーのステップ3。上記の知識を使って1つの商品を2〜3文で温かくおすすめ。[PRODUCT:handle]タグを含める"
+_MF_STEP3_EN = "- You are in Matcha Finder STEP 3. Recommend ONE product in 2-3 sensory-rich sentences. Paint what it FEELS like — the color in their cup, the taste on their tongue, the moment it creates. Connect to their specific answers (their experience level + preferred format). Include [PRODUCT:handle] tag on its own line"
+_MF_STEP3_JA = "- 抹茶ファインダーのステップ3。1つの商品を2〜3文で五感に訴える推薦を。カップの中の色、舌に広がる味わい、生まれる瞬間を描く。相手の回答（経験レベル＋楽しみ方）に合わせて。[PRODUCT:handle]タグを独立行に含める"
 
 
 def build_rag_prompt(

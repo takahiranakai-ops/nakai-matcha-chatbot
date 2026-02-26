@@ -12,6 +12,7 @@ from api.admin_routes import admin_api_router
 from api.admin_page import admin_page_router
 from api.wholesale import wholesale_router
 from api.wholesale_inquiry import inquiry_router
+from api.ai_discovery import ai_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -37,8 +38,10 @@ async def _auto_ingest():
         from scripts.ingest import run_ingestion
         count = await run_ingestion(vector_store)
         logger.info(f"Auto-ingestion complete: {count} documents")
+        if count == 0:
+            logger.warning("Auto-ingestion produced 0 documents — check API keys and knowledge files")
     except Exception as e:
-        logger.error(f"Auto-ingestion failed: {e}")
+        logger.error(f"Auto-ingestion failed: {e}", exc_info=True)
 
 
 app = FastAPI(title="NAKAI Matcha Chatbot API", version="1.0.0", lifespan=lifespan)
@@ -64,6 +67,7 @@ app.include_router(widget_router)
 app.include_router(pwa_router)
 app.include_router(wholesale_router)
 app.include_router(inquiry_router)
+app.include_router(ai_router)
 
 
 @app.get("/health")

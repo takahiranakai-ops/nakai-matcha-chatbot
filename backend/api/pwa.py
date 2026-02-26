@@ -98,11 +98,52 @@ APP_HTML = f"""<!DOCTYPE html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="NAKAI">
-<meta name="description" content="NAKAI Matcha Concierge">
-<title>NAKAI Matcha Concierge</title>
+<meta name="description" content="NAKAI's AI Matcha Concierge — discover premium organic matcha from Japan. Get personalized recommendations, brewing guides, and matcha expertise.">
+<title>NAKAI Matcha Concierge — Premium Organic Matcha from Japan</title>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NAKAI Matcha Concierge">
+<meta property="og:description" content="Your personal AI matcha expert. Discover REVI (SS Grade Plus) and IKIGAI (SS Grade) — premium organic matcha from Kagoshima, Japan.">
+<meta property="og:url" content="https://nakai-matcha-chat.onrender.com/app">
+<meta property="og:site_name" content="NAKAI Matcha">
+<meta property="og:image" content="https://nakaimatcha.com/cdn/shop/files/nakai-logo.png">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ja_JP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NAKAI Matcha Concierge">
+<meta name="twitter:description" content="Premium organic matcha from Kagoshima, Japan. AI-powered concierge for personalized recommendations.">
+<meta name="twitter:image" content="https://nakaimatcha.com/cdn/shop/files/nakai-logo.png">
+<link rel="canonical" href="https://nakai-matcha-chat.onrender.com/app">
+<script type="application/ld+json">
+{{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "NAKAI Matcha Concierge",
+  "description": "AI-powered matcha concierge for premium organic matcha from Japan",
+  "url": "https://nakai-matcha-chat.onrender.com/app",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Any",
+  "offers": {{
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }},
+  "author": {{
+    "@type": "Organization",
+    "name": "NAKAI",
+    "url": "https://nakaimatcha.com",
+    "description": "Specialty organic matcha brand — grounded in nature, elevated in ritual",
+    "foundingDate": "2024",
+    "email": "info@s-natural.xyz",
+    "brand": {{
+      "@type": "Brand",
+      "name": "NAKAI"
+    }}
+  }}
+}}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
