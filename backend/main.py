@@ -44,7 +44,25 @@ async def _auto_ingest():
         logger.error(f"Auto-ingestion failed: {e}", exc_info=True)
 
 
-app = FastAPI(title="NAKAI Matcha Chatbot API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(
+    title="NAKAI Matcha API",
+    version="2.0.0",
+    description=(
+        "NAKAI is a specialty organic matcha brand from Kagoshima, Japan. "
+        "This API powers the AI Matcha Concierge and provides structured "
+        "product data for external AI agents, search engines, and voice assistants.\n\n"
+        "**Key endpoints for AI agents:**\n"
+        "- `GET /llms.txt` — AI-readable site summary\n"
+        "- `GET /llms-full.txt` — Extended product & science detail\n"
+        "- `GET /api/products/catalog` — Schema.org JSON-LD product catalog\n"
+        "- `GET /api/products/{handle}` — Individual product JSON-LD\n"
+        "- `GET /api/faq` — FAQPage structured data\n"
+        "- `POST /api/chat` — AI matcha concierge conversation\n"
+    ),
+    contact={"name": "NAKAI", "email": "info@s-natural.xyz", "url": "https://nakaimatcha.com"},
+    license_info={"name": "Proprietary"},
+    lifespan=lifespan,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger.info("NAKAI Matcha Chatbot starting up...")
