@@ -38,10 +38,23 @@ _RECOMMENDATION_START_RE = re.compile(
 
 # Product name → Shopify handle mapping for [PRODUCT] tag injection
 _PRODUCT_HANDLE_MAP = {
-    "revi": "revi-organic-matcha-20g-ss-grade-plus",
-    "ikigai": "ikigai-organic-matcha-40g-ss-grade",
-    "exquisite matcha set": "the-exquisite-matcha-set-limited-edition",
-    "matcha set": "the-exquisite-matcha-set-limited-edition",
+    "四": "shi-4",
+    "shi": "shi-4",
+    "十六": "ju-roku-16",
+    "ju-roku": "ju-roku-16",
+    "十七": "ju-nana-17",
+    "ju-nana": "ju-nana-17",
+    "十八": "ju-hachi-18",
+    "ju-hachi": "ju-hachi-18",
+    "二十二": "nijyu-ni-22",
+    "nijyu-ni": "nijyu-ni-22",
+    "discovery bundle": "discovery-bundle",
+    "everyday": "the-everyday",
+    "signature reserve": "expert-set",
+    "hiragoushi": "hiragoushi-chawan",
+    "yagoushi": "yagoushi-chawan",
+    "chasen": "takayama-chasen-100",
+    "茶筅": "takayama-chasen-100",
 }
 _PRODUCT_TAG_RE = re.compile(r"\[PRODUCT:[a-z0-9-]+\]", re.IGNORECASE)
 

@@ -105,7 +105,7 @@ APP_HTML = f"""<!DOCTYPE html>
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="NAKAI Matcha Concierge">
-<meta property="og:description" content="Your personal AI matcha expert. Discover REVI (SS Grade Plus) and IKIGAI (SS Grade) — premium organic matcha from Kagoshima, Japan.">
+<meta property="og:description" content="Your personal AI matcha expert. Discover NAKAI's numbered matcha collection — each with its own story, terroir, and character. From Kagoshima and Kyoto, Japan.">
 <meta property="og:url" content="https://nakai-matcha-chat.onrender.com/app">
 <meta property="og:site_name" content="NAKAI Matcha">
 <meta property="og:image" content="https://nakaimatcha.com/cdn/shop/files/nakai-logo.png">
@@ -733,9 +733,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       faqMsg:'What are the most common customer questions about matcha? Give me quick answers I can use as a barista.',
       findMsg:"I'd like to find the right matcha for me. Could you ask me a few questions to help narrow it down?",
       secProducts:'Our Matcha',secRecipes:'Recipes & Guides',
-      pRevi:'REVI',pReviGrade:'SS Grade Plus',pReviDesc:'Our finest. Creamy, elegant, rich in umami.',pReviPrice:'From Dhs. 259',pReviMsg:'Tell me about REVI matcha. What makes it special and how should I use it?',
-      pIkigai:'IKIGAI',pIkigaiGrade:'SS Grade',pIkigaiDesc:'Daily premium. Vibrant, balanced, versatile.',pIkigaiPrice:'Dhs. 296',pIkigaiMsg:'Tell me about IKIGAI matcha. What is it best for and how does it compare to REVI?',
-      pSet:'The Exquisite Set',pSetGrade:'REVI + IKIGAI',pSetDesc:'The complete NAKAI experience. A perfect gift.',pSetPrice:'Dhs. 525',pSetMsg:'Tell me about The Exquisite Matcha Set. What does it include and who is it for?',
+      pRevi:'NIJYU-NI (22)',pReviGrade:'Ceremonial Reserved',pReviDesc:'Within the Flow, Everything Exists. Quiet, effortless depth.',pReviPrice:'',pReviMsg:'Tell me about 二十二 (22) matcha. What makes it special and how should I prepare it?',
+      pIkigai:'JU-ROKU (16)',pIkigaiGrade:'Specialty Grade',pIkigaiDesc:'Veil of Mist, Infinite Echo. Elegant layers of flavor.',pIkigaiPrice:'',pIkigaiMsg:'Tell me about 十六 (16) matcha. What is it best for and what makes it unique?',
+      pSet:'Discovery Bundle',pSetGrade:'Explore NAKAI',pSetDesc:'Your gateway to the world of specialty matcha.',pSetPrice:'',pSetMsg:'Tell me about the Discovery Bundle. What does it include and who is it for?',
       rUsucha:'Usucha',rUsuchaDesc:'Traditional thin tea, light and frothy',rUsuchaMsg:'How do I make usucha (thin matcha tea)? Give me step-by-step instructions.',
       rKoicha:'Koicha',rKoichaDesc:'Thick tea, intense and full-bodied',rKoichaMsg:'How do I make koicha (thick matcha tea)? Give me step-by-step instructions.',
       rLatte:'Matcha Latte',rLatteDesc:'Hot or iced, the perfect everyday drink',rLatteMsg:'How do I make the perfect matcha latte? Include hot and iced variations.',
@@ -775,9 +775,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       faqMsg:'抹茶に関するお客様からのよくある質問は何ですか？バリスタとして使える簡潔な回答をお願いします。',
       findMsg:'自分に合う抹茶を探しています。いくつか質問してもらえますか？',
       secProducts:'\u62b9\u8336\u30b3\u30ec\u30af\u30b7\u30e7\u30f3',secRecipes:'\u30ec\u30b7\u30d4 & \u30ac\u30a4\u30c9',
-      pRevi:'REVI',pReviGrade:'SS Grade Plus',pReviDesc:'\u6700\u9ad8\u54c1\u8cea\u3002\u30af\u30ea\u30fc\u30df\u30fc\u3067\u6df1\u3044\u3046\u307e\u307f\u3002',pReviPrice:'Dhs. 259\u301c',pReviMsg:'REVI\u62b9\u8336\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u4f55\u304c\u7279\u5225\u3067\u3001\u3069\u3046\u4f7f\u3046\u306e\u304c\u826f\u3044\u3067\u3059\u304b\uff1f',
-      pIkigai:'IKIGAI',pIkigaiGrade:'SS Grade',pIkigaiDesc:'\u6bce\u65e5\u306e\u30d7\u30ec\u30df\u30a2\u30e0\u3002\u9bae\u3084\u304b\u3067\u30d0\u30e9\u30f3\u30b9\u306e\u826f\u3044\u5473\u308f\u3044\u3002',pIkigaiPrice:'Dhs. 296',pIkigaiMsg:'IKIGAI\u62b9\u8336\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u4f55\u306b\u6700\u9069\u3067\u3001REVI\u3068\u306e\u9055\u3044\u306f\uff1f',
-      pSet:'The Exquisite Set',pSetGrade:'REVI + IKIGAI',pSetDesc:'NAKAI\u306e\u5168\u3066\u3092\u4f53\u9a13\u3002\u30ae\u30d5\u30c8\u306b\u6700\u9069\u3002',pSetPrice:'Dhs. 525',pSetMsg:'The Exquisite Matcha Set\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u4f55\u304c\u542b\u307e\u308c\u3066\u3044\u3066\u3001\u8ab0\u5411\u3051\u3067\u3059\u304b\uff1f',
+      pRevi:'\u4e8c\u5341\u4e8c NIJYU-NI (22)',pReviGrade:'Ceremonial Reserved',pReviDesc:'\u6700\u9ad8\u5cf0\u3002\u6df1\u3044\u3046\u307e\u307f\u3068\u30af\u30ea\u30fc\u30df\u30fc\u306a\u4f59\u97fb\u3002',pReviPrice:'',pReviMsg:'\u4e8c\u5341\u4e8c NIJYU-NI\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u4f55\u304c\u7279\u5225\u3067\u3001\u3069\u3046\u4f7f\u3046\u306e\u304c\u826f\u3044\u3067\u3059\u304b\uff1f',
+      pIkigai:'\u5341\u516d JU-ROKU (16)',pIkigaiGrade:'Specialty Grade',pIkigaiDesc:'\u7dbf\u306e\u3088\u3046\u306b\u306a\u3081\u3089\u304b\u3002\u6bce\u65e5\u306e\u8d05\u6ca2\u306b\u3002',pIkigaiPrice:'',pIkigaiMsg:'\u5341\u516d JU-ROKU\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u7279\u5fb4\u3068\u304a\u3059\u3059\u3081\u306e\u4f7f\u3044\u65b9\u306f\uff1f',
+      pSet:'Discovery Bundle',pSetGrade:'3\u7a2e\u304a\u8a66\u3057\u30bb\u30c3\u30c8',pSetDesc:'NAKAI\u306e\u5473\u308f\u3044\u3092\u63a2\u6c42\u3002\u521d\u3081\u3066\u306e\u65b9\u306b\u6700\u9069\u3002',pSetPrice:'',pSetMsg:'Discovery Bundle\u306b\u3064\u3044\u3066\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u4f55\u304c\u542b\u307e\u308c\u3066\u3044\u3066\u3001\u8ab0\u5411\u3051\u3067\u3059\u304b\uff1f',
       rUsucha:'\u8584\u8336',rUsuchaDesc:'\u4f1d\u7d71\u7684\u306a\u8584\u8336\u3001\u8efd\u3084\u304b\u3067\u6ce1\u7acb\u3061\u8c4a\u304b',rUsuchaMsg:'\u8584\u8336\u306e\u70b9\u3066\u65b9\u3092\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u3067\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
       rKoicha:'\u6fc3\u8336',rKoichaDesc:'\u6fc3\u539a\u3067\u6df1\u3044\u5473\u308f\u3044\u306e\u4e00\u676f',rKoichaMsg:'\u6fc3\u8336\u306e\u70b9\u3066\u65b9\u3092\u30b9\u30c6\u30c3\u30d7\u30d0\u30a4\u30b9\u30c6\u30c3\u30d7\u3067\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002',
       rLatte:'\u62b9\u8336\u30e9\u30c6',rLatteDesc:'\u30db\u30c3\u30c8\u3067\u3082\u30a2\u30a4\u30b9\u3067\u3082\u3002\u6bce\u65e5\u306e\u4e00\u676f\u306b',rLatteMsg:'\u7f8e\u5473\u3057\u3044\u62b9\u8336\u30e9\u30c6\u306e\u4f5c\u308a\u65b9\u3092\u6559\u3048\u3066\u304f\u3060\u3055\u3044\u3002\u30db\u30c3\u30c8\u3068\u30a2\u30a4\u30b9\u306e\u4e21\u65b9\u3092\u304a\u9858\u3044\u3057\u307e\u3059\u3002',
@@ -871,9 +871,9 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   }}
 
   var products=[
-    {{id:'Revi',gradient:'linear-gradient(170deg,rgba(64,101,70,.16),rgba(64,101,70,.06))',url:SHOP+'/products/revi-organic-matcha-20g-ss-grade-plus'}},
-    {{id:'Ikigai',gradient:'linear-gradient(170deg,rgba(64,101,70,.10),rgba(64,101,70,.04))',url:SHOP+'/products/ikigai-organic-matcha-40g-ss-grade'}},
-    {{id:'Set',gradient:'linear-gradient(170deg,rgba(64,101,70,.13),rgba(64,101,70,.05))',url:SHOP+'/products/the-exquisite-matcha-set-limited-edition'}}
+    {{id:'Revi',gradient:'linear-gradient(170deg,rgba(64,101,70,.16),rgba(64,101,70,.06))',url:SHOP+'/products/%E4%BA%8C%E5%8D%81%E4%BA%8C-nijyu-ni-22-ceremonial-reserved'}},
+    {{id:'Ikigai',gradient:'linear-gradient(170deg,rgba(64,101,70,.10),rgba(64,101,70,.04))',url:SHOP+'/products/%E5%8D%81%E5%85%AD-ju-roku-16-specialty-grade'}},
+    {{id:'Set',gradient:'linear-gradient(170deg,rgba(64,101,70,.13),rgba(64,101,70,.05))',url:SHOP+'/products/discovery-bundle'}}
   ];
   var recipes=[
     {{id:'Usucha',icon:'\U0001F375'}},

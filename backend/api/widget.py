@@ -25,11 +25,17 @@ WIDGET_JS = r"""
 
   // Known product name → handle mapping
   var PRODUCT_MAP = {
-    'revi': '/products/revi-organic-matcha-20g-ss-grade-plus',
-    'ikigai': '/products/ikigai-organic-matcha-40g-ss-grade',
-    'exquisite matcha set': '/products/the-exquisite-matcha-set',
-    '\u30a8\u30af\u30b9\u30ad\u30b8\u30c3\u30c8\u62b9\u8336\u30bb\u30c3\u30c8': '/products/the-exquisite-matcha-set',
-    '\u62b9\u8336\u30bb\u30c3\u30c8': '/products/the-exquisite-matcha-set'
+    'shi-4': '/products/%E5%9B%9B-shi-4-specialty-grade-organic-matcha',
+    'ju-roku-16': '/products/%E5%8D%81%E5%85%ADju-roku-16-specialty-grade-organic-matcha',
+    'ju-nana-17': '/products/%E5%8D%81%E4%B8%83-ju-nana-17-specialty-grade-organic-matcha',
+    'ju-hachi-18': '/products/%E5%8D%81%E5%85%AB-ju-hachi-18-specialty-grade-organic-matcha',
+    'nijyu-ni-22': '/products/%E4%BA%8C%E5%8D%81%E4%BA%8C-nijyu-ni22-ceremonial-reserved-organic-matcha',
+    'discovery-bundle': '/products/%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AA%E3%83%BC%E3%83%90%E3%83%B3%E3%83%96%E3%83%AB',
+    'the-everyday': '/products/the-everyday',
+    'expert-set': '/products/expert-set',
+    'hiragoushi-chawan': '/products/hiragoushi-%E5%B9%B3%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97',
+    'yagoushi-chawan': '/products/yagoushi-chawan-%E7%9F%A2%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97',
+    'takayama-chasen-100': '/products/%E8%8C%B6%E7%AD%85-cyasen'
   };
 
   // Detect language
