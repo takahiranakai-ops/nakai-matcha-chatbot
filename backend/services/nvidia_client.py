@@ -1,6 +1,7 @@
 import json as _json
 import logging
 import re
+import time
 
 import httpx
 
@@ -12,14 +13,36 @@ logger = logging.getLogger(__name__)
 _THINK_RE = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
 _THINK_UNCLOSED_RE = re.compile(r"<think>.*", re.DOTALL)
 
-# ── Shared HTTP client ──────────────────────────────────────
+# ── Shared HTTP client with connection pool management ──────
 _client: httpx.AsyncClient | None = None
+_client_created_at: float = 0.0
+_CLIENT_MAX_AGE = 300.0  # Recreate client every 5 minutes to avoid stale connections
 
 
 def _get_client() -> httpx.AsyncClient:
-    global _client
-    if _client is None or _client.is_closed:
-        _client = httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
+    global _client, _client_created_at
+    now = time.monotonic()
+    if (
+        _client is None
+        or _client.is_closed
+        or (now - _client_created_at) > _CLIENT_MAX_AGE
+    ):
+        # Close old client if still open
+        if _client and not _client.is_closed:
+            import asyncio
+            try:
+                asyncio.get_event_loop().create_task(_client.aclose())
+            except Exception:
+                pass
+        _client = httpx.AsyncClient(
+            timeout=httpx.Timeout(120.0, connect=10.0),
+            limits=httpx.Limits(
+                max_connections=20,
+                max_keepalive_connections=5,
+                keepalive_expiry=60.0,
+            ),
+        )
+        _client_created_at = now
     return _client
 
 
