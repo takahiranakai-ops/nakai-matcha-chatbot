@@ -1,4 +1,5 @@
 import logging
+import random
 import re
 from typing import Optional, List, Dict
 
@@ -14,6 +15,29 @@ _GREETING_RE = re.compile(
     r"^(h[ae]llo|hi|hey|yo|sup|good\s*(morning|afternoon|evening|night)"
     r"|こんにちは|こんばんは|おはよう|はじめまして|ハロー|ハイ|やあ"
     r"|ありがとう|thank|thanks|どうも|よろしく)[\s!?。！？]*$",
+    re.IGNORECASE,
+)
+
+# Pre-written greetings — instant, no LLM call needed
+_INSTANT_GREETINGS_EN = [
+    "Hey there! Whether you're curious about matcha or ready to find your perfect cup, I'm here for it. What's on your mind?",
+    "Welcome! Matcha has this way of turning ordinary moments into something special. How can I help you today?",
+    "Hi! Ready to explore the world of matcha? Ask me anything — from brewing tips to finding your perfect match.",
+]
+_INSTANT_GREETINGS_JA = [
+    "ようこそ！抹茶の世界を一緒に楽しみましょう。何でもお気軽にどうぞ。",
+    "こんにちは！あなたにぴったりの一杯を一緒に見つけましょう。どんなことが気になりますか？",
+    "いらっしゃいませ！淹れ方から商品選びまで、何でもお聞きください。",
+]
+_INSTANT_THANKS_EN = [
+    "You're welcome! Anything else about matcha I can help with?",
+]
+_INSTANT_THANKS_JA = [
+    "こちらこそ！他にも気になることがあればお気軽にどうぞ。",
+]
+
+_THANKS_RE = re.compile(
+    r"^(ありがとう|thank|thanks|どうも)[\s!?。！？]*$",
     re.IGNORECASE,
 )
 
@@ -226,23 +250,14 @@ class RAGEngine:
         system_prompt = build_system_prompt(language=language, source=source)
         msg_stripped = user_message.strip()
 
-        # For greetings / small talk, skip RAG entirely (faster + more natural)
+        # For greetings / small talk — instant pre-written response, no LLM needed
         if _GREETING_RE.match(msg_stripped):
-            messages = [{"role": "system", "content": system_prompt}]
-            if conversation_history:
-                messages.extend(conversation_history[-6:])
-            messages.append({"role": "user", "content": msg_stripped})
-            response = await chat_completion(
-                messages, temperature=0.6, max_tokens=600, language=language
-            )
-            # Truncate after the first question mark to keep greetings short
-            for end_char in ("？", "?"):
-                idx = response.find(end_char)
-                if idx != -1:
-                    response = response[: idx + 1]
-                    break
+            if _THANKS_RE.match(msg_stripped):
+                pool = _INSTANT_THANKS_JA if language == "ja" else _INSTANT_THANKS_EN
+            else:
+                pool = _INSTANT_GREETINGS_JA if language == "ja" else _INSTANT_GREETINGS_EN
             return {
-                "response": response.strip(),
+                "response": random.choice(pool),
                 "sources": [],
                 "context_chunks": 0,
                 "suggestions": [],
@@ -380,20 +395,13 @@ class RAGEngine:
         system_prompt = build_system_prompt(language=language, source=source)
         msg_stripped = user_message.strip()
 
-        # Greetings — skip RAG, stream for fast TTFT
+        # Greetings — instant pre-written response, no LLM needed
         if _GREETING_RE.match(msg_stripped):
-            messages = [{"role": "system", "content": system_prompt}]
-            if conversation_history:
-                messages.extend(conversation_history[-6:])
-            messages.append({"role": "user", "content": msg_stripped})
-            try:
-                async for chunk in chat_completion_stream(
-                    messages, temperature=0.6, max_tokens=600, language=language
-                ):
-                    yield ("text", chunk)
-            except Exception as e:
-                logger.error(f"Greeting streaming failed: {e}")
-                yield ("text", "Hi! How can I help you with matcha today?" if language == "en" else "こんにちは！抹茶について何でもお聞きください。")
+            if _THANKS_RE.match(msg_stripped):
+                pool = _INSTANT_THANKS_JA if language == "ja" else _INSTANT_THANKS_EN
+            else:
+                pool = _INSTANT_GREETINGS_JA if language == "ja" else _INSTANT_GREETINGS_EN
+            yield ("text", random.choice(pool))
             yield ("done", {"sources": [], "suggestions": []})
             return
 
