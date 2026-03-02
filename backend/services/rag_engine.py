@@ -82,20 +82,45 @@ _PRODUCT_HANDLE_MAP = {
 }
 _PRODUCT_TAG_RE = re.compile(r"\[PRODUCT:[a-z0-9-]+\]", re.IGNORECASE)
 
+# Topic → product mapping: certain topics always show specific products
+_TOPIC_PRODUCT_MAP = [
+    (re.compile(r"(latte|ラテ|matcha latte|抹茶ラテ)", re.IGNORECASE), ["nijyu-ni-22"]),
+]
 
-def _inject_product_tags(response: str, conversation_history: Optional[List[Dict]] = None) -> str:
+
+def _inject_product_tags(
+    response: str,
+    conversation_history: Optional[List[Dict]] = None,
+    user_message: str = "",
+) -> str:
     """If the model mentioned a product but didn't output [PRODUCT:handle]
     tags, inject them automatically. Works for ALL responses — not just
-    Matcha Finder step 3 — so product cards always appear."""
-    # Already has [PRODUCT] tags — don't double up
-    if _PRODUCT_TAG_RE.search(response):
-        return response
-    # Find mentioned products and inject tags
-    lower = response.lower()
+    Matcha Finder step 3 — so product cards always appear.
+    Also injects topic-based products (e.g. latte → nijyu-ni-22)."""
+    # Collect handles from [PRODUCT] tags already present
+    existing_tags = set(m.group(0).lower() for m in _PRODUCT_TAG_RE.finditer(response))
+
+    # Topic-based injection takes priority: if matched, use ONLY topic products
+    topic_matched = False
     handles = []
-    for name, handle in _PRODUCT_HANDLE_MAP.items():
-        if name in lower and handle not in handles:
-            handles.append(handle)
+    if user_message:
+        for pattern, topic_handles in _TOPIC_PRODUCT_MAP:
+            if pattern.search(user_message):
+                topic_matched = True
+                for h in topic_handles:
+                    if h not in handles:
+                        handles.append(h)
+
+    # Fall back to name-based detection only if no topic matched
+    if not topic_matched:
+        lower = response.lower()
+        for name, handle in _PRODUCT_HANDLE_MAP.items():
+            if name in lower and handle not in handles:
+                handles.append(handle)
+
+    # Filter out handles already present as [PRODUCT] tags
+    handles = [h for h in handles if f"[product:{h}]" not in existing_tags]
+
     if handles:
         tags = "\n".join(f"[PRODUCT:{h}]" for h in handles)
         response = response.rstrip() + "\n" + tags
@@ -374,8 +399,8 @@ class RAGEngine:
         # 7. Parse out follow-up suggestions
         response, suggestions = _parse_suggestions(raw_response)
 
-        # 8. Inject [PRODUCT] tags for Matcha Finder step 3
-        response = _inject_product_tags(response, conversation_history)
+        # 8. Inject [PRODUCT] tags for Matcha Finder step 3 + topic-based
+        response = _inject_product_tags(response, conversation_history, user_message=msg_stripped)
 
         return {
             "response": response,
@@ -509,8 +534,8 @@ class RAGEngine:
         raw = "".join(full_response)
         _, suggestions = _parse_suggestions(raw)
 
-        # 7. Inject [PRODUCT] tags for Matcha Finder step 3
-        injected = _inject_product_tags(raw, conversation_history)
+        # 7. Inject [PRODUCT] tags for Matcha Finder step 3 + topic-based
+        injected = _inject_product_tags(raw, conversation_history, user_message=msg_stripped)
         if injected != raw:
             # Emit the product tags as additional text so frontend can parse them
             extra = injected[len(raw):]
