@@ -1,0 +1,21 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-banner",
+      "settings": {
+        "heading": "NAKAI Matcha",
+        "subheading": "Premium Japanese Matcha",
+        "button_label": "Shop Now",
+        "button_link": "/collections/all"
+      }
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Our Collection",
+        "collection": "all"
+      }
+    }
+  },
+  "order": ["hero", "featured-collection"]
+}

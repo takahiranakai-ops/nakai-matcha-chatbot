@@ -513,3 +513,101 @@ async def create_wholesale_inquiry(
     except Exception as e:
         logger.warning(f"Failed to create wholesale inquiry: {e}", exc_info=True)
         return None
+
+
+# ----------------------------------------------------------------
+# AUTOMATION DATA (WS34-41)
+# ----------------------------------------------------------------
+
+async def _upsert_automation(table: str, payload: dict) -> Optional[dict]:
+    """Generic upsert to an automation table. Silently skips if unconfigured."""
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.post(
+            f"{_BASE_URL}/{table}",
+            headers={**_HEADERS, "Prefer": "return=representation,resolution=merge-duplicates"},
+            json=payload,
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.debug(f"Automation upsert to {table} failed: {e}")
+        return None
+
+
+async def store_citation(data: dict) -> Optional[dict]:
+    """WS35: Store AI citation monitoring result."""
+    return await _upsert_automation("citation_logs", data)
+
+
+async def store_competitor_data(data: dict) -> Optional[dict]:
+    """WS36: Store competitor monitoring result."""
+    return await _upsert_automation("competitor_data", data)
+
+
+async def store_social_mention(data: dict) -> Optional[dict]:
+    """WS39: Store social media mention."""
+    return await _upsert_automation("social_mentions", data)
+
+
+async def store_seo_ranking(data: dict) -> Optional[dict]:
+    """WS40: Store SEO ranking result."""
+    return await _upsert_automation("seo_rankings", data)
+
+
+async def get_automation_stats() -> dict:
+    """Get automation summary stats for admin dashboard."""
+    if not _is_configured():
+        return {}
+    _init()
+    stats: dict = {}
+    client = _get_client()
+
+    for table, key in [
+        ("citation_logs", "citations"),
+        ("social_mentions", "social_mentions"),
+        ("seo_rankings", "seo_rankings"),
+        ("competitor_data", "competitor_checks"),
+    ]:
+        try:
+            resp = await client.get(
+                f"{_BASE_URL}/{table}",
+                headers={**_HEADERS, "Prefer": "count=exact"},
+                params={"select": "id", "limit": "0"},
+            )
+            count = int(resp.headers.get("content-range", "0/0").split("/")[-1])
+            stats[key] = count
+        except Exception:
+            stats[key] = 0
+
+    # Share of Model: % of citations where nakai_cited=true
+    try:
+        resp = await client.get(
+            f"{_BASE_URL}/citation_logs",
+            headers={**_HEADERS, "Prefer": "count=exact"},
+            params={"select": "id", "nakai_cited": "eq.true", "limit": "0"},
+        )
+        cited = int(resp.headers.get("content-range", "0/0").split("/")[-1])
+        total = stats.get("citations", 0)
+        stats["share_of_model"] = round(cited / total * 100, 1) if total else 0
+        stats["nakai_cited"] = cited
+    except Exception:
+        stats["share_of_model"] = 0
+        stats["nakai_cited"] = 0
+
+    # Latest social mentions
+    try:
+        resp = await client.get(
+            f"{_BASE_URL}/social_mentions",
+            headers=_HEADERS,
+            params={"order": "timestamp.desc", "limit": "5"},
+        )
+        stats["recent_mentions"] = resp.json()
+    except Exception:
+        stats["recent_mentions"] = []
+
+    return stats

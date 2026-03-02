@@ -1,0 +1,44 @@
+/* NAKAI Matcha Theme — Base Styles */
+
+.visually-hidden {
+  position: absolute !important;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  word-wrap: normal !important;
+}
+
+.skip-to-content-link:focus {
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  padding: 1rem 2rem;
+  background: var(--color-primary, #406546);
+  color: #fff;
+  clip: auto;
+  font-size: 1.4rem;
+}
+
+.page-width {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.rte h2 { font-size: 2rem; font-weight: 400; margin: 2rem 0 1rem; }
+.rte h3 { font-size: 1.7rem; font-weight: 400; margin: 1.5rem 0 .8rem; }
+.rte p { margin-bottom: 1rem; }
+.rte ul, .rte ol { padding-left: 2rem; margin-bottom: 1rem; }
+.rte li { margin-bottom: .4rem; }
+.rte a { color: var(--color-primary, #406546); text-decoration: underline; }
+
+@media screen and (max-width: 749px) {
+  .page-width { padding: 0 1.5rem; }
+}

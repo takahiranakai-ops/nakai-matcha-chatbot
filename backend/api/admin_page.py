@@ -115,6 +115,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     <div class="tab" data-tab="history">Chat History</div>
     <div class="tab" data-tab="analytics">Analytics</div>
     <div class="tab" data-tab="leads">Wholesale Leads</div>
+    <div class="tab" data-tab="ai">AI Visibility</div>
   </div>
   <div class="panel active" id="panel-knowledge">
     <div class="toolbar">
@@ -160,6 +161,30 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
       <span id="leads-count" style="font-size:.85rem;color:var(--gray)"></span>
     </div>
     <table><thead><tr><th>Email</th><th>Session</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="leads-tbody"></tbody></table>
+  </div>
+  <div class="panel" id="panel-ai">
+    <div class="stats-grid" id="ai-stats-grid"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px">
+      <div>
+        <h3 style="font-size:.9rem;margin-bottom:12px;color:var(--green)">Recent Social Mentions</h3>
+        <div id="ai-mentions" style="background:var(--white);border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);max-height:340px;overflow-y:auto">
+          <p style="color:var(--gray);font-size:.85rem">Loading...</p>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:.9rem;margin-bottom:12px;color:var(--green)">Automation Status</h3>
+        <div id="ai-jobs" style="background:var(--white);border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+          <div class="breakdown-row"><span>Citation Monitor (WS35)</span><span class="badge badge-active">Daily 00:00</span></div>
+          <div class="breakdown-row"><span>Review Aggregator (WS37)</span><span class="badge badge-active">Daily 01:00</span></div>
+          <div class="breakdown-row"><span>SEO Tracker (WS40)</span><span class="badge badge-active">Daily 02:00</span></div>
+          <div class="breakdown-row"><span>Social Monitor (WS39)</span><span class="badge badge-active">Every 6h</span></div>
+          <div class="breakdown-row"><span>Content Freshness (WS38)</span><span class="badge badge-active">Weekly Wed</span></div>
+          <div class="breakdown-row"><span>Competitor Monitor (WS36)</span><span class="badge badge-active">Weekly Mon</span></div>
+          <div class="breakdown-row"><span>Sitemap Ping (WS41)</span><span class="badge badge-active">On Webhook</span></div>
+        </div>
+        <p style="font-size:.72rem;color:var(--gray);margin-top:8px">Requires SERP_API_KEY for WS35/WS40. Jobs run automatically when env vars are set.</p>
+      </div>
+    </div>
   </div>
 </div>
 <div class="modal-bg" id="article-modal">
@@ -240,6 +265,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
       if(t.getAttribute('data-tab')==='history')loadConversations();
       if(t.getAttribute('data-tab')==='analytics')loadAnalytics();
       if(t.getAttribute('data-tab')==='leads')loadLeads();
+      if(t.getAttribute('data-tab')==='ai')loadAIStats();
     }});
   }});
 
@@ -433,6 +459,37 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     if(!confirm('Delete this lead permanently?'))return;
     fetch('/api/admin/wholesale/leads/'+id,{{method:'DELETE',headers:hdrs()}})
     .then(function(){{loadLeads()}});
+  }};
+
+  window.loadAIStats=function(){{
+    fetch('/api/admin/automation-stats',{{headers:hdrs()}})
+    .then(function(r){{return r.json()}})
+    .then(function(d){{
+      var sg=document.getElementById('ai-stats-grid');
+      var som=d.share_of_model||0;
+      var cit=d.citations_count||0;
+      var soc=d.social_mentions_count||0;
+      var seo=d.seo_rankings_count||0;
+      sg.innerHTML='<div class="stat-card"><div class="label">Share of Model</div><div class="value">'+som+'%</div></div>'
+        +'<div class="stat-card"><div class="label">AI Citations Found</div><div class="value">'+cit+'</div></div>'
+        +'<div class="stat-card"><div class="label">Social Mentions</div><div class="value">'+soc+'</div></div>'
+        +'<div class="stat-card"><div class="label">SEO Rankings Tracked</div><div class="value">'+seo+'</div></div>';
+      var mc=document.getElementById('ai-mentions');mc.innerHTML='';
+      var mentions=d.recent_mentions||[];
+      if(!mentions.length){{mc.innerHTML='<p style="color:var(--gray);font-size:.85rem">No mentions yet. Data will appear after the social monitor runs.</p>';return}}
+      mentions.forEach(function(m){{
+        var div=document.createElement('div');div.style.cssText='padding:10px 0;border-bottom:1px solid #f0f0f0';
+        var plat=esc(m.platform||'reddit');
+        var sub=m.subreddit?' r/'+esc(m.subreddit):'';
+        var ts=m.timestamp?m.timestamp.substring(0,10):'';
+        div.innerHTML='<div style="font-size:.78rem;color:var(--gray)">'+plat+sub+' \u00b7 '+ts+'</div>'
+          +'<div style="font-size:.88rem;margin-top:4px"><a href="'+esc(m.url||'#')+'" target="_blank" style="color:var(--green)">'+esc(m.title||'Mention')+'</a></div>';
+        mc.appendChild(div);
+      }});
+    }})
+    .catch(function(){{
+      document.getElementById('ai-stats-grid').innerHTML='<div class="stat-card"><div class="label">Status</div><div class="value" style="font-size:1rem;color:var(--gray)">Set SERP_API_KEY to enable AI citation tracking</div></div>';
+    }});
   }};
 }})();
 </script>

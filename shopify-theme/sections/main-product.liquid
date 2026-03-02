@@ -3,13 +3,29 @@
   <div class="main-product__grid">
     <div class="main-product__media" role="img" aria-label="{{ product.title | escape }} product image">
       {%- if product.featured_image -%}
-        <img
-          src="{{ product.featured_image | image_url: width: 800 }}"
-          alt="{{ product.title | escape }} — {{ product.vendor | default: 'NAKAI' }} organic matcha"
-          loading="eager"
-          width="800"
-          height="800"
-        >
+        <picture>
+          <source
+            type="image/webp"
+            srcset="{{ product.featured_image | image_url: width: 400, format: 'webp' }} 400w,
+                    {{ product.featured_image | image_url: width: 600, format: 'webp' }} 600w,
+                    {{ product.featured_image | image_url: width: 800, format: 'webp' }} 800w,
+                    {{ product.featured_image | image_url: width: 1200, format: 'webp' }} 1200w"
+            sizes="(max-width: 749px) 100vw, 50vw"
+          >
+          <img
+            src="{{ product.featured_image | image_url: width: 800 }}"
+            srcset="{{ product.featured_image | image_url: width: 400 }} 400w,
+                    {{ product.featured_image | image_url: width: 600 }} 600w,
+                    {{ product.featured_image | image_url: width: 800 }} 800w,
+                    {{ product.featured_image | image_url: width: 1200 }} 1200w"
+            sizes="(max-width: 749px) 100vw, 50vw"
+            alt="{{ product.title | escape }} — {{ product.vendor | default: 'NAKAI' }} organic matcha"
+            loading="eager"
+            width="800"
+            height="800"
+            fetchpriority="high"
+          >
+        </picture>
       {%- endif -%}
     </div>
 

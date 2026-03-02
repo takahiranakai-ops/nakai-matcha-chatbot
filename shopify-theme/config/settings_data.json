@@ -1,0 +1,22 @@
+{
+  "current": {
+    "color_primary": "#406546",
+    "color_secondary": "#F9F0E2",
+    "color_background": "#FFFFFF",
+    "color_text": "#161614",
+    "color_text_secondary": "#7A766D",
+    "social_instagram_link": "https://instagram.com/nakaimatcha",
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {}
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {}
+      }
+    },
+    "content_for_header": [],
+    "content_for_layout": []
+  }
+}

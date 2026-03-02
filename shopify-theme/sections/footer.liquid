@@ -1,0 +1,110 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner page-width">
+    <div class="site-footer__brand">
+      <span class="site-footer__logo-text">{{ shop.name }}</span>
+      <p class="site-footer__tagline">Premium Japanese Matcha</p>
+    </div>
+
+    <div class="site-footer__links">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <a href="{{ link.url }}" class="site-footer__link">{{ link.title }}</a>
+      {%- endfor -%}
+    </div>
+
+    <div class="site-footer__social">
+      {%- if settings.social_instagram_link != blank -%}
+        <a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-secondary, #F9F0E2);
+    padding: 4rem 0 2rem;
+    margin-top: 4rem;
+  }
+  .site-footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    text-align: center;
+  }
+  .site-footer__logo-text {
+    font-family: var(--font-heading-family);
+    font-size: 1.6rem;
+    font-weight: 500;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--color-primary, #406546);
+  }
+  .site-footer__tagline {
+    font-size: 1.2rem;
+    color: var(--color-text-secondary, #7A766D);
+    margin-top: .4rem;
+    letter-spacing: .06em;
+  }
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+  }
+  .site-footer__link {
+    font-size: 1.2rem;
+    color: var(--color-text-secondary, #7A766D);
+    letter-spacing: .04em;
+    transition: color .3s ease;
+  }
+  .site-footer__link:hover {
+    color: var(--color-primary, #406546);
+  }
+  .site-footer__social {
+    display: flex;
+    gap: 1.2rem;
+  }
+  .site-footer__social a {
+    color: var(--color-text-secondary, #7A766D);
+    transition: color .3s ease;
+  }
+  .site-footer__social a:hover {
+    color: var(--color-primary, #406546);
+  }
+  .site-footer__bottom {
+    border-top: 1px solid rgba(0,0,0,.06);
+    padding-top: 1.5rem;
+    width: 100%;
+  }
+  .site-footer__bottom p {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary, #7A766D);
+    letter-spacing: .04em;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Footer menu",
+      "default": "footer"
+    }
+  ]
+}
+{% endschema %}

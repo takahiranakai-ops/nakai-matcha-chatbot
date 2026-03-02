@@ -1,0 +1,110 @@
+<section class="main-cart page-width">
+  <h1 class="main-cart__heading">{{ 'cart.general.title' | t | default: 'Your Cart' }}</h1>
+
+  {%- if cart.item_count > 0 -%}
+    <form action="/cart" method="post">
+      <div class="main-cart__items">
+        {%- for item in cart.items -%}
+          <div class="main-cart__item">
+            <div class="main-cart__item-image">
+              {%- if item.image -%}
+                <img src="{{ item.image | image_url: width: 120 }}" alt="{{ item.title | escape }}" loading="lazy">
+              {%- endif -%}
+            </div>
+            <div class="main-cart__item-info">
+              <a href="{{ item.url }}" class="main-cart__item-title">{{ item.product.title }}</a>
+              {%- if item.variant.title != 'Default Title' -%}
+                <p class="main-cart__item-variant">{{ item.variant.title }}</p>
+              {%- endif -%}
+              <p class="main-cart__item-price">{{ item.final_line_price | money }}</p>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <div class="main-cart__footer">
+        <p class="main-cart__total">
+          <span>{{ 'cart.general.subtotal' | t | default: 'Subtotal' }}</span>
+          <span>{{ cart.total_price | money }}</span>
+        </p>
+        <button type="submit" name="checkout" class="main-cart__checkout-btn">
+          {{ 'cart.general.checkout' | t | default: 'Checkout' }}
+        </button>
+      </div>
+    </form>
+  {%- else -%}
+    <p class="main-cart__empty">{{ 'cart.general.empty' | t | default: 'Your cart is empty.' }}</p>
+    <a href="/collections/all" class="main-cart__continue">{{ 'cart.general.continue_shopping' | t | default: 'Continue Shopping' }}</a>
+  {%- endif -%}
+</section>
+
+<style>
+  .main-cart { padding: 3rem 0; max-width: 700px; margin: 0 auto; }
+  .main-cart__heading {
+    font-family: var(--font-heading-family);
+    font-size: 2.4rem;
+    font-weight: 400;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--color-primary, #406546);
+    margin-bottom: 2rem;
+  }
+  .main-cart__item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+  }
+  .main-cart__item-image { width: 80px; flex-shrink: 0; }
+  .main-cart__item-image img { border-radius: 8px; width: 100%; }
+  .main-cart__item-title { font-size: 1.4rem; font-weight: 400; }
+  .main-cart__item-variant { font-size: 1.2rem; color: var(--color-text-secondary); margin-top: .2rem; }
+  .main-cart__item-price { font-size: 1.3rem; margin-top: .5rem; color: var(--color-primary, #406546); }
+  .main-cart__footer { margin-top: 2rem; text-align: center; }
+  .main-cart__total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.6rem;
+    font-weight: 500;
+    padding: 1.5rem 0;
+    border-top: 2px solid rgba(0,0,0,.08);
+  }
+  .main-cart__checkout-btn {
+    width: 100%;
+    padding: 1.4rem;
+    background: var(--color-primary, #406546);
+    color: #fff;
+    border: none;
+    border-radius: 9999px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    transition: opacity .3s;
+  }
+  .main-cart__checkout-btn:hover { opacity: .9; }
+  .main-cart__empty {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--color-text-secondary);
+    margin: 3rem 0 1.5rem;
+  }
+  .main-cart__continue {
+    display: block;
+    text-align: center;
+    font-size: 1.3rem;
+    color: var(--color-primary, #406546);
+    text-decoration: underline;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Cart",
+  "tag": "section",
+  "class": "section-main-cart",
+  "settings": []
+}
+{% endschema %}

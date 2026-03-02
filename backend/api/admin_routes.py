@@ -269,3 +269,13 @@ async def delete_wholesale_lead(lead_id: str, _auth: bool = Depends(verify_admin
     if not success:
         raise HTTPException(status_code=500, detail="Failed to delete lead")
     return {"deleted": True}
+
+
+# ----------------------------------------------------------------
+# AUTOMATION STATS (WS35-41 dashboard data)
+# ----------------------------------------------------------------
+
+@admin_api_router.get("/automation-stats")
+async def get_automation_stats(_auth: bool = Depends(verify_admin)):
+    stats = await supabase_client.get_automation_stats()
+    return stats

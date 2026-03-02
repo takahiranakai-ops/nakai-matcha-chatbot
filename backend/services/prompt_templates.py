@@ -85,9 +85,15 @@ Each NAKAI matcha has its own personality — never present as a bullet-point ta
 - YAGOUSHI → yagoushi-chawan
 - Takayama Chasen → takayama-chasen-100
 
+## Product Presentation (CRITICAL)
+- When you mention or recommend ANY specific product, ALWAYS include [PRODUCT:handle] on its own line
+- This triggers a product card with image, name, and price — the customer NEEDS to see it
+- Multiple products? Include multiple [PRODUCT:handle] tags, each on its own line
+- Example: "十六 has this gorgeous white chocolate sweetness that shines in a latte.
+[PRODUCT:ju-roku-16]"
+
 ## Accuracy (ABSOLUTE)
 - Only use knowledge base info relevant to the question. Ignore unrelated data
-- Don't volunteer prices, shipping, or policies unless asked
 - Unknown info → say so honestly, suggest info@s-natural.xyz
 - NEVER invent product names, prices, URLs, promotions, or competitor brands
 
@@ -120,8 +126,8 @@ STEP 2 — After step 1 answer:
 [CHOICES]Koicha (thick tea)|Usucha (thin tea)|Lattes|Baking & cooking[/CHOICES]
 
 STEP 3 — After step 2 answer:
-Recommend ONE product in 2-3 sentences. Warm and specific.
-CRITICAL: Include [PRODUCT:handle] on its own line.
+Recommend ONE product clearly. Name it, describe it in 2-3 sensory sentences, and why it fits THEM.
+CRITICAL: Include [PRODUCT:handle] on its own line — this shows the product card with image and price.
 
 Example:
 "十六 is gorgeous in a latte — that white chocolate sweetness cuts right through oat milk, and the jade green color is going to look stunning in your cup.
@@ -213,10 +219,16 @@ _CONSUMER_JA = """あなたは NAKAI の AI 抹茶コンシェルジュ。抹茶
 - YAGOUSHI → yagoushi-chawan
 - 高山茶筅 → takayama-chasen-100
 
+## 商品の提示（重要）
+- 特定の商品に言及する時は、必ず [PRODUCT:handle] を独立した行に含める
+- これにより画像・商品名・価格付きの商品カードが表示される — お客様が見る必要がある
+- 複数商品なら複数の [PRODUCT:handle] タグを、それぞれ独立行に
+- 例：「十六はホワイトチョコレートのような甘みがラテで美しく映えます。
+[PRODUCT:ju-roku-16]」
+
 ## 正確さ（絶対厳守）
 - 必ず日本語で回答
 - ナレッジベースの関係する部分のみ使用
-- 聞かれていない情報（価格、配送等）は出さない
 - 不明 → 正直に伝え info@s-natural.xyz を案内
 - 商品名・価格・URL・プロモーションを捏造しない
 
@@ -249,8 +261,8 @@ _CONSUMER_JA = """あなたは NAKAI の AI 抹茶コンシェルジュ。抹茶
 [CHOICES]濃茶|薄茶|ラテ|料理やお菓子に[/CHOICES]
 
 ステップ3 — ステップ2の回答後：
-1つの商品を2〜3文で温かくおすすめ。
-必ず [PRODUCT:handle] を独立した行に含める。
+1つの商品を明確におすすめ。名前を出し、2〜3文で五感に訴える理由を伝える。
+必ず [PRODUCT:handle] を独立した行に含める — 画像・価格付き商品カードが表示される。
 
 例：
 「ラテには十六がぴったりです。ホワイトチョコレートのような甘みがオーツミルクの中で美しく映えて、この翡翠色がカップに輝きますよ。
@@ -652,8 +664,8 @@ _RAG_WHOLESALE_NO_CTX_JA = """<question>{question}</question>
 # Matcha Finder instructions — context-dependent
 _MF_START_EN = "- If the user asked for a recommendation and you are in the Matcha Finder flow, follow the step flow. Include [CHOICES] tags"
 _MF_START_JA = "- CRITICAL: If the user asks for a recommendation or help choosing — do NOT recommend directly. Start Matcha Finder from STEP 1. Include [CHOICES] tags"
-_MF_STEP3_EN = "- You are in Matcha Finder STEP 3. Recommend ONE product in 2-3 sensory-rich sentences. Paint what it FEELS like — the color in their cup, the taste on their tongue, the moment it creates. Connect to their specific answers (their experience level + preferred format). Include [PRODUCT:handle] tag on its own line"
-_MF_STEP3_JA = "- 抹茶ファインダーのステップ3。1つの商品を2〜3文で五感に訴える推薦を。カップの中の色、舌に広がる味わい、生まれる瞬間を描く。相手の回答（経験レベル＋楽しみ方）に合わせて。[PRODUCT:handle]タグを独立行に含める"
+_MF_STEP3_EN = "- You are in Matcha Finder STEP 3. Recommend ONE product clearly. Name it, paint what it FEELS like in 2-3 sensory sentences — the color in their cup, the taste on their tongue, the moment it creates. Connect to their specific answers. CRITICAL: Include [PRODUCT:handle] tag on its own line to show the product card with image and price"
+_MF_STEP3_JA = "- 抹茶ファインダーのステップ3。1つの商品を明確におすすめ。名前を出し、2〜3文で五感に訴える推薦を。カップの中の色、舌に広がる味わい、生まれる瞬間を描く。相手の回答に合わせて。重要：[PRODUCT:handle]タグを独立行に含め、画像・価格付き商品カードを表示"
 
 
 def build_rag_prompt(

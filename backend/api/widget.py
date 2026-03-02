@@ -66,7 +66,7 @@ WIDGET_JS = r"""
       placeholder: 'Ask about matcha...',
       typing: 'AI is composing...',
       aiBanner: 'AI-powered answers based on our matcha expertise',
-      q1: 'Find my matcha',
+      q1: 'Find your matcha',
       q1msg: "I'd like to find the right matcha for me. Can you help?",
       q2: 'Make a matcha latte',
       q2msg: 'How do I make the perfect matcha latte at home?',
@@ -158,24 +158,41 @@ WIDGET_JS = r"""
     handles.forEach(function(handle) {
       var card = document.createElement('a');
       card.className = 'nakai-chat__product-card';
-      card.href = SHOP_URL + '/products/' + handle;
+      card.href = SHOP_URL + (PRODUCT_MAP[handle] || '/products/' + handle);
       card.target = '_blank'; card.rel = 'noopener';
       card.innerHTML = '<div class="nakai-chat__product-card-img" style="background:linear-gradient(90deg,rgba(61,97,66,.04) 25%,rgba(61,97,66,.08) 50%,rgba(61,97,66,.04) 75%);background-size:200% 100%;animation:nakaiShimmer 1.5s infinite"></div><div class="nakai-chat__product-card-body"><div class="nakai-chat__product-card-title" style="height:2.6em;background:rgba(61,97,66,.04);border-radius:4px"></div></div>';
       carousel.appendChild(card);
-      fetch('https://nakaimatcha.com/products/' + handle + '.json')
-        .then(function(r) { if (!r.ok) throw new Error('err'); return r.json(); })
+
+      function renderCard(title, img, price) {
+        card.innerHTML = (img ? '<img class="nakai-chat__product-card-img" src="' + img + '" alt="' + escapeHtml(title) + '" loading="lazy">' : '<div class="nakai-chat__product-card-img"></div>')
+          + '<div class="nakai-chat__product-card-body">'
+          + '<div class="nakai-chat__product-card-title">' + escapeHtml(title) + '</div>'
+          + (price ? '<div class="nakai-chat__product-card-price">$' + price + '</div>' : '')
+          + '<div class="nakai-chat__product-card-cta">' + (PAGE_LANG === 'ja' ? '商品を見る' : 'View Product') + '</div>'
+          + '</div>';
+      }
+
+      // Try Shopify JSON first, fallback to backend API
+      fetch(SHOP_URL + '/products/' + handle + '.json')
+        .then(function(r) { if (!r.ok) throw new Error('shopify-err'); return r.json(); })
         .then(function(data) {
           var p = data.product;
           var img = p.images && p.images.length ? p.images[0].src : '';
           var price = p.variants && p.variants.length ? p.variants[0].price : '';
-          card.innerHTML = (img ? '<img class="nakai-chat__product-card-img" src="' + img + '" alt="' + escapeHtml(p.title) + '" loading="lazy">' : '<div class="nakai-chat__product-card-img"></div>')
-            + '<div class="nakai-chat__product-card-body">'
-            + '<div class="nakai-chat__product-card-title">' + escapeHtml(p.title) + '</div>'
-            + (price ? '<div class="nakai-chat__product-card-price">$' + price + '</div>' : '')
-            + '<div style="font-size:.7rem;font-weight:500;color:var(--nc-g1);margin-top:4px">' + (PAGE_LANG === 'ja' ? '商品を見る →' : 'View Product →') + '</div>'
-            + '</div>';
+          renderCard(p.title, img, price);
         })
-        .catch(function() { var t = card.querySelector('.nakai-chat__product-card-title'); if (t) t.textContent = PAGE_LANG === 'ja' ? '商品を見る' : 'View Product'; });
+        .catch(function() {
+          // Fallback: backend product API
+          fetch(API_BASE.replace('/api', '') + '/api/products/' + handle)
+            .then(function(r) { if (!r.ok) throw new Error('api-err'); return r.json(); })
+            .then(function(p) {
+              var title = p.name || handle;
+              var img = p.image || '';
+              var price = p.offers && p.offers.price ? p.offers.price : '';
+              renderCard(title, img, price);
+            })
+            .catch(function() { renderCard(handle.replace(/-/g, ' '), '', ''); });
+        });
     });
     parentEl.appendChild(carousel);
     scrollToBottom();
@@ -200,9 +217,9 @@ WIDGET_JS = r"""
 
   function WIDGET_HTML() {
     return '<div id="nakai-chat-widget" class="nakai-chat">'
-      + '<button id="nakai-chat-toggle" class="nakai-chat__toggle" aria-label="Find My Matcha AI" aria-expanded="false">'
+      + '<button id="nakai-chat-toggle" class="nakai-chat__toggle" aria-label="Find Your Matcha" aria-expanded="false">'
       +   '<div class="nakai-chat__toggle-body">'
-      +     '<span class="nakai-chat__toggle-label">FIND MY MATCHA</span>'
+      +     '<span class="nakai-chat__toggle-label">FIND YOUR MATCHA</span>'
       +     '<span class="nakai-chat__toggle-sep"></span>'
       +     '<span class="nakai-chat__toggle-ai">by AI</span>'
       +   '</div>'
@@ -531,33 +548,42 @@ WIDGET_JS = r"""
     parentDiv.appendChild(grid);
   }
 
-  function fetchProductCard(handle, card) {
-    var url = SHOP_URL + '/products/' + handle + '.json';
-    fetch(url)
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (data) {
-        if (!data || !data.product) return;
-        var p = data.product;
-        var imgSrc = p.image ? p.image.src : '';
-        var price = p.variants && p.variants[0] ? p.variants[0].price : '';
+  function fillCard(card, title, imgSrc, price) {
+    card.classList.remove('nakai-chat__product-card--loading');
+    var imgEl = card.querySelector('.nakai-chat__product-card-img');
+    if (imgEl && imgSrc) {
+      var img = document.createElement('img');
+      img.src = imgSrc;
+      img.alt = title;
+      img.className = 'nakai-chat__product-card-img';
+      img.loading = 'lazy';
+      imgEl.replaceWith(img);
+    }
+    var titleEl = card.querySelector('.nakai-chat__product-card-title');
+    if (titleEl) titleEl.textContent = title;
+    var priceEl = card.querySelector('.nakai-chat__product-card-price');
+    if (priceEl && price) priceEl.textContent = '$' + price;
+    var ctaEl = card.querySelector('.nakai-chat__product-card-cta');
+    if (ctaEl) ctaEl.style.display = '';
+  }
 
-        card.classList.remove('nakai-chat__product-card--loading');
-        var imgEl = card.querySelector('.nakai-chat__product-card-img');
-        if (imgEl && imgSrc) {
-          var img = document.createElement('img');
-          img.src = imgSrc;
-          img.alt = p.title;
-          img.className = 'nakai-chat__product-card-img';
-          img.loading = 'lazy';
-          imgEl.replaceWith(img);
-        }
-        var titleEl = card.querySelector('.nakai-chat__product-card-title');
-        if (titleEl) titleEl.textContent = p.title;
-        var priceEl = card.querySelector('.nakai-chat__product-card-price');
-        if (priceEl && price) priceEl.textContent = '$' + price;
+  function fetchProductCard(handle, card) {
+    var shopUrl = SHOP_URL + '/products/' + handle + '.json';
+    fetch(shopUrl)
+      .then(function (r) { if (!r.ok) throw new Error('shopify'); return r.json(); })
+      .then(function (data) {
+        if (!data || !data.product) throw new Error('no-product');
+        var p = data.product;
+        fillCard(card, p.title, p.image ? p.image.src : '', p.variants && p.variants[0] ? p.variants[0].price : '');
       })
       .catch(function () {
-        card.classList.remove('nakai-chat__product-card--loading');
+        // Fallback: backend product API
+        fetch(API_BASE.replace('/api', '') + '/api/products/' + handle)
+          .then(function (r) { if (!r.ok) throw new Error('api'); return r.json(); })
+          .then(function (p) {
+            fillCard(card, p.name || handle, p.image || '', p.offers && p.offers.price ? p.offers.price : '');
+          })
+          .catch(function () { card.classList.remove('nakai-chat__product-card--loading'); });
       });
   }
 

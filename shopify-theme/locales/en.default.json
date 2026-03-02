@@ -1,0 +1,46 @@
+{
+  "general": {
+    "cart": "Cart",
+    "404": {
+      "title": "Page not found",
+      "link": "Return home"
+    }
+  },
+  "accessibility": {
+    "skip_to_content": "Skip to content"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to Cart",
+      "sold_out": "Sold Out",
+      "variant": "Option"
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "Your Cart",
+      "subtotal": "Subtotal",
+      "checkout": "Checkout",
+      "empty": "Your cart is empty.",
+      "continue_shopping": "Continue Shopping"
+    }
+  },
+  "blogs": {
+    "article": {
+      "back": "Back to blog"
+    }
+  },
+  "nakai": {
+    "chat": {
+      "page_subtitle": "Ask us anything about matcha",
+      "welcome_full": "Welcome to NAKAI Matcha. I can help you learn about our products, Japanese tea ceremony, brewing techniques, and more. What would you like to know?",
+      "ai_intro_full": "AI answers based on our product knowledge, tea ceremony traditions, and brewing expertise",
+      "placeholder_ai": "Ask AI about our matcha...",
+      "send": "Send",
+      "quick_recommend": "Recommend a matcha",
+      "quick_shipping": "Shipping info",
+      "quick_brewing": "How to brew",
+      "quick_ceremony": "Tea ceremony"
+    }
+  }
+}

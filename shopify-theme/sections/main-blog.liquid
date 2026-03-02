@@ -1,0 +1,58 @@
+<section class="main-blog page-width">
+  <h1 class="main-blog__heading">{{ blog.title }}</h1>
+
+  <div class="main-blog__grid">
+    {%- for article in blog.articles -%}
+      <a href="{{ article.url }}" class="blog-card">
+        {%- if article.image -%}
+          <div class="blog-card__image">
+            <img src="{{ article.image | image_url: width: 600 }}" alt="{{ article.title | escape }}" loading="lazy">
+          </div>
+        {%- endif -%}
+        <div class="blog-card__info">
+          <time class="blog-card__date">{{ article.published_at | date: '%B %d, %Y' }}</time>
+          <h2 class="blog-card__title">{{ article.title }}</h2>
+          <p class="blog-card__excerpt">{{ article.excerpt_or_content | strip_html | truncate: 120 }}</p>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+</section>
+
+<style>
+  .main-blog { padding: 3rem 0; }
+  .main-blog__heading {
+    font-family: var(--font-heading-family);
+    font-size: 2.8rem;
+    font-weight: 400;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--color-primary, #406546);
+    margin-bottom: 3rem;
+  }
+  .main-blog__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+  }
+  .blog-card { display: block; transition: transform .3s ease; }
+  .blog-card:hover { transform: translateY(-4px); }
+  .blog-card__image { border-radius: 16px; overflow: hidden; margin-bottom: 1rem; }
+  .blog-card__image img { width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+  .blog-card__date { font-size: 1.1rem; color: var(--color-text-secondary); letter-spacing: .04em; }
+  .blog-card__title { font-size: 1.6rem; font-weight: 400; margin: .5rem 0; }
+  .blog-card__excerpt { font-size: 1.3rem; color: var(--color-text-secondary); line-height: 1.6; }
+  @media screen and (max-width: 749px) {
+    .main-blog__grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Blog",
+  "tag": "section",
+  "class": "section-main-blog",
+  "settings": []
+}
+{% endschema %}

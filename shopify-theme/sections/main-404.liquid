@@ -1,0 +1,48 @@
+<section class="main-404 page-width">
+  <h1 class="main-404__heading">404</h1>
+  <p class="main-404__text">{{ 'general.404.title' | t | default: 'Page not found' }}</p>
+  <a href="/" class="main-404__link">{{ 'general.404.link' | t | default: 'Return home' }}</a>
+</section>
+
+<style>
+  .main-404 {
+    text-align: center;
+    padding: 8rem 2rem;
+  }
+  .main-404__heading {
+    font-size: 8rem;
+    font-weight: 300;
+    color: var(--color-primary, #406546);
+    opacity: .3;
+    line-height: 1;
+  }
+  .main-404__text {
+    font-size: 1.8rem;
+    color: var(--color-text-secondary, #7A766D);
+    margin: 1.5rem 0;
+  }
+  .main-404__link {
+    display: inline-block;
+    padding: 1rem 2.4rem;
+    border: 1px solid var(--color-primary, #406546);
+    border-radius: 9999px;
+    color: var(--color-primary, #406546);
+    font-size: 1.2rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    transition: all .3s ease;
+  }
+  .main-404__link:hover {
+    background: var(--color-primary, #406546);
+    color: #fff;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "404",
+  "tag": "section",
+  "class": "section-main-404",
+  "settings": []
+}
+{% endschema %}

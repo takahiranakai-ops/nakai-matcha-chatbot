@@ -544,7 +544,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     </div>
     <nav class="nc-brand__nav">
       <button class="nc-brand__nav-item" id="nc-nav-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>Home</button>
-      <button class="nc-brand__nav-item" id="nc-nav-find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span id="nc-nav-find-label">Find My Matcha</span></button>
+      <button class="nc-brand__nav-item" id="nc-nav-find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span id="nc-nav-find-label">Find Your Matcha</span></button>
       <button class="nc-brand__nav-item" id="nc-nav-brew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg><span id="nc-nav-brew-label">Barista Guide</span></button>
       <button class="nc-brand__nav-item" id="nc-nav-recipes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span id="nc-nav-recipes-label">Recipes</span></button>
       <button class="nc-brand__nav-item" id="nc-nav-faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="nc-nav-faq-label">About Matcha</span></button>
@@ -594,7 +594,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           </div>
         </div>
         <div class="nc-topics" id="nc-topics">
-          <button class="nc-topics__pill nc-topics__pill--primary" id="nc-t-find">Find My Matcha</button>
+          <button class="nc-topics__pill nc-topics__pill--primary" id="nc-t-find">Find Your Matcha</button>
           <button class="nc-topics__pill" id="nc-t-brew">Barista Guide</button>
           <button class="nc-topics__pill" id="nc-t-product">Recipes</button>
           <button class="nc-topics__pill" id="nc-t-faq">About Matcha</button>
@@ -631,7 +631,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       </div>
       <div class="nc-drawer__nav">
         <button class="nc-drawer__nav-item" id="nc-dnav-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg><span>Home</span></button>
-        <button class="nc-drawer__nav-item" id="nc-dnav-find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span id="nc-dnav-find-label">Find My Matcha</span></button>
+        <button class="nc-drawer__nav-item" id="nc-dnav-find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span id="nc-dnav-find-label">Find Your Matcha</span></button>
         <button class="nc-drawer__nav-item" id="nc-dnav-brew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg><span id="nc-dnav-brew-label">Barista Guide</span></button>
         <button class="nc-drawer__nav-item" id="nc-dnav-recipes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span id="nc-dnav-recipes-label">Recipes</span></button>
         <button class="nc-drawer__nav-item" id="nc-dnav-faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="nc-dnav-faq-label">About Matcha</span></button>
@@ -719,13 +719,13 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       placeholder:'Ask about matcha...',
       typing:'Thinking...',
       banner:'AI-powered answers based on our matcha expertise',
-      q1:'Find my matcha',q1m:"I'd like to find the right matcha for me. Can you help?",
+      q1:'Find your matcha',q1m:"I'd like to find the right matcha for me. Can you help?",
       q2:'Make a matcha latte',q2m:'How do I make the perfect matcha latte at home?',
       q3:'Why NAKAI?',q3m:'What makes NAKAI matcha different from other matcha brands?',
       q4:'Health benefits',q4m:'What are the health benefits of drinking matcha daily?',
       error:"Connection issue. Please try again.",
       sub:'AI Matcha Concierge',homeGreeting:'What can I help you with?',
-      findCta:'Find My Matcha',
+      findCta:'Find Your Matcha',
       mBrew:'Barista Guide',mProduct:'NAKAI Matcha Product Recipes',mFaq:'Learn about Matcha',
       hShop:'Shop',hWs:'Wholesale',
       brewMsg:'How do I brew the perfect cup of matcha? Please include water temperature, matcha-to-water ratio, and whisking technique.',
@@ -743,7 +743,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       rAffogato:'Affogato',rAffogatoDesc:'Matcha meets vanilla ice cream',rAffogatoMsg:'How do I make a matcha affogato?',
       rBarista:'Barista Tips',rBaristaDesc:'Water temp, whisking, milk pairing',rBaristaMsg:'What are the essential barista tips for working with matcha? Cover water temperature, whisking technique, and milk pairing.',
       heroSub:'Your private matcha concierge',heroGreeting:'Discover your perfect matcha',
-      tFind:'Find My Matcha',tBrew:'Barista Guide',tProduct:'Recipes',tFaq:'About Matcha',
+      tFind:'Find Your Matcha',tBrew:'Barista Guide',tProduct:'Recipes',tFaq:'About Matcha',
       pAsk:'Ask about this',
       inviteHeadline:'Share matcha with someone you love',inviteBody:'Invite a close friend and they\u2019ll receive a special matcha gift.',
       inviteBtn:'Invite a friend',inviteAllUsed:'All invites shared',

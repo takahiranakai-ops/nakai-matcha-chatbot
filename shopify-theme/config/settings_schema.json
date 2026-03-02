@@ -1,0 +1,95 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "NAKAI Matcha",
+    "theme_version": "1.0.0",
+    "theme_author": "NAKAI",
+    "theme_documentation_url": "https://nakaimatcha.com",
+    "theme_support_url": "https://nakaimatcha.com/pages/contact"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Primary (Matcha Green)",
+        "default": "#406546"
+      },
+      {
+        "type": "color",
+        "id": "color_secondary",
+        "label": "Secondary (Cream)",
+        "default": "#F9F0E2"
+      },
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Background",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Text",
+        "default": "#161614"
+      },
+      {
+        "type": "color",
+        "id": "color_text_secondary",
+        "label": "Text secondary",
+        "default": "#7A766D"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "heading_font_family",
+        "label": "Heading font",
+        "default": "work_sans_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "body_font_family",
+        "label": "Body font",
+        "default": "work_sans_n4"
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram",
+        "default": "https://instagram.com/nakaimatcha"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok_link",
+        "label": "TikTok",
+        "default": ""
+      },
+      {
+        "type": "text",
+        "id": "social_facebook_link",
+        "label": "Facebook",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon image"
+      }
+    ]
+  }
+]

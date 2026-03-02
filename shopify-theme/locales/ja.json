@@ -1,0 +1,46 @@
+{
+  "general": {
+    "cart": "カート",
+    "404": {
+      "title": "ページが見つかりません",
+      "link": "ホームへ戻る"
+    }
+  },
+  "accessibility": {
+    "skip_to_content": "コンテンツへスキップ"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "カートに追加",
+      "sold_out": "売り切れ",
+      "variant": "オプション"
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "カート",
+      "subtotal": "小計",
+      "checkout": "お会計へ",
+      "empty": "カートは空です。",
+      "continue_shopping": "お買い物を続ける"
+    }
+  },
+  "blogs": {
+    "article": {
+      "back": "ブログへ戻る"
+    }
+  },
+  "nakai": {
+    "chat": {
+      "page_subtitle": "抹茶に関することなら何でもお聞きください",
+      "welcome_full": "NAKAI Matchaへようこそ。商品、茶道、淹れ方のコツなど、お気軽にご質問ください。",
+      "ai_intro_full": "AIが商品知識・茶道の伝統・淹れ方の専門知識に基づいてお答えします",
+      "placeholder_ai": "抹茶について聞いてみましょう...",
+      "send": "送信",
+      "quick_recommend": "おすすめの抹茶",
+      "quick_shipping": "配送について",
+      "quick_brewing": "淹れ方のコツ",
+      "quick_ceremony": "茶道について"
+    }
+  }
+}

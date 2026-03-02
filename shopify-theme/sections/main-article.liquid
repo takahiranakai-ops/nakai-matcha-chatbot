@@ -1,0 +1,51 @@
+<article class="main-article page-width">
+  <header class="main-article__header">
+    <h1 class="main-article__title">{{ article.title }}</h1>
+    <time class="main-article__date">{{ article.published_at | date: '%B %d, %Y' }}</time>
+  </header>
+
+  {%- if article.image -%}
+    <div class="main-article__image">
+      <img src="{{ article.image | image_url: width: 1200 }}" alt="{{ article.title | escape }}" loading="eager">
+    </div>
+  {%- endif -%}
+
+  <div class="main-article__content rte">
+    {{ article.content }}
+  </div>
+
+  <a href="{{ blog.url }}" class="main-article__back">&larr; {{ 'blogs.article.back' | t | default: 'Back to blog' }}</a>
+</article>
+
+<style>
+  .main-article { padding: 3rem 0; max-width: 800px; margin: 0 auto; }
+  .main-article__header { text-align: center; margin-bottom: 2rem; }
+  .main-article__title {
+    font-family: var(--font-heading-family);
+    font-size: 3rem;
+    font-weight: 400;
+    letter-spacing: .04em;
+    color: var(--color-text);
+    margin-bottom: .5rem;
+  }
+  .main-article__date { font-size: 1.2rem; color: var(--color-text-secondary); }
+  .main-article__image { margin-bottom: 2rem; }
+  .main-article__image img { border-radius: 16px; width: 100%; }
+  .main-article__content { font-size: 1.5rem; line-height: 1.8; }
+  .main-article__content img { border-radius: 12px; margin: 1.5rem 0; }
+  .main-article__back {
+    display: inline-block;
+    margin-top: 3rem;
+    font-size: 1.3rem;
+    color: var(--color-primary, #406546);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Article",
+  "tag": "section",
+  "class": "section-main-article",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,142 @@
+{%- comment -%}
+  WS15: HowTo JSON-LD Schema — Matcha Preparation Recipes
+  Generates step-by-step recipe structured data for Google rich results.
+  Auto-renders on product pages for matcha products.
+{%- endcomment -%}
+
+{%- if product and product.type == 'Matcha' or template.name == 'product' -%}
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Make Usucha (Thin Matcha Tea)",
+    "description": "Traditional Japanese thin matcha preparation. The standard daily way to enjoy NAKAI matcha, producing a light and frothy bowl.",
+    "totalTime": "PT2M",
+    "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "2" },
+    "tool": [
+      { "@type": "HowToTool", "name": "Chasen (bamboo whisk)" },
+      { "@type": "HowToTool", "name": "Chawan (matcha bowl)" },
+      { "@type": "HowToTool", "name": "Chashaku (bamboo scoop) or fine sieve" }
+    ],
+    "supply": [
+      { "@type": "HowToSupply", "name": "NAKAI matcha powder", "requiredQuantity": "2g (about 2 scoops)" },
+      { "@type": "HowToSupply", "name": "Hot water at 75-80°C (167-176°F)", "requiredQuantity": "70ml" }
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Sift",
+        "text": "Sift 2g of NAKAI matcha through a fine sieve into a pre-warmed chawan to remove clumps."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Add water",
+        "text": "Pour 70ml of water at 75-80°C (never boiling) over the matcha. Let the kettle rest 2 minutes after boiling."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Whisk",
+        "text": "Using a chasen, whisk vigorously in a W or M motion for 15-20 seconds until a smooth, frothy surface with fine bubbles forms."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Enjoy",
+        "text": "Lift the chasen from the center. Enjoy immediately while the crema is fresh and vibrant."
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Make Koicha (Thick Matcha Tea)",
+    "description": "Traditional Japanese thick matcha preparation. Reserved for the highest ceremonial grades like NAKAI NIJYU-NI (22). Reveals the full depth of umami.",
+    "totalTime": "PT3M",
+    "tool": [
+      { "@type": "HowToTool", "name": "Chasen (bamboo whisk)" },
+      { "@type": "HowToTool", "name": "Chawan (matcha bowl)" }
+    ],
+    "supply": [
+      { "@type": "HowToSupply", "name": "NAKAI NIJYU-NI (22) or JU-NANA (17) matcha", "requiredQuantity": "4g" },
+      { "@type": "HowToSupply", "name": "Hot water at 75°C (167°F)", "requiredQuantity": "30-40ml" }
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Sift double",
+        "text": "Sift 4g of ceremonial matcha into a warmed bowl. Sifting is essential for koicha's smooth consistency."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Add water",
+        "text": "Add only 30-40ml of water at 75°C. Much less water than usucha."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Knead",
+        "text": "Using the chasen, knead slowly in circular motions. Do NOT whisk — koicha should have no foam. Achieve a thick, glossy, paint-like consistency."
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Make a Matcha Latte",
+    "description": "NAKAI's recommended matcha latte recipe using NIJYU-NI (22). The vibrant jade color stays vivid through milk, with zero grittiness from the ultra-fine 5-10 micrometer stone-ground particles.",
+    "totalTime": "PT3M",
+    "supply": [
+      { "@type": "HowToSupply", "name": "NAKAI NIJYU-NI (22) matcha", "requiredQuantity": "2g" },
+      { "@type": "HowToSupply", "name": "Hot water at 80°C", "requiredQuantity": "30ml" },
+      { "@type": "HowToSupply", "name": "Milk (oat milk recommended)", "requiredQuantity": "150-200ml" }
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Make matcha concentrate",
+        "text": "Sift 2g matcha into a cup. Add 30ml hot water at 80°C. Whisk vigorously until completely smooth with no lumps."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Steam milk",
+        "text": "Steam or heat 150-200ml of milk (oat milk creates the best pairing with matcha's umami)."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Combine",
+        "text": "Pour steamed milk over the matcha concentrate. The vibrant jade green of NAKAI 22 stays beautifully visible through the milk."
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Make Iced Matcha",
+    "description": "Refreshing iced matcha preparation. Perfect for summer. The ultra-fine stone-ground particles of NAKAI matcha dissolve completely even in cold water.",
+    "totalTime": "PT2M",
+    "supply": [
+      { "@type": "HowToSupply", "name": "NAKAI matcha", "requiredQuantity": "2g" },
+      { "@type": "HowToSupply", "name": "Hot water at 80°C", "requiredQuantity": "30ml" },
+      { "@type": "HowToSupply", "name": "Ice cubes" },
+      { "@type": "HowToSupply", "name": "Cold water or milk", "requiredQuantity": "150ml" }
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Make matcha shot",
+        "text": "Sift 2g matcha. Add 30ml hot water. Whisk until smooth and completely dissolved."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Prepare glass",
+        "text": "Fill a tall glass with ice cubes to the top."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Pour and serve",
+        "text": "Pour the matcha concentrate over ice. Top with cold water or cold milk to taste. Stir gently and enjoy."
+      }
+    ]
+  }
+]
+</script>
+{%- endif -%}
