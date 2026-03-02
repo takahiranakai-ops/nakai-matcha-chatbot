@@ -4,6 +4,7 @@ import json
 import logging
 import time
 
+import httpx
 from fastapi import APIRouter, HTTPException, Header, Request
 from fastapi.responses import StreamingResponse
 from api.models import ChatRequest, ChatResponse, RefreshResponse
@@ -183,6 +184,48 @@ async def health():
         "documents": vector_store.count(),
         "refresh_running": _refresh_running,
     }
+
+
+@router.get("/health/nvidia")
+async def health_nvidia():
+    """Diagnose NVIDIA NIM API connectivity — tests embedding + chat."""
+    diag = {"api_key_set": bool(settings.ngc_api_key), "api_key_prefix": settings.ngc_api_key[:12] + "..." if settings.ngc_api_key else ""}
+    headers = {"Authorization": f"Bearer {settings.ngc_api_key}", "Content-Type": "application/json"}
+
+    # Test embedding
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as c:
+            r = await c.post(
+                f"{settings.nvidia_base_url}/embeddings",
+                headers=headers,
+                json={"model": settings.nvidia_embed_model, "input": ["test"], "input_type": "query", "encoding_format": "float", "truncate": "END"},
+            )
+            diag["embedding_status"] = r.status_code
+            if r.status_code != 200:
+                diag["embedding_error"] = r.text[:500]
+            else:
+                diag["embedding_ok"] = True
+    except Exception as e:
+        diag["embedding_error"] = str(e)
+
+    # Test chat completion
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as c:
+            r = await c.post(
+                f"{settings.nvidia_base_url}/chat/completions",
+                headers=headers,
+                json={"model": settings.nvidia_chat_model, "messages": [{"role": "user", "content": "Say hello in one word"}], "max_tokens": 10, "stream": False},
+            )
+            diag["chat_status"] = r.status_code
+            if r.status_code != 200:
+                diag["chat_error"] = r.text[:500]
+            else:
+                diag["chat_ok"] = True
+                diag["chat_response"] = r.json().get("choices", [{}])[0].get("message", {}).get("content", "")[:100]
+    except Exception as e:
+        diag["chat_error"] = str(e)
+
+    return diag
 
 
 @router.post("/refresh", response_model=RefreshResponse)
