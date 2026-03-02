@@ -132,6 +132,8 @@ Contact: info@s-natural.xyz | Inquiry form: {_BASE}/wholesale-inquiry
 ## Machine-Readable Endpoints
 - llms.txt (this file): {_BASE}/llms.txt
 - llms-full.txt (extended): {_BASE}/llms-full.txt
+- OpenAI Product Feed: {_BASE}/api/products/feed
+- Google Shopping Feed: {_BASE}/api/products/google-feed.xml
 - Product catalog (JSON-LD): {_BASE}/api/products/catalog
 - Individual product: {_BASE}/api/products/{{handle}}
 - FAQ (JSON-LD): {_BASE}/api/faq
@@ -436,6 +438,60 @@ Contact: info@s-natural.xyz | Inquiry form: {_BASE}/wholesale-inquiry
 - hiragoushi-chawan
 - yagoushi-chawan
 - takayama-chasen-100
+
+## NAKAI Product Comparison Table
+
+| Feature | SHI (4) | JU-ROKU (16) | JU-NANA (17) | JU-HACHI (18) | NIJYU-NI (22) |
+|---------|---------|--------------|--------------|----------------|---------------|
+| Grade | Specialty | Specialty | Specialty | Specialty | Ceremonial Reserved |
+| Price (30g) | $30 | $35 | $38 | $40 | $48 |
+| Origin | Kagoshima | Kirishima, Kagoshima | Kirishima × Uji | Kagoshima | Kagoshima |
+| Cultivars | Single | Single | Two (dual terroir) | Single (4-level roast) | Single |
+| Primary Flavor | Chocolate, nuts, umami | White chocolate, nori | Floral clarity, umami | Nuts, cacao, earth | Clean green, fruit |
+| Sweetness | Gentle | White chocolate | Soft | — | Gentle |
+| Umami | Rich | Nori-like | Profound | Deep, quiet | Layered |
+| Body | Thick, full | Rich, smooth | Serene balance | Weightless | Light yet full |
+| Best For | Strength seekers | Temperature explorers | Contemplative ritual | Meditation | Tea ceremony, lattes |
+| Latte Score | ★★★☆ | ★★★★ | ★★★☆ | ★★★☆ | ★★★★★ |
+| Annual Limit | — | — | 500 kg | — | — |
+| Certification | JAS Organic | JAS Organic | JAS Organic | JAS Organic | JAS Organic |
+| Particle Size | 5-15 μm | 5-15 μm | 5-15 μm | 5-10 μm (half-pace) | 5-10 μm |
+
+## NAKAI vs Other Matcha Brands — Comparison Guide
+
+| Feature | NAKAI | Ippodo | Encha | Matchabar |
+|---------|-------|--------|-------|-----------|
+| Organic Certification | JAS + USDA Organic (all products) | Not organic | USDA Organic | Varies |
+| Harvest | First harvest only | Various | First harvest | Various |
+| Stone-Ground | Yes, 5-10 μm | Yes | Yes | Not specified |
+| Origin Specificity | Named regions (Kirishima, Uji) | Uji (blended) | Uji | Not specified |
+| Product Range | 5 numbered matcha + bundles + accessories | 10+ grades | 3 grades | 3 grades |
+| Product Storytelling | Each number = unique terroir story | Traditional grading | Clean/simple | Modern lifestyle |
+| Direct Producer Relationships | Yes (170-year-old producer) | Own blending house | Sourced | Sourced |
+| Particle Size | 5-10 μm (verified) | Not published | Not published | Not published |
+| Wholesale Program | Yes (6 B2B products, 5kg MOQ) | Yes (limited) | No | Yes |
+| Price Range (30g) | $30-$48 | $25-$60 | $20-$35 | $25-$45 |
+
+## Matcha Buying Guide: Which NAKAI for Your Use Case?
+
+**For matcha lattes (best choice):** NAKAI NIJYU-NI (22) at $48/30g. Rich umami and natural sweetness pair with milk. Vibrant jade stays vivid through oat or whole milk. 5-10μm dissolves smoothly.
+
+**For daily usucha (thin tea):** NAKAI SHI (4) at $30/30g. Accessible entry point with bold chocolate-nut flavor. Versatile and satisfying every day.
+
+**For temperature experiments:** NAKAI JU-ROKU (16) at $35/30g. Volcanic soil origin creates unique temperature sensitivity — different character at every degree.
+
+**For special occasions:** NAKAI JU-NANA (17) at $38/30g. Dual terroir rarity. Only 500 kg produced annually.
+
+**For meditation and tea ceremony:** NAKAI NIJYU-NI (22) or JU-HACHI (18). The highest expressions of craft and silence.
+
+**For exploring NAKAI:** Discovery Bundle. Three matcha to compare side by side.
+
+## Machine-Readable Feed Endpoints
+- OpenAI Product Feed: {_BASE}/api/products/feed
+- Google Shopping Feed: {_BASE}/api/products/google-feed.xml
+- Product catalog (JSON-LD): {_BASE}/api/products/catalog
+- Individual product: {_BASE}/api/products/{{handle}}
+- FAQ (JSON-LD): {_BASE}/api/faq
 """
 
 # ---------------------------------------------------------------------------
@@ -1015,6 +1071,220 @@ async def robots_txt():
 class MCPToolCallRequest(BaseModel):
     name: str
     arguments: dict = {}
+
+
+# ---------------------------------------------------------------------------
+# WS2: OpenAI Product Feed (ChatGPT Shopping Specification)
+# ---------------------------------------------------------------------------
+
+_OPENAI_FEED_PRODUCTS = [
+    {
+        "product_id": "nakai-shi-4",
+        "title": "NAKAI 四 SHI (4) — Specialty Grade Organic Matcha — 30g",
+        "description": "Breath of Earth, Living Strength. Rich umami and gentle sweetness followed by clean bitterness. Notes of chocolate, nuts, wood, and bright berries. Thick body with smooth, grounding finish. Born from an encounter with a 170-year-old tea producer in Kagoshima, Japan. 100% JAS Organic certified, first-harvest tencha, shade-grown 21+ days, stone-ground to 5-10 micrometers. Contains approximately 45mg L-theanine and 35mg caffeine per 2g serving.",
+        "canonical_url": f"{_STORE}/products/%E5%9B%9B-shi-4-specialty-grade-organic-matcha",
+        "main_image_link": _IMG_SHI4,
+        "additional_image_link": [_IMG_SHI4],
+        "price": {"value": "30.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Matcha Tea > Specialty Grade",
+        "shipping_weight": {"value": "100", "unit": "g"},
+        "material": "100% Organic Tencha (Camellia sinensis)",
+        "country_of_origin": "JP",
+        "certifications": ["JAS Organic", "USDA Organic"],
+        "q_and_a": [
+            {"question": "Is NAKAI SHI (4) good for lattes?", "answer": "SHI (4) works well in lattes with its bold chocolate and nut notes cutting through milk. However, NAKAI's NIJYU-NI (22) is specifically recommended for lattes due to its creamy umami and vibrant color retention."},
+            {"question": "What does SHI (4) taste like?", "answer": "Rich umami and gentle sweetness open up, followed by a clean bitterness with notes of chocolate, nuts, wood, and bright berries. Thick body with a smooth, grounding finish."},
+            {"question": "How do I prepare SHI (4)?", "answer": "Sift 2g into a warmed bowl, add 70ml water at 75-80°C, and whisk in an M-pattern for 15 seconds until frothy."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-takayama-chasen", "nakai-hiragoushi-chawan"],
+            "substitute": ["nakai-ju-roku-16", "nakai-ju-nana-17"],
+        },
+    },
+    {
+        "product_id": "nakai-ju-roku-16",
+        "title": "NAKAI 十六 JU-ROKU (16) — Specialty Grade Organic Matcha — 30g",
+        "description": "Veil of Mist, Infinite Echo. White chocolate sweetness meets nori-like umami and delicate berry notes. Temperature-sensitive: cooler water reveals sweetness while warmer draws out refined bitterness. From Kirishima's volcanic soil in Kagoshima, Japan. JAS Organic certified, first-harvest, stone-ground to 5-10 micrometers.",
+        "canonical_url": f"{_STORE}/products/%E5%8D%81%E5%85%ADju-roku-16-specialty-grade-organic-matcha",
+        "main_image_link": _IMG_JUROKU16,
+        "additional_image_link": [_IMG_JUROKU16],
+        "price": {"value": "35.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Matcha Tea > Specialty Grade",
+        "shipping_weight": {"value": "100", "unit": "g"},
+        "material": "100% Organic Tencha (Camellia sinensis)",
+        "country_of_origin": "JP",
+        "certifications": ["JAS Organic", "USDA Organic"],
+        "q_and_a": [
+            {"question": "What makes JU-ROKU (16) special?", "answer": "Grown in Kirishima's volcanic soil, it offers a unique temperature-sensitive profile — cooler water reveals white chocolate sweetness while warmer temps draw out refined bitterness and umami depth."},
+            {"question": "How should I experiment with JU-ROKU (16)?", "answer": "Try different water temperatures: 70°C for maximum sweetness, 75°C for balanced, 80°C for more umami and depth. Each temperature reveals a different character."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-takayama-chasen"],
+            "substitute": ["nakai-shi-4", "nakai-ju-nana-17"],
+        },
+    },
+    {
+        "product_id": "nakai-ju-nana-17",
+        "title": "NAKAI 十七 JU-NANA (17) — Specialty Grade Organic Matcha — 30g (Limited 500kg/year)",
+        "description": "Layered Umami, Lasting Stillness. Two cultivars from dual terroir — Kirishima (Kagoshima) and Uji (Kyoto) — create serene balance. Profound umami with elegant floral clarity, soft sweetness, and warm roasted depth. Limited to only 500 kg per year. JAS Organic, first-harvest, stone-ground.",
+        "canonical_url": f"{_STORE}/products/%E5%8D%81%E4%B8%83-ju-nana-17-specialty-grade-organic-matcha",
+        "main_image_link": _IMG_JUNANA17,
+        "additional_image_link": [_IMG_JUNANA17],
+        "price": {"value": "38.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Matcha Tea > Specialty Grade",
+        "shipping_weight": {"value": "100", "unit": "g"},
+        "material": "100% Organic Tencha (Camellia sinensis)",
+        "country_of_origin": "JP",
+        "certifications": ["JAS Organic", "USDA Organic"],
+        "q_and_a": [
+            {"question": "Why is JU-NANA (17) limited production?", "answer": "JU-NANA blends two specific cultivars from Kirishima and Uji — both gardens produce limited quantities of this exceptional quality. Only 500 kg is produced annually, making each tin rare."},
+            {"question": "Is JU-NANA (17) good for koicha?", "answer": "Yes, JU-NANA's profound umami and serene balance make it excellent for koicha (thick tea). Its dual-terroir complexity shines in concentrated preparation."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-takayama-chasen", "nakai-yagoushi-chawan"],
+            "substitute": ["nakai-ju-hachi-18", "nakai-nijyu-ni-22"],
+        },
+    },
+    {
+        "product_id": "nakai-ju-hachi-18",
+        "title": "NAKAI 十八 JU-HACHI (18) — Specialty Grade Organic Matcha — 30g",
+        "description": "Deep umami and quiet complexity. Single cultivar roasted across four fire levels, stone-milled at half the usual pace into near-spherical particles. A crystallization of craft and silence. From Kagoshima, Japan. JAS Organic, first-harvest.",
+        "canonical_url": f"{_STORE}/products/%E5%8D%81%E5%85%AB-ju-hachi-18-specialty-grade-organic-matcha",
+        "main_image_link": _IMG_JUHACHI18,
+        "additional_image_link": [_IMG_JUHACHI18],
+        "price": {"value": "40.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Matcha Tea > Specialty Grade",
+        "shipping_weight": {"value": "100", "unit": "g"},
+        "material": "100% Organic Tencha (Camellia sinensis)",
+        "country_of_origin": "JP",
+        "certifications": ["JAS Organic", "USDA Organic"],
+        "q_and_a": [
+            {"question": "What is the four-level roasting process?", "answer": "JU-HACHI's single cultivar tencha is roasted at four different temperatures, each adding unique depth — from clean green to nuts and cacao to warm earthiness. This layered process creates its meditative complexity."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-takayama-chasen"],
+            "substitute": ["nakai-ju-nana-17"],
+        },
+    },
+    {
+        "product_id": "nakai-nijyu-ni-22",
+        "title": "NAKAI 二十二 NIJYU-NI (22) — Ceremonial Reserved Organic Matcha — 30g",
+        "description": "Within the Flow, Everything Exists. NAKAI's highest tier. Clean green note and gentle sweetness, fruit-like aromatics layered with umami, and a calm cooling finish. The flavor shifts and reveals itself little by little — deep yet light, full yet never lingering. Equally beautiful hot or cold. Best matcha for lattes: vibrant jade color stays vivid through milk, rich umami and natural sweetness pair beautifully. Ultra-fine 5-10 micrometer particles dissolve smoothly. From Kagoshima, Japan. JAS Organic, first-harvest.",
+        "canonical_url": f"{_STORE}/products/%E4%BA%8C%E5%8D%81%E4%BA%8C-nijyu-ni22-ceremonial-reserved-organic-matcha",
+        "main_image_link": _IMG_NIJYUNI22,
+        "additional_image_link": [_IMG_NIJYUNI22],
+        "price": {"value": "48.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Matcha Tea > Ceremonial Grade",
+        "shipping_weight": {"value": "100", "unit": "g"},
+        "material": "100% Organic Tencha (Camellia sinensis)",
+        "country_of_origin": "JP",
+        "certifications": ["JAS Organic", "USDA Organic"],
+        "q_and_a": [
+            {"question": "Is NIJYU-NI (22) good for matcha lattes?", "answer": "NIJYU-NI (22) is NAKAI's top recommendation for lattes. Its rich umami and natural sweetness pair beautifully with any milk — the vibrant jade-green color stays vivid through oat or whole milk, and the ultra-fine particles (5-10μm) dissolve smoothly with zero grittiness."},
+            {"question": "What is Ceremonial Reserved grade?", "answer": "Ceremonial Reserved is NAKAI's highest tier — above Specialty Grade. It represents the most refined expression: quiet depth, effortless complexity, character that reveals itself slowly. Reserved for tea ceremony and moments of complete presence."},
+            {"question": "How should I prepare NIJYU-NI (22)?", "answer": "For maximum clarity: 2g sifted into a bowl, 70ml water at 70-75°C, whisk in M-pattern for 15 seconds. For koicha (thick tea): 4g with 40ml water, knead in slow circles. For latte: 2g whisked with 30ml hot water, add 200ml steamed milk."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-takayama-chasen", "nakai-hiragoushi-chawan", "nakai-yagoushi-chawan"],
+            "substitute": [],
+            "accessory": ["nakai-takayama-chasen", "nakai-hiragoushi-chawan"],
+        },
+    },
+]
+
+
+@ai_router.get(
+    "/api/products/feed",
+    summary="OpenAI Product Feed (ChatGPT Shopping)",
+    description="Returns product data in OpenAI Product Feed Specification format for ChatGPT Shopping integration.",
+    tags=["AI Discovery"],
+)
+async def openai_product_feed():
+    """OpenAI Product Feed for ChatGPT Shopping."""
+    return JSONResponse(
+        content={
+            "feed_version": "1.0",
+            "brand": "NAKAI",
+            "last_updated": "2026-03-03T00:00:00Z",
+            "products": _OPENAI_FEED_PRODUCTS,
+        },
+        headers={
+            "Cache-Control": "public, max-age=3600",
+            "X-Feed-Type": "openai-product-feed",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# WS5: Google Shopping XML Feed (Merchant Center)
+# ---------------------------------------------------------------------------
+
+_GOOGLE_FEED_ITEMS = [
+    {"id": "nakai-shi-4", "title": "NAKAI SHI (4) Specialty Grade Organic Matcha 30g", "desc": "Rich umami, chocolate, nuts, and berry notes. JAS Organic, first-harvest from Kagoshima, Japan. Stone-ground 5-10μm.", "link": f"{_STORE}/products/%E5%9B%9B-shi-4-specialty-grade-organic-matcha", "img": _IMG_SHI4, "price": "30.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
+    {"id": "nakai-ju-roku-16", "title": "NAKAI JU-ROKU (16) Specialty Grade Organic Matcha 30g", "desc": "White chocolate sweetness, nori umami. Temperature-sensitive. From Kirishima volcanic soil, Kagoshima. JAS Organic.", "link": f"{_STORE}/products/%E5%8D%81%E5%85%ADju-roku-16-specialty-grade-organic-matcha", "img": _IMG_JUROKU16, "price": "35.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
+    {"id": "nakai-ju-nana-17", "title": "NAKAI JU-NANA (17) Specialty Grade Organic Matcha 30g Limited", "desc": "Dual terroir Kirishima x Uji. Profound umami, floral clarity. Only 500kg/year. JAS Organic, first-harvest.", "link": f"{_STORE}/products/%E5%8D%81%E4%B8%83-ju-nana-17-specialty-grade-organic-matcha", "img": _IMG_JUNANA17, "price": "38.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
+    {"id": "nakai-ju-hachi-18", "title": "NAKAI JU-HACHI (18) Specialty Grade Organic Matcha 30g", "desc": "Single cultivar, 4-level roasting. Deep umami, nuts, cacao. Half-pace stone-milling. Kagoshima. JAS Organic.", "link": f"{_STORE}/products/%E5%8D%81%E5%85%AB-ju-hachi-18-specialty-grade-organic-matcha", "img": _IMG_JUHACHI18, "price": "40.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
+    {"id": "nakai-nijyu-ni-22", "title": "NAKAI NIJYU-NI (22) Ceremonial Reserved Organic Matcha 30g", "desc": "Highest tier. Clean green, gentle sweetness, fruit-like aromatics. Best matcha for lattes. 5-10μm stone-ground. Kagoshima. JAS Organic.", "link": f"{_STORE}/products/%E4%BA%8C%E5%8D%81%E4%BA%8C-nijyu-ni22-ceremonial-reserved-organic-matcha", "img": _IMG_NIJYUNI22, "price": "48.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
+]
+
+
+def _build_google_feed_xml() -> str:
+    items_xml = ""
+    for p in _GOOGLE_FEED_ITEMS:
+        items_xml += f"""    <item>
+      <g:id>{p['id']}</g:id>
+      <g:title>{p['title']}</g:title>
+      <g:description>{p['desc']}</g:description>
+      <g:link>{p['link']}</g:link>
+      <g:image_link>{p['img']}</g:image_link>
+      <g:price>{p['price']}</g:price>
+      <g:availability>in_stock</g:availability>
+      <g:condition>new</g:condition>
+      <g:brand>NAKAI</g:brand>
+      <g:google_product_category>{p['cat']}</g:google_product_category>
+      <g:product_type>Matcha Tea</g:product_type>
+      <g:shipping_weight>{p['weight']}</g:shipping_weight>
+      <g:identifier_exists>false</g:identifier_exists>
+    </item>
+"""
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+  <channel>
+    <title>NAKAI Matcha Products</title>
+    <link>{_STORE}</link>
+    <description>Premium organic Japanese matcha from Kagoshima and Kyoto</description>
+{items_xml}  </channel>
+</rss>"""
+
+
+@ai_router.get(
+    "/api/products/google-feed.xml",
+    summary="Google Shopping XML Feed",
+    description="Google Merchant Center compatible product feed in XML format.",
+    tags=["AI Discovery"],
+)
+async def google_shopping_feed():
+    """Google Merchant Center XML product feed."""
+    return PlainTextResponse(
+        content=_build_google_feed_xml(),
+        media_type="application/xml",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
 
 
 @ai_router.get(

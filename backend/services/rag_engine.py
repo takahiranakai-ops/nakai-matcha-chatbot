@@ -48,6 +48,9 @@ _SUGGESTIONS_RE = re.compile(
     re.DOTALL,
 )
 
+# WS22: B2B Lead tag extraction
+_B2B_LEAD_RE = re.compile(r"\[B2B_LEAD\](.*?)\[/B2B_LEAD\]", re.DOTALL)
+
 # Detect Matcha Finder mid-flow: assistant's last message had [CHOICES]
 _CHOICES_RE = re.compile(r"\[CHOICES\]")
 
@@ -253,6 +256,22 @@ def _parse_suggestions(response: str) -> tuple[str, list[str]]:
     return clean, suggestions[:3]
 
 
+def _extract_b2b_lead(response: str) -> tuple[str, Optional[dict]]:
+    """Extract [B2B_LEAD] tag from response.
+    Returns (clean_response, lead_data_or_None)."""
+    match = _B2B_LEAD_RE.search(response)
+    if not match:
+        return response, None
+    parts = match.group(1).strip().split("|")
+    lead = {
+        "business_type": parts[0].strip() if len(parts) > 0 else "",
+        "volume": parts[1].strip() if len(parts) > 1 else "",
+        "notes": parts[2].strip() if len(parts) > 2 else "",
+    }
+    clean = response[:match.start()] + response[match.end():]
+    return clean.strip(), lead
+
+
 class RAGEngine:
     def __init__(self, vector_store: VectorStore):
         self.vector_store = vector_store
@@ -425,6 +444,11 @@ class RAGEngine:
         # 7. Parse out follow-up suggestions
         response, suggestions = _parse_suggestions(raw_response)
 
+        # 7b. Extract B2B lead data if present (WS22)
+        response, b2b_lead = _extract_b2b_lead(response)
+        if b2b_lead:
+            logger.info(f"B2B lead captured: {b2b_lead}")
+
         # 8. Inject [PRODUCT] tags for Matcha Finder step 3 + topic-based
         response = _inject_product_tags(response, conversation_history, user_message=msg_stripped)
 
@@ -433,6 +457,7 @@ class RAGEngine:
             "sources": list(source_urls),
             "context_chunks": len(context_texts),
             "suggestions": suggestions,
+            "b2b_lead": b2b_lead,
         }
 
     async def answer_stream(
@@ -564,6 +589,11 @@ class RAGEngine:
         # 6. Parse suggestions from full response
         raw = "".join(full_response)
         _, suggestions = _parse_suggestions(raw)
+
+        # 6b. Extract B2B lead data if present (WS22)
+        raw, b2b_lead = _extract_b2b_lead(raw)
+        if b2b_lead:
+            logger.info(f"B2B lead captured (stream): {b2b_lead}")
 
         # 7. Inject [PRODUCT] tags for Matcha Finder step 3 + topic-based
         injected = _inject_product_tags(raw, conversation_history, user_message=msg_stripped)
