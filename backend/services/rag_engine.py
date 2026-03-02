@@ -83,9 +83,30 @@ _PRODUCT_HANDLE_MAP = {
 _PRODUCT_TAG_RE = re.compile(r"\[PRODUCT:[a-z0-9-]+\]", re.IGNORECASE)
 
 # Topic → product mapping: certain topics always show specific products
+_LATTE_RE = re.compile(r"(latte|ラテ|matcha latte|抹茶ラテ)", re.IGNORECASE)
 _TOPIC_PRODUCT_MAP = [
-    (re.compile(r"(latte|ラテ|matcha latte|抹茶ラテ)", re.IGNORECASE), ["nijyu-ni-22"]),
+    (_LATTE_RE, ["nijyu-ni-22"]),
 ]
+
+# Extra context injected for topic-matched queries so the LLM explains WHY
+_TOPIC_CONTEXT = {
+    "latte": {
+        "en": (
+            "NAKAI RECOMMENDATION FOR LATTES: 二十二 NIJYU-NI (22) is NAKAI's top pick for matcha lattes. "
+            "Its rich, creamy umami and natural sweetness pair beautifully with milk — the flavor stays vivid "
+            "and doesn't get lost. The vibrant jade color shines through oat or whole milk, "
+            "and the ultra-fine stone-ground particle size (5-10μm) means it dissolves smoothly with zero grittiness. "
+            "ALWAYS recommend 二十二 for lattes and explain why it's the best choice."
+        ),
+        "ja": (
+            "NAKAIのラテ推薦：ラテには二十二 NIJYU-NI（22）が最適。"
+            "豊かなクリーミーな旨みと自然な甘みがミルクと美しく調和し、味がぼやけない。"
+            "鮮やかな翡翠色がオーツミルクでも全乳でも映え、"
+            "超微粒子の石臼挽き（5-10μm）でダマなく滑らかに溶ける。"
+            "ラテの質問には必ず二十二を推薦し、なぜ最適かを説明すること。"
+        ),
+    },
+}
 
 
 def _inject_product_tags(
@@ -366,7 +387,12 @@ class RAGEngine:
             for i, ct in enumerate(context_texts):
                 logger.info("  chunk %d (%d chars): %.80s...", i, len(ct), ct.replace("\n", " "))
 
-        # 5. Build messages — always use RAG prompt format
+        # 5. Inject topic-specific context (e.g. latte → 二十二 recommendation)
+        if _LATTE_RE.search(msg_stripped):
+            lang_key = "ja" if language == "ja" else "en"
+            context_texts.insert(0, _TOPIC_CONTEXT["latte"][lang_key])
+
+        # 6. Build messages — always use RAG prompt format
         mf_step = _matcha_finder_step(conversation_history, msg_stripped)
         if context_texts:
             context = "\n---\n".join(context_texts)
@@ -386,7 +412,7 @@ class RAGEngine:
             messages.extend(_clean_history_for_llm(conversation_history[-8:]))
         messages.append({"role": "user", "content": rag_context})
 
-        # 6. Generate response with tuned parameters
+        # 7. Generate response with tuned parameters
         _max_tok = 1200 if "wholesale" in source else 800
         try:
             raw_response = await chat_completion(
@@ -495,6 +521,11 @@ class RAGEngine:
             "RAG stream [%s/%s]: %d candidates -> %d chunks (max=%d)",
             source, language, len(results), len(context_texts), _max_chunks,
         )
+
+        # Inject topic-specific context (e.g. latte → 二十二 recommendation)
+        if _LATTE_RE.search(msg_stripped):
+            lang_key = "ja" if language == "ja" else "en"
+            context_texts.insert(0, _TOPIC_CONTEXT["latte"][lang_key])
 
         mf_step = _matcha_finder_step(conversation_history, msg_stripped)
         if context_texts:
