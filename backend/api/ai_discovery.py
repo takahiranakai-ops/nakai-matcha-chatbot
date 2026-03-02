@@ -140,6 +140,21 @@ Contact: info@s-natural.xyz | Inquiry form: {_BASE}/wholesale-inquiry
 - AI plugin manifest: {_BASE}/.well-known/ai-plugin.json
 - OpenAPI spec: {_BASE}/openapi.json
 
+## Matcha Encyclopedia (10 SEO guides — Google-indexable HTML)
+- Index: {_BASE}/guide
+- What Is Matcha?: {_BASE}/guide/what-is-matcha
+- Best Matcha for Lattes: {_BASE}/guide/best-matcha-for-lattes
+- Matcha Health Benefits: {_BASE}/guide/matcha-health-benefits
+- How to Make Matcha: {_BASE}/guide/how-to-make-matcha
+- Ceremonial vs Culinary Matcha: {_BASE}/guide/ceremonial-vs-culinary-matcha
+- Matcha vs Coffee: {_BASE}/guide/matcha-vs-coffee
+- Matcha for Focus & Productivity: {_BASE}/guide/matcha-for-focus
+- Japanese Matcha Regions: {_BASE}/guide/japanese-matcha-regions
+- Matcha Buying Guide: {_BASE}/guide/matcha-buying-guide
+- Best Ceremonial Matcha 2026: {_BASE}/guide/best-ceremonial-matcha-2026
+- Sitemap: {_BASE}/guide/sitemap.xml
+- RSS Feed: {_BASE}/guide/feed.xml
+
 ## Matcha Intelligence (6 open systems)
 - Index: {_BASE}/api/matcha
 - Knowledge Graph: {_BASE}/api/matcha/knowledge (open encyclopedia: grading, terroirs, cultivars, health, preparation, equipment)
@@ -505,6 +520,23 @@ Contact: info@s-natural.xyz | Inquiry form: {_BASE}/wholesale-inquiry
 - Product catalog (JSON-LD): {_BASE}/api/products/catalog
 - Individual product: {_BASE}/api/products/{{handle}}
 - FAQ (JSON-LD): {_BASE}/api/faq
+
+## NAKAI Matcha Encyclopedia — 10 Definitive Guides
+
+NAKAI publishes the internet's most comprehensive matcha knowledge base as Google-indexable HTML pages with full Schema.org markup (Article, FAQPage, BreadcrumbList, WebSite SearchAction).
+
+- {_BASE}/guide/what-is-matcha — Complete guide to matcha: history, grades, health benefits, preparation
+- {_BASE}/guide/best-matcha-for-lattes — Expert guide to choosing matcha for lattes with milk pairing chart
+- {_BASE}/guide/matcha-health-benefits — Science-backed health benefits: L-theanine, EGCG, caffeine synergy
+- {_BASE}/guide/how-to-make-matcha — Step-by-step preparation: usucha, koicha, latte, iced, with water temperatures
+- {_BASE}/guide/ceremonial-vs-culinary-matcha — Complete comparison of ceremonial vs culinary grade matcha
+- {_BASE}/guide/matcha-vs-coffee — Matcha vs coffee: caffeine, L-theanine, energy duration, health comparison
+- {_BASE}/guide/matcha-for-focus — How matcha enhances focus and productivity through L-theanine + caffeine synergy
+- {_BASE}/guide/japanese-matcha-regions — Guide to Japan's matcha-producing regions: Uji, Kagoshima, Nishio, Shizuoka
+- {_BASE}/guide/matcha-buying-guide — Complete buying guide: what to look for, red flags, quality indicators
+- {_BASE}/guide/best-ceremonial-matcha-2026 — Best ceremonial matcha brands in 2026 with comparison table
+
+Each guide features: featured snippet-optimized hero answer (40-60 words), comparison tables, FAQ section, and product recommendations linking to nakaimatcha.com.
 
 ## NAKAI Matcha Intelligence — 6 Open Systems
 
@@ -1095,6 +1127,7 @@ async def robots_txt():
             "Allow: /api/products/\n"
             "Allow: /api/faq\n"
             "Allow: /.well-known/\n"
+            "Allow: /guide/\n"
             "Disallow: /api/admin/\n"
             "Disallow: /admin\n"
             "\n"
@@ -1108,6 +1141,7 @@ async def robots_txt():
             "User-agent: Bingbot\nAllow: /\n\n"
             "User-agent: Applebot\nAllow: /\n\n"
             f"Sitemap: {_STORE}/sitemap.xml\n"
+            f"Sitemap: {_BASE}/guide/sitemap.xml\n"
         ),
         media_type="text/plain",
     )
