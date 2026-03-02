@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
+    # WS34-41: Automation
+    shopify_webhook_secret: str = ""
+    serp_api_key: str = ""
+    indexnow_api_key: str = ""
+    enable_scheduler: bool = True
 
     class Config:
         env_file = ".env"

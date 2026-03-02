@@ -13,6 +13,7 @@ from api.admin_page import admin_page_router
 from api.wholesale import wholesale_router
 from api.wholesale_inquiry import inquiry_router
 from api.ai_discovery import ai_router
+from api.webhooks import webhook_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -25,7 +26,19 @@ async def lifespan(app: FastAPI):
     if vector_store.count() == 0:
         logger.info("Vector store empty — starting auto-ingestion...")
         asyncio.create_task(_auto_ingest())
+
+    # Start automation scheduler (WS34-41)
+    if settings.enable_scheduler:
+        from services.automation.scheduler import start_scheduler
+        start_scheduler()
+
     yield
+
+    # Stop scheduler
+    if settings.enable_scheduler:
+        from services.automation.scheduler import stop_scheduler
+        stop_scheduler()
+
     # Cleanup shared HTTP clients on shutdown
     from services import nvidia_client, supabase_client, shopify_client
     await nvidia_client.close()
@@ -46,7 +59,7 @@ async def _auto_ingest():
 
 app = FastAPI(
     title="NAKAI Matcha API",
-    version="2.0.0",
+    version="3.0.0",
     description=(
         "NAKAI is a specialty organic matcha brand from Kagoshima, Japan. "
         "This API powers the AI Matcha Concierge and provides structured "
@@ -58,6 +71,8 @@ app = FastAPI(
         "- `GET /api/products/{handle}` — Individual product JSON-LD\n"
         "- `GET /api/faq` — FAQPage structured data\n"
         "- `POST /api/chat` — AI matcha concierge conversation\n"
+        "- `GET /api/mcp/tools` — MCP tool definitions\n"
+        "- `POST /api/mcp/call` — Execute MCP tool call\n"
     ),
     contact={"name": "NAKAI", "email": "info@s-natural.xyz", "url": "https://nakaimatcha.com"},
     license_info={"name": "Proprietary"},
@@ -65,7 +80,7 @@ app = FastAPI(
 )
 
 logging.basicConfig(level=logging.INFO)
-logger.info("NAKAI Matcha Chatbot starting up...")
+logger.info("NAKAI Matcha Chatbot v3.0 starting up...")
 
 origins = [origin.strip() for origin in settings.allowed_origins.split(",")]
 app.add_middleware(
@@ -73,7 +88,13 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=False,
     allow_methods=["POST", "GET", "PATCH", "DELETE"],
-    allow_headers=["Content-Type", "X-Refresh-Secret", "X-Admin-Password"],
+    allow_headers=[
+        "Content-Type",
+        "X-Refresh-Secret",
+        "X-Admin-Password",
+        "X-Shopify-Hmac-Sha256",
+        "X-Shopify-Topic",
+    ],
 )
 
 setup_rate_limiting(app)
@@ -86,6 +107,7 @@ app.include_router(pwa_router)
 app.include_router(wholesale_router)
 app.include_router(inquiry_router)
 app.include_router(ai_router)
+app.include_router(webhook_router)
 
 
 @app.get("/health")

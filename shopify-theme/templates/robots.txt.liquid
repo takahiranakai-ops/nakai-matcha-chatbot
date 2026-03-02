@@ -1,0 +1,61 @@
+{%- comment -%}
+  WS9: robots.txt — AI Bot Full Access
+  Allows all AI commerce bots to crawl NAKAI.
+  This overrides Shopify's default robots.txt.
+{%- endcomment -%}
+
+# NAKAI Matcha — robots.txt
+# AI Commerce Bots (MUST ALLOW)
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+# Standard crawlers
+User-agent: *
+Disallow: /admin
+Disallow: /cart
+Disallow: /orders
+Disallow: /checkouts/
+Disallow: /checkout
+Disallow: /carts
+Disallow: /account
+Disallow: /*?q=*
+Disallow: /search
+
+Sitemap: https://nakaimatcha.com/sitemap.xml

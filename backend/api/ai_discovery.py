@@ -4,8 +4,10 @@ Provides structured information about NAKAI for external AI agents,
 search engines, and voice assistants.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse, JSONResponse
+from pydantic import BaseModel
+from typing import Optional
 
 ai_router = APIRouter()
 
@@ -987,3 +989,67 @@ async def robots_txt():
         ),
         media_type="text/plain",
     )
+
+
+# ---------------------------------------------------------------------------
+# WS23: MCP Server HTTP Endpoints
+# ---------------------------------------------------------------------------
+
+
+class MCPToolCallRequest(BaseModel):
+    name: str
+    arguments: dict = {}
+
+
+@ai_router.get(
+    "/api/mcp/tools",
+    summary="MCP tool definitions",
+    tags=["MCP Server"],
+)
+async def mcp_list_tools():
+    """List available MCP tools for AI agents."""
+    from mcp_server import get_mcp_tools
+    return JSONResponse(content={"tools": get_mcp_tools()})
+
+
+@ai_router.post(
+    "/api/mcp/call",
+    summary="Execute MCP tool call",
+    tags=["MCP Server"],
+)
+async def mcp_call_tool(request: Request):
+    """Execute an MCP tool call. Accepts {name, arguments}."""
+    from mcp_server import handle_mcp_tool_call
+    import json
+    body = await request.json()
+    name = body.get("name", "")
+    arguments = body.get("arguments", {})
+    result = handle_mcp_tool_call(name, arguments)
+    return JSONResponse(content=json.loads(result))
+
+
+@ai_router.get(
+    "/api/mcp/resources",
+    summary="MCP resource definitions",
+    tags=["MCP Server"],
+)
+async def mcp_list_resources():
+    """List available MCP resources."""
+    from mcp_server import get_mcp_resources
+    return JSONResponse(content={"resources": get_mcp_resources()})
+
+
+@ai_router.get(
+    "/api/mcp/resources/{uri:path}",
+    summary="Read MCP resource",
+    tags=["MCP Server"],
+)
+async def mcp_read_resource(uri: str):
+    """Read an MCP resource by URI."""
+    from mcp_server import read_mcp_resource
+    import json
+    result = read_mcp_resource(uri)
+    try:
+        return JSONResponse(content=json.loads(result))
+    except (json.JSONDecodeError, TypeError):
+        return PlainTextResponse(content=result)

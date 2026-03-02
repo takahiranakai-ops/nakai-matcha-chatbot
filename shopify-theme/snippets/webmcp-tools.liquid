@@ -1,0 +1,114 @@
+{%- comment -%}
+  WS6: WebMCP — AI Agent Tool Registration
+  Enables AI agents to interact with the NAKAI store as tools.
+  Declarative API (HTML form attributes) + Imperative API (JavaScript).
+  Chrome 146+ / WebMCP-compatible AI agents.
+{%- endcomment -%}
+
+{%- comment -%} Declarative API — HTML Form Attributes {%- endcomment -%}
+
+<!-- Search NAKAI Products -->
+<form toolname="search-nakai-products"
+      tooldescription="Search NAKAI organic matcha products by grade, flavor profile, or use case"
+      toolautosubmit="true"
+      action="/search"
+      method="get"
+      style="display:none">
+  <input type="text" name="q"
+         toolparamdescription="Search term like 'ceremonial matcha for koicha' or 'wholesale matcha for cafes'" />
+  <select name="type"
+          toolparamdescription="Filter to products only">
+    <option value="product" selected>Products</option>
+  </select>
+</form>
+
+<!-- Add to Cart -->
+<form toolname="add-to-cart"
+      tooldescription="Add a NAKAI matcha product to the shopping cart"
+      action="/cart/add"
+      method="post"
+      style="display:none">
+  <input type="hidden" name="id"
+         toolparamdescription="Product variant ID from NAKAI catalog" />
+  <input type="number" name="quantity" value="1"
+         toolparamdescription="Number of units to add (default 1)" />
+</form>
+
+{%- comment -%} Imperative API — JavaScript Tool Registration {%- endcomment -%}
+<script>
+(function() {
+  if (typeof navigator === 'undefined' || !navigator.modelContext) return;
+
+  // Tool: Find matcha by use case
+  navigator.modelContext.registerTool({
+    name: 'find_matcha_by_use_case',
+    description: 'Find the best NAKAI matcha for a specific use case (latte, koicha, usucha, baking, cold brew, daily drinking)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        useCase: { type: 'string', description: 'How the matcha will be used: latte, koicha, usucha, iced, baking, daily' },
+        budget: { type: 'string', description: 'Budget preference: premium, mid, value', default: 'any' }
+      },
+      required: ['useCase']
+    },
+    async execute(args) {
+      try {
+        var res = await fetch('https://nakai-matcha-chat.onrender.com/api/products/catalog');
+        var data = await res.json();
+        return { content: [{ type: 'text', text: JSON.stringify(data) }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: 'Error fetching products: ' + e.message }] };
+      }
+    }
+  });
+
+  // Tool: Get product details
+  navigator.modelContext.registerTool({
+    name: 'get_nakai_product_details',
+    description: 'Get detailed information about a specific NAKAI matcha product including nutrition, origin, preparation guide, and pricing',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        handle: { type: 'string', description: 'Product handle: shi-4, ju-roku-16, ju-nana-17, ju-hachi-18, nijyu-ni-22, discovery-bundle, the-everyday, expert-set, hiragoushi-chawan, yagoushi-chawan, takayama-chasen-100' }
+      },
+      required: ['handle']
+    },
+    async execute(args) {
+      try {
+        var res = await fetch('https://nakai-matcha-chat.onrender.com/api/products/' + encodeURIComponent(args.handle));
+        var data = await res.json();
+        return { content: [{ type: 'text', text: JSON.stringify(data) }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: 'Error: ' + e.message }] };
+      }
+    }
+  });
+
+  // Tool: Ask the NAKAI matcha concierge
+  navigator.modelContext.registerTool({
+    name: 'ask_nakai_concierge',
+    description: 'Ask the NAKAI AI Matcha Concierge any question about matcha preparation, health benefits, grades, or product recommendations',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        question: { type: 'string', description: 'Question about matcha, NAKAI products, preparation, or health benefits' },
+        language: { type: 'string', description: 'Response language: en or ja', default: 'en' }
+      },
+      required: ['question']
+    },
+    async execute(args) {
+      try {
+        var res = await fetch('https://nakai-matcha-chat.onrender.com/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: args.question, language: args.language || 'en' })
+        });
+        var data = await res.json();
+        return { content: [{ type: 'text', text: data.response || JSON.stringify(data) }] };
+      } catch (e) {
+        return { content: [{ type: 'text', text: 'Error: ' + e.message }] };
+      }
+    }
+  });
+})();
+</script>
