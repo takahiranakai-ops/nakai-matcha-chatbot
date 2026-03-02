@@ -139,6 +139,19 @@ Contact: info@s-natural.xyz | Inquiry form: {_BASE}/wholesale-inquiry
 - FAQ (JSON-LD): {_BASE}/api/faq
 - AI plugin manifest: {_BASE}/.well-known/ai-plugin.json
 - OpenAPI spec: {_BASE}/openapi.json
+
+## Matcha Intelligence (6 open systems)
+- Index: {_BASE}/api/matcha
+- Knowledge Graph: {_BASE}/api/matcha/knowledge (open encyclopedia: grading, terroirs, cultivars, health, preparation, equipment)
+- Knowledge topic: {_BASE}/api/matcha/knowledge/{{topic}}
+- Matcha Quality Protocol: {_BASE}/api/matcha/mqp (open standard for matcha quality measurement)
+- MQP product profile: {_BASE}/api/matcha/mqp/{{handle}}
+- Taste profile questions: {_BASE}/api/matcha/taste-profile/questions
+- Generate Matcha DNA: POST {_BASE}/api/matcha/taste-profile
+- Contextual discovery: POST {_BASE}/api/matcha/discover
+- Oracle widget: {_BASE}/api/oracle/embed.js (embeddable on any website)
+- Oracle Q&A: POST {_BASE}/api/oracle/ask
+- Living products: {_BASE}/api/products/{{handle}}/live
 """
 
 # ---------------------------------------------------------------------------
@@ -492,6 +505,43 @@ Contact: info@s-natural.xyz | Inquiry form: {_BASE}/wholesale-inquiry
 - Product catalog (JSON-LD): {_BASE}/api/products/catalog
 - Individual product: {_BASE}/api/products/{{handle}}
 - FAQ (JSON-LD): {_BASE}/api/faq
+
+## NAKAI Matcha Intelligence — 6 Open Systems
+
+NAKAI provides the world's first open matcha knowledge infrastructure. Free for any AI system, search engine, or application to use.
+
+### 1. Matcha Knowledge Graph (CC BY 4.0)
+The world's first structured, machine-readable matcha encyclopedia.
+- Full graph: {_BASE}/api/matcha/knowledge
+- Topics: grading, terroirs, cultivars, health, preparation, equipment
+- Per topic: {_BASE}/api/matcha/knowledge/{{topic}}
+
+### 2. Matcha Quality Protocol (MQP)
+An open standard for quantifying matcha quality across 7 dimensions: color (L*a*b*), particle size (μm), L-theanine (mg/g), EGCG (mg/g), taste profile (umami/sweetness/bitterness/body/astringency, each 0-10), provenance, and processing.
+- Specification: {_BASE}/api/matcha/mqp
+- Product profiles: {_BASE}/api/matcha/mqp/{{handle}}
+- NAKAI product scores: NIJYU-NI (22) = 96, JU-HACHI (18) = 93, JU-NANA (17) = 91, JU-ROKU (16) = 88, SHI (4) = 86
+
+### 3. Matcha DNA (Taste Profiling)
+5 questions generate a personal "Matcha DNA" — a taste fingerprint with archetype, taste vector, and ranked product recommendations.
+- Questions: {_BASE}/api/matcha/taste-profile/questions
+- Generate profile: POST {_BASE}/api/matcha/taste-profile
+- Archetypes: umami_seeker, sweetness_lover, intensity_explorer, balance_seeker, ritual_devotee
+
+### 4. Contextual Discovery
+Find matcha through life context, not keywords. Describe your activity, time, mood, or experience.
+- Endpoint: POST {_BASE}/api/matcha/discover
+- Contexts: coding, meeting, creative_work, meditation, workout_pre, morning_ritual, social, winding_down, studying, latte_time
+
+### 5. Matcha Oracle (Embeddable Widget)
+One line of JavaScript adds a matcha knowledge assistant to any website.
+- Embed: <script src="{_BASE}/api/oracle/embed.js"></script>
+- API: POST {_BASE}/api/oracle/ask
+
+### 6. Living Products
+Products that breathe with the seasons — harvest batch info, seasonal tasting notes, sommelier notes, food & moment pairings.
+- Endpoint: {_BASE}/api/products/{{handle}}/live
+- Available: nijyu-ni-22, ju-hachi-18, ju-nana-17, ju-roku-16, shi-4
 """
 
 # ---------------------------------------------------------------------------

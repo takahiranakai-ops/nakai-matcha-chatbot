@@ -13,6 +13,7 @@ from api.admin_page import admin_page_router
 from api.wholesale import wholesale_router
 from api.wholesale_inquiry import inquiry_router
 from api.ai_discovery import ai_router
+from api.matcha_intelligence import intelligence_router
 from api.webhooks import webhook_router
 from api.middleware import setup_rate_limiting
 from config import settings
@@ -73,6 +74,12 @@ app = FastAPI(
         "- `POST /api/chat` — AI matcha concierge conversation\n"
         "- `GET /api/mcp/tools` — MCP tool definitions\n"
         "- `POST /api/mcp/call` — Execute MCP tool call\n"
+        "- `GET /api/matcha` — Matcha Intelligence index (6 systems)\n"
+        "- `GET /api/matcha/knowledge` — Open Matcha Knowledge Graph\n"
+        "- `GET /api/matcha/mqp` — Matcha Quality Protocol specification\n"
+        "- `POST /api/matcha/taste-profile` — Matcha DNA taste fingerprinting\n"
+        "- `POST /api/matcha/discover` — Contextual matcha discovery\n"
+        "- `GET /api/products/{handle}/live` — Living product intelligence\n"
     ),
     contact={"name": "NAKAI", "email": "info@s-natural.xyz", "url": "https://nakaimatcha.com"},
     license_info={"name": "Proprietary"},
@@ -107,6 +114,7 @@ app.include_router(pwa_router)
 app.include_router(wholesale_router)
 app.include_router(inquiry_router)
 app.include_router(ai_router)
+app.include_router(intelligence_router)
 app.include_router(webhook_router)
 
 
