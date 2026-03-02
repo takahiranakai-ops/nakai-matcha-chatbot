@@ -1,0 +1,143 @@
+{%- comment -%} WS7: ARIA-enhanced product section for AI agent accessibility {%- endcomment -%}
+<section class="main-product page-width" aria-label="{{ product.title | escape }}">
+  <div class="main-product__grid">
+    <div class="main-product__media" role="img" aria-label="{{ product.title | escape }} product image">
+      {%- if product.featured_image -%}
+        <img
+          src="{{ product.featured_image | image_url: width: 800 }}"
+          alt="{{ product.title | escape }} — {{ product.vendor | default: 'NAKAI' }} organic matcha"
+          loading="eager"
+          width="800"
+          height="800"
+        >
+      {%- endif -%}
+    </div>
+
+    <div class="main-product__info" role="region" aria-label="Product details">
+      <h1 class="main-product__title">{{ product.title }}</h1>
+      <p class="main-product__price" aria-label="Price: {{ product.price | money }}">{{ product.price | money }}</p>
+
+      {%- if product.description != blank -%}
+        <div class="main-product__description rte" aria-label="Product description">
+          {{ product.description }}
+        </div>
+      {%- endif -%}
+
+      {%- form 'product', product, aria-label: 'Add to cart form' -%}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+        {%- if product.variants.size > 1 -%}
+          <div class="main-product__variants">
+            <label for="variant-select">{{ 'products.product.variant' | t | default: 'Option' }}</label>
+            <select id="variant-select" name="id" aria-label="Select product variant">
+              {%- for variant in product.variants -%}
+                <option value="{{ variant.id }}"{% unless variant.available %} disabled{% endunless %}>
+                  {{ variant.title }} — {{ variant.price | money }}
+                </option>
+              {%- endfor -%}
+            </select>
+          </div>
+        {%- endif -%}
+
+        <button type="submit" class="main-product__add-btn"
+          aria-label="Add {{ product.title | escape }} to cart"
+          {% unless product.available %} disabled aria-disabled="true"{% endunless %}>
+          {%- if product.available -%}
+            {{ 'products.product.add_to_cart' | t | default: 'Add to Cart' }}
+          {%- else -%}
+            {{ 'products.product.sold_out' | t | default: 'Sold Out' }}
+          {%- endif -%}
+        </button>
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .main-product { padding: 3rem 0; }
+  .main-product__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .main-product__media img {
+    border-radius: 16px;
+    width: 100%;
+  }
+  .main-product__title {
+    font-family: var(--font-heading-family);
+    font-size: 2.8rem;
+    font-weight: 400;
+    letter-spacing: .06em;
+    color: var(--color-text, #161614);
+    margin-bottom: .8rem;
+  }
+  .main-product__price {
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--color-primary, #406546);
+    margin-bottom: 2rem;
+  }
+  .main-product__description {
+    font-size: 1.4rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary, #7A766D);
+    margin-bottom: 2rem;
+  }
+  .main-product__variants {
+    margin-bottom: 1.5rem;
+  }
+  .main-product__variants label {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+  }
+  .main-product__variants select {
+    width: 100%;
+    padding: 1rem 1.4rem;
+    border: 1px solid rgba(0,0,0,.1);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 1.4rem;
+    background: #fff;
+  }
+  .main-product__add-btn {
+    width: 100%;
+    padding: 1.4rem;
+    background: var(--color-primary, #406546);
+    color: #fff;
+    border: none;
+    border-radius: 9999px;
+    font-family: inherit;
+    font-size: 1.3rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    transition: all .3s ease;
+  }
+  .main-product__add-btn:hover {
+    opacity: .9;
+    transform: translateY(-1px);
+  }
+  .main-product__add-btn:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+  @media screen and (max-width: 749px) {
+    .main-product__grid { grid-template-columns: 1fr; gap: 2rem; }
+    .main-product__title { font-size: 2.2rem; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Product",
+  "tag": "section",
+  "class": "section-main-product",
+  "settings": []
+}
+{% endschema %}

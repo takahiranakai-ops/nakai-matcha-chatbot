@@ -1,0 +1,57 @@
+{%- comment -%}
+  WS11: DefinedTerm JSON-LD Schema
+  Creates a mini knowledge graph for matcha terminology.
+  Renders on the homepage to establish entity authority.
+{%- endcomment -%}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "DefinedTermSet",
+  "name": "Matcha Grading & Terminology by NAKAI",
+  "description": "Authoritative matcha grading system and terminology defined by NAKAI, a premium organic Japanese matcha brand.",
+  "url": "https://nakaimatcha.com",
+  "hasDefinedTerm": [
+    {
+      "@type": "DefinedTerm",
+      "name": "Ceremonial Grade Matcha",
+      "description": "The highest classification of Japanese matcha, made exclusively from first-harvest shade-grown tencha leaves, stone-ground to a particle size of 5-15 micrometers. Characterized by vibrant jade-green color, rich umami flavor, and natural sweetness with zero bitterness. Intended for traditional tea ceremony preparation (usucha and koicha)."
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Specialty Grade Matcha",
+      "description": "High-quality matcha from early harvest tencha leaves, slightly more robust flavor profile than ceremonial grade. Excellent for daily drinking as usucha and for premium matcha lattes where the matcha flavor needs to shine through milk."
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Tencha",
+      "description": "The shade-grown tea leaf variety used exclusively for making matcha. Tencha leaves are shaded for 21+ days before harvest, then steamed, dried, and de-stemmed before stone-grinding into matcha powder. The shading process increases L-theanine content and produces matcha's characteristic umami flavor."
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Usucha",
+      "description": "Thin-style matcha preparation. Uses approximately 2g of matcha whisked with 70-80ml of 80°C water using a chasen (bamboo whisk). The standard way to enjoy matcha daily, producing a light, frothy beverage."
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Koicha",
+      "description": "Thick-style matcha preparation reserved for the highest ceremonial grades. Uses approximately 4g of matcha with only 30-40ml of water, kneaded (not whisked) to a thick, paint-like consistency. Reveals the full depth of umami in premium matcha."
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "L-Theanine",
+      "description": "An amino acid uniquely abundant in shade-grown tea (matcha contains 45mg+ per serving). L-theanine promotes calm focus by increasing alpha brain wave activity, providing sustained energy without the jitters associated with coffee. The 21+ day shading of tencha maximizes L-theanine production."
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Stone-Ground Matcha",
+      "description": "Traditional method of grinding tencha leaves using granite stone mills (ishiusu) that rotate at 40-60 RPM, producing ultra-fine particles of 5-10 micrometers. This slow process preserves nutrients, color, and flavor that high-speed ball-milling destroys through heat friction."
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Chasen",
+      "description": "A handcrafted bamboo whisk used for preparing matcha. Traditional chasen are carved from a single piece of bamboo with 80-120 fine tines. Essential for achieving the proper froth and smooth consistency in usucha preparation."
+    }
+  ]
+}
+</script>

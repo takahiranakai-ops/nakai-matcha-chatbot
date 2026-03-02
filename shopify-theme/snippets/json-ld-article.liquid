@@ -1,0 +1,43 @@
+{%- comment -%}
+  WS15: Article JSON-LD Schema
+  Provides structured blog/article data for AI and search engines.
+  Included on article pages via layout/theme.liquid.
+{%- endcomment -%}
+
+{%- if article -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ article.title | json }},
+  "url": "{{ shop.url }}{{ article.url }}",
+  "datePublished": "{{ article.published_at | date: '%Y-%m-%dT%H:%M:%S%z' }}",
+  "dateModified": "{{ article.updated_at | date: '%Y-%m-%dT%H:%M:%S%z' }}",
+  {%- if article.image -%}
+  "image": "https:{{ article.image | image_url: width: 1200 }}",
+  {%- endif -%}
+  "author": {
+    "@type": "Organization",
+    "name": "NAKAI",
+    "url": "https://nakaimatcha.com"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "NAKAI",
+    "url": "https://nakaimatcha.com",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://nakaimatcha.com/cdn/shop/files/nakai-logo.png"
+    }
+  },
+  "description": {{ article.excerpt_or_content | strip_html | truncate: 300 | json }},
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ shop.url }}{{ article.url }}"
+  }
+  {%- if article.tags.size > 0 -%}
+  ,"keywords": {{ article.tags | join: ', ' | json }}
+  {%- endif -%}
+}
+</script>
+{%- endif -%}

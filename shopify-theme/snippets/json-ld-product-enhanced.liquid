@@ -1,0 +1,103 @@
+{%- comment -%}
+  WS10: Enhanced Product JSON-LD Schema
+  Generates rich structured data for AI systems and search engines.
+  Included on product pages via layout/theme.liquid.
+{%- endcomment -%}
+
+{%- if product -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": {{ product.title | json }},
+  "url": "{{ shop.url }}{{ product.url }}",
+  "description": {{ product.description | strip_html | truncate: 5000 | json }},
+  "brand": {
+    "@type": "Brand",
+    "name": "NAKAI"
+  },
+  {%- if product.selected_or_first_available_variant.sku != blank -%}
+  "sku": {{ product.selected_or_first_available_variant.sku | json }},
+  {%- endif -%}
+  {%- if product.selected_or_first_available_variant.barcode != blank -%}
+  "gtin13": {{ product.selected_or_first_available_variant.barcode | json }},
+  {%- endif -%}
+  "image": [
+    {%- for image in product.images -%}
+      "https:{{ image | image_url: width: 1200 }}"{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ],
+  "material": "100% Organic Tencha (shade-grown tea leaves)",
+  "countryOfOrigin": {
+    "@type": "Country",
+    "name": "Japan"
+  },
+  "additionalProperty": [
+    {
+      "@type": "PropertyValue",
+      "name": "Certification",
+      "value": "USDA Organic, JAS Organic"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Origin",
+      "value": "Uji / Kagoshima, Japan"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Processing",
+      "value": "Stone-ground (5-10 micrometer particle size)"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Harvest",
+      "value": "First harvest (Ichibancha)"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Shading Period",
+      "value": "21+ days"
+    }
+  ],
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ shop.url }}{{ product.url }}",
+    "priceCurrency": "{{ cart.currency.iso_code }}",
+    "price": "{{ product.selected_or_first_available_variant.price | money_without_currency | strip_html | strip }}",
+    "availability": "https://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}",
+    "seller": {
+      "@type": "Organization",
+      "name": "NAKAI"
+    },
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingDestination": [
+        { "@type": "DefinedRegion", "addressCountry": "US" },
+        { "@type": "DefinedRegion", "addressCountry": "AE" },
+        { "@type": "DefinedRegion", "addressCountry": "JP" }
+      ],
+      "deliveryTime": {
+        "@type": "ShippingDeliveryTime",
+        "handlingTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 3, "unitCode": "d" },
+        "transitTime": { "@type": "QuantitativeValue", "minValue": 3, "maxValue": 10, "unitCode": "d" }
+      }
+    },
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": ["US", "AE", "JP"],
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 30,
+      "returnMethod": "https://schema.org/ReturnByMail",
+      "returnFees": "https://schema.org/FreeReturn"
+    }
+  }
+  {%- if product.metafields.reviews.rating.value != blank -%}
+  ,"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ product.metafields.reviews.rating.value }}",
+    "reviewCount": "{{ product.metafields.reviews.rating_count.value | default: 1 }}"
+  }
+  {%- endif -%}
+}
+</script>
+{%- endif -%}

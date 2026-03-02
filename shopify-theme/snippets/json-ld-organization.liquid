@@ -1,0 +1,57 @@
+{%- comment -%}
+  WS14: Organization JSON-LD Schema
+  Provides brand authority signals to AI systems and search engines.
+  Included on all pages via layout/theme.liquid.
+{%- endcomment -%}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "NAKAI",
+  "legalName": "NAKAI",
+  "url": "https://nakaimatcha.com",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://nakaimatcha.com/cdn/shop/files/nakai-logo.png",
+    "width": 512,
+    "height": 512
+  },
+  "description": "Premium organic Japanese matcha brand. Ceremonial, specialty, and everyday grades sourced from Uji and Kagoshima, Japan. USDA Organic and JAS Organic certified.",
+  "foundingLocation": {
+    "@type": "Place",
+    "name": "Dubai, UAE"
+  },
+  "areaServed": "Worldwide",
+  "sameAs": [
+    "https://www.instagram.com/nakai_matcha/",
+    "https://www.tiktok.com/@nakai_matcha"
+  ],
+  "knowsAbout": [
+    "Matcha",
+    "Japanese Tea Ceremony",
+    "Organic Tea",
+    "Ceremonial Grade Matcha",
+    "Stone-ground Matcha",
+    "L-Theanine",
+    "Uji Matcha",
+    "Kagoshima Tea"
+  ],
+  "hasCredential": [
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "USDA Organic Certification"
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "JAS Organic Certification"
+    }
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "email": "hello@nakaimatcha.com",
+    "availableLanguage": ["English", "Japanese", "Arabic"]
+  }
+}
+</script>
