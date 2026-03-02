@@ -59,18 +59,10 @@ _PRODUCT_HANDLE_MAP = {
 _PRODUCT_TAG_RE = re.compile(r"\[PRODUCT:[a-z0-9-]+\]", re.IGNORECASE)
 
 
-def _inject_product_tags(response: str, conversation_history: Optional[List[Dict]]) -> str:
-    """If this is Matcha Finder step 3 and the model mentioned a product
-    but didn't output [PRODUCT:handle] tags, inject them automatically."""
-    if not conversation_history:
-        return response
-    # Count CHOICES in history — step 3 happens when 2+ CHOICES have been sent
-    choices_count = sum(
-        1 for msg in conversation_history
-        if msg.get("role") == "assistant" and _CHOICES_RE.search(msg.get("content", ""))
-    )
-    if choices_count < 2:
-        return response
+def _inject_product_tags(response: str, conversation_history: Optional[List[Dict]] = None) -> str:
+    """If the model mentioned a product but didn't output [PRODUCT:handle]
+    tags, inject them automatically. Works for ALL responses — not just
+    Matcha Finder step 3 — so product cards always appear."""
     # Already has [PRODUCT] tags — don't double up
     if _PRODUCT_TAG_RE.search(response):
         return response
@@ -355,7 +347,7 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 6. Generate response with tuned parameters
-        _max_tok = 1800 if "wholesale" in source else 1400
+        _max_tok = 1200 if "wholesale" in source else 800
         try:
             raw_response = await chat_completion(
                 messages, temperature=0.45, max_tokens=_max_tok, language=language
@@ -490,7 +482,7 @@ class RAGEngine:
         messages.append({"role": "user", "content": rag_context})
 
         # 5. Stream LLM response
-        _max_tok = 1800 if "wholesale" in source else 1400
+        _max_tok = 1200 if "wholesale" in source else 800
         full_response = []
         try:
             async for chunk in chat_completion_stream(
