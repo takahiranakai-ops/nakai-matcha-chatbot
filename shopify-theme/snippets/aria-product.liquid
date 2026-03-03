@@ -1,0 +1,158 @@
+{%- comment -%}
+  WS7: ARIA Accessibility for AI Agents
+  AI agents (OpenAI Atlas/CUA, Google Bard) parse the accessibility tree
+  as their primary interface. ARIA-optimized pages achieve 80% agent success
+  rate vs 42% without (UC Berkeley research).
+
+  Usage: {% render 'aria-product' %} on product pages
+{%- endcomment -%}
+
+{%- if template.name == 'product' and product -%}
+<script type="application/json" id="nakai-aria-hints" data-purpose="ai-agent-hints">
+{
+  "product": "{{ product.title | escape }}",
+  "brand": "NAKAI",
+  "price": "{{ product.selected_or_first_available_variant.price | money }}",
+  "available": {{ product.available }},
+  "type": "{{ product.type | escape }}",
+  "tags": {{ product.tags | json }}
+}
+</script>
+
+<script>
+(function(){
+  'use strict';
+  // Enhance product page elements with ARIA attributes for AI agent navigation.
+  // AI agents read the accessibility tree — rich labels dramatically improve
+  // their ability to understand and interact with the page.
+
+  function enhanceProductARIA(){
+    var title = '{{ product.title | escape }}';
+    var price = '{{ product.selected_or_first_available_variant.price | money | escape }}';
+    var available = {{ product.available | json }};
+    var grade = '{{ product.type | escape }}';
+    var vendor = '{{ product.vendor | escape }}';
+
+    // --- Product Title ---
+    var headings = document.querySelectorAll('h1');
+    headings.forEach(function(h){
+      if(h.textContent.trim().length > 0){
+        h.setAttribute('role','heading');
+        h.setAttribute('aria-level','1');
+      }
+    });
+
+    // --- Price elements ---
+    document.querySelectorAll('[class*="price"]:not([aria-label])').forEach(function(el){
+      var text = el.textContent.trim();
+      if(text && text.match(/[\$\¥€£]/)){
+        el.setAttribute('aria-label', title + ' price: ' + text);
+        el.setAttribute('role','text');
+      }
+    });
+
+    // --- Add to Cart button ---
+    document.querySelectorAll('button[type="submit"], button[name="add"], [class*="add-to-cart"], [class*="addtocart"]').forEach(function(btn){
+      if(!btn.getAttribute('aria-label') && btn.closest('form[action*="/cart/add"]')){
+        btn.setAttribute('aria-label', 'Add ' + title + ' ' + price + ' to cart');
+        btn.setAttribute('role', 'button');
+      }
+    });
+
+    // --- Product form ---
+    document.querySelectorAll('form[action*="/cart/add"]').forEach(function(form){
+      form.setAttribute('role','form');
+      form.setAttribute('aria-label', 'Purchase ' + title + ' — ' + vendor + ' ' + grade);
+    });
+
+    // --- Variant selectors ---
+    document.querySelectorAll('select[name*="option"], [class*="variant-select"]').forEach(function(sel){
+      if(!sel.getAttribute('aria-label')){
+        var labelText = '';
+        var label = sel.closest('label') || (sel.id && document.querySelector('label[for="'+sel.id+'"]'));
+        if(label) labelText = label.textContent.trim();
+        sel.setAttribute('aria-label', labelText ? title + ' ' + labelText : title + ' option selector');
+      }
+    });
+
+    // --- Quantity input ---
+    document.querySelectorAll('input[name="quantity"]').forEach(function(inp){
+      inp.setAttribute('aria-label', 'Quantity of ' + title);
+      inp.setAttribute('role','spinbutton');
+    });
+
+    // --- Product images ---
+    document.querySelectorAll('.product__media img, [class*="product-image"] img, [class*="product-photo"] img').forEach(function(img){
+      if(!img.getAttribute('alt') || img.getAttribute('alt').trim() === ''){
+        img.setAttribute('alt', title + ' — ' + vendor + ' ' + grade + ' organic matcha');
+      }
+    });
+
+    // --- Product description region ---
+    document.querySelectorAll('.product__description, [class*="product-description"], .rte').forEach(function(el){
+      if(el.closest('[class*="product"]')){
+        el.setAttribute('role','region');
+        el.setAttribute('aria-label', title + ' detailed description');
+      }
+    });
+
+    // --- Availability status ---
+    var statusEl = document.querySelector('[class*="inventory"], [class*="stock"], [class*="availability"]');
+    if(statusEl){
+      statusEl.setAttribute('role','status');
+      statusEl.setAttribute('aria-live','polite');
+      statusEl.setAttribute('aria-label', title + ' availability: ' + (available ? 'In stock' : 'Out of stock'));
+    }
+
+    // --- Review section ---
+    document.querySelectorAll('[class*="review"], [class*="rating"]').forEach(function(el){
+      if(!el.getAttribute('role')){
+        el.setAttribute('role','region');
+        el.setAttribute('aria-label', title + ' customer reviews and ratings');
+      }
+    });
+
+    // --- Product media gallery ---
+    var gallery = document.querySelector('.product__media-list, [class*="product-gallery"], [class*="product-media"]');
+    if(gallery){
+      gallery.setAttribute('role','region');
+      gallery.setAttribute('aria-label', title + ' product images');
+      gallery.querySelectorAll('li, [class*="slide"]').forEach(function(item, i){
+        item.setAttribute('role','group');
+        item.setAttribute('aria-label', title + ' image ' + (i + 1));
+      });
+    }
+
+    // --- Breadcrumb enhancement ---
+    document.querySelectorAll('nav[class*="breadcrumb"], .breadcrumb, [class*="breadcrumbs"]').forEach(function(nav){
+      nav.setAttribute('role','navigation');
+      nav.setAttribute('aria-label','Breadcrumb');
+    });
+
+    // --- Share buttons ---
+    document.querySelectorAll('[class*="share"] a, [class*="social-share"] a').forEach(function(a){
+      if(!a.getAttribute('aria-label')){
+        a.setAttribute('aria-label', 'Share ' + title + ' on ' + (a.textContent.trim() || 'social media'));
+      }
+    });
+
+    // --- Live region for cart updates (dynamic) ---
+    if(!document.getElementById('nakai-aria-live')){
+      var live = document.createElement('div');
+      live.id = 'nakai-aria-live';
+      live.setAttribute('role','status');
+      live.setAttribute('aria-live','polite');
+      live.setAttribute('aria-atomic','true');
+      live.className = 'visually-hidden';
+      document.body.appendChild(live);
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', enhanceProductARIA);
+  } else {
+    enhanceProductARIA();
+  }
+})();
+</script>
+{%- endif -%}

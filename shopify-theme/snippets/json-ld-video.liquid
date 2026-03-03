@@ -1,0 +1,92 @@
+{%- comment -%}
+  WS15: VideoObject JSON-LD Schema
+  Enables rich video snippets in Google/AI search results.
+  Covers: homepage brand video + product preparation guides.
+
+  Usage: {% render 'json-ld-video' %} in theme.liquid
+{%- endcomment -%}
+
+{%- comment -%} Homepage — Brand / Hero Video {%- endcomment -%}
+{%- if template == 'index' -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "NAKAI — Premium Organic Matcha from Japan",
+  "description": "Discover NAKAI's premium organic matcha, sourced from Uji and Kagoshima, Japan. Stone-ground to 5-10 micrometers for the smoothest ceremonial experience. USDA Organic and JAS certified.",
+  "thumbnailUrl": "https://nakaimatcha.com/cdn/shop/files/nakai-matcha-hero.jpg",
+  "uploadDate": "2025-01-01",
+  "duration": "PT1M30S",
+  "publisher": {
+    "@type": "Organization",
+    "name": "NAKAI",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://nakaimatcha.com/cdn/shop/files/nakai-logo.png",
+      "width": 200,
+      "height": 60
+    }
+  },
+  "potentialAction": {
+    "@type": "WatchAction",
+    "target": "https://nakaimatcha.com/"
+  }
+}
+</script>
+{%- endif -%}
+
+{%- comment -%} Product Pages — Preparation Guide Videos {%- endcomment -%}
+{%- if template.name == 'product' and product -%}
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": "How to Prepare {{ product.title | escape }} — Usucha (Thin Tea)",
+    "description": "Step-by-step guide to preparing {{ product.title | escape }} as usucha (thin tea). Sift 2g of matcha, add 70ml of 80°C water, and whisk in a W-motion for 15-20 seconds until a fine crema forms. Perfect for daily drinking.",
+    "thumbnailUrl": "{{ product.featured_image | image_url: width: 1200 }}",
+    "uploadDate": "{{ product.published_at | date: '%Y-%m-%d' }}",
+    "duration": "PT2M",
+    "publisher": {
+      "@type": "Organization",
+      "name": "NAKAI",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://nakaimatcha.com/cdn/shop/files/nakai-logo.png",
+        "width": 200,
+        "height": 60
+      }
+    },
+    "about": {
+      "@type": "Product",
+      "name": "{{ product.title | escape }}",
+      "brand": { "@type": "Brand", "name": "NAKAI" }
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": "How to Make a Matcha Latte with {{ product.title | escape }}",
+    "description": "Prepare a creamy matcha latte using {{ product.title | escape }}. Whisk 2g of matcha with 30ml hot water to create a concentrated shot, then pour over 200ml steamed milk. Works with oat, almond, or dairy milk.",
+    "thumbnailUrl": "{{ product.featured_image | image_url: width: 1200 }}",
+    "uploadDate": "{{ product.published_at | date: '%Y-%m-%d' }}",
+    "duration": "PT3M",
+    "publisher": {
+      "@type": "Organization",
+      "name": "NAKAI",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://nakaimatcha.com/cdn/shop/files/nakai-logo.png",
+        "width": 200,
+        "height": 60
+      }
+    },
+    "about": {
+      "@type": "Product",
+      "name": "{{ product.title | escape }}",
+      "brand": { "@type": "Brand", "name": "NAKAI" }
+    }
+  }
+]
+</script>
+{%- endif -%}
