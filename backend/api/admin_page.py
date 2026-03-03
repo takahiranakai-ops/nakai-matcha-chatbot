@@ -164,9 +164,20 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
   </div>
   <div class="panel" id="panel-ai">
     <div class="stats-grid" id="ai-stats-grid"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px">
+    <div style="margin-top:8px">
+      <h3 style="font-size:.9rem;margin-bottom:12px;color:var(--green)">Share of Model Trend (Last 30 Days)</h3>
+      <div style="background:var(--white);border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+        <div class="bar-chart" id="som-trend-chart" style="height:120px"></div>
+        <p id="som-trend-empty" style="color:var(--gray);font-size:.85rem;text-align:center;display:none">No citation data yet. Data appears after the citation monitor runs.</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px">
       <div>
-        <h3 style="font-size:.9rem;margin-bottom:12px;color:var(--green)">Recent Social Mentions</h3>
+        <h3 style="font-size:.9rem;margin-bottom:12px;color:var(--green)">Top Cited Queries</h3>
+        <div id="ai-top-queries" style="background:var(--white);border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);max-height:220px;overflow-y:auto">
+          <p style="color:var(--gray);font-size:.85rem">Loading...</p>
+        </div>
+        <h3 style="font-size:.9rem;margin:20px 0 12px;color:var(--green)">Recent Social Mentions</h3>
         <div id="ai-mentions" style="background:var(--white);border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);max-height:340px;overflow-y:auto">
           <p style="color:var(--gray);font-size:.85rem">Loading...</p>
         </div>
@@ -467,13 +478,47 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     .then(function(d){{
       var sg=document.getElementById('ai-stats-grid');
       var som=d.share_of_model||0;
-      var cit=d.citations_count||0;
-      var soc=d.social_mentions_count||0;
-      var seo=d.seo_rankings_count||0;
+      var cit=d.citations||d.citations_count||0;
+      var soc=d.social_mentions||d.social_mentions_count||0;
+      var seo=d.seo_rankings||d.seo_rankings_count||0;
       sg.innerHTML='<div class="stat-card"><div class="label">Share of Model</div><div class="value">'+som+'%</div></div>'
         +'<div class="stat-card"><div class="label">AI Citations Found</div><div class="value">'+cit+'</div></div>'
         +'<div class="stat-card"><div class="label">Social Mentions</div><div class="value">'+soc+'</div></div>'
         +'<div class="stat-card"><div class="label">SEO Rankings Tracked</div><div class="value">'+seo+'</div></div>';
+
+      var trend=d.citation_trend||[];
+      var tChart=document.getElementById('som-trend-chart');
+      var tEmpty=document.getElementById('som-trend-empty');
+      tChart.innerHTML='';
+      if(!trend.length){{tEmpty.style.display='block'}}
+      else{{
+        tEmpty.style.display='none';
+        var maxT=1;trend.forEach(function(t){{if(t.total>maxT)maxT=t.total}});
+        trend.forEach(function(t){{
+          var col=document.createElement('div');col.className='bar-col';
+          var h=Math.max((t.total/maxT)*100,4);
+          var citH=t.total?Math.max((t.cited/maxT)*100,2):0;
+          col.innerHTML='<div class="bar-value" style="font-size:.65rem">'+t.pct+'%</div>'
+            +'<div style="position:relative;width:100%;max-width:40px;height:'+h+'px">'
+            +'<div style="position:absolute;bottom:0;width:100%;height:'+h+'px;background:rgba(64,101,70,.15);border-radius:4px 4px 0 0"></div>'
+            +'<div style="position:absolute;bottom:0;width:100%;height:'+citH+'px;background:var(--green);border-radius:4px 4px 0 0"></div>'
+            +'</div>'
+            +'<div class="bar-label">'+t.date.substring(5)+'</div>';
+          tChart.appendChild(col);
+        }});
+      }}
+
+      var tq=document.getElementById('ai-top-queries');tq.innerHTML='';
+      var topQ=d.top_cited_queries||[];
+      if(!topQ.length){{tq.innerHTML='<p style="color:var(--gray);font-size:.85rem">No cited queries yet.</p>'}}
+      else{{
+        topQ.forEach(function(q){{
+          var row=document.createElement('div');row.className='breakdown-row';
+          row.innerHTML='<span style="flex:1;font-size:.85rem">'+esc(q.query)+'</span><strong style="color:var(--green)">'+q.count+'x</strong>';
+          tq.appendChild(row);
+        }});
+      }}
+
       var mc=document.getElementById('ai-mentions');mc.innerHTML='';
       var mentions=d.recent_mentions||[];
       if(!mentions.length){{mc.innerHTML='<p style="color:var(--gray);font-size:.85rem">No mentions yet. Data will appear after the social monitor runs.</p>';return}}

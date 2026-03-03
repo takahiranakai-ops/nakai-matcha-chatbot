@@ -610,4 +610,62 @@ async def get_automation_stats() -> dict:
     except Exception:
         stats["recent_mentions"] = []
 
+    # Citation trend: daily counts for last 30 days
+    try:
+        resp = await client.get(
+            f"{_BASE_URL}/citation_logs",
+            headers=_HEADERS,
+            params={
+                "select": "checked_at,nakai_cited",
+                "order": "checked_at.desc",
+                "limit": "500",
+            },
+        )
+        rows = resp.json()
+        daily_cited: dict = {}
+        daily_total: dict = {}
+        for row in rows:
+            day = str(row.get("checked_at", ""))[:10]
+            if not day:
+                continue
+            daily_total[day] = daily_total.get(day, 0) + 1
+            if row.get("nakai_cited"):
+                daily_cited[day] = daily_cited.get(day, 0) + 1
+        # Build trend as list of {date, cited, total, pct}
+        trend = []
+        for day in sorted(daily_total.keys())[-30:]:
+            c = daily_cited.get(day, 0)
+            t = daily_total.get(day, 0)
+            trend.append({
+                "date": day,
+                "cited": c,
+                "total": t,
+                "pct": round(c / t * 100, 1) if t else 0,
+            })
+        stats["citation_trend"] = trend
+    except Exception:
+        stats["citation_trend"] = []
+
+    # Top cited queries
+    try:
+        resp = await client.get(
+            f"{_BASE_URL}/citation_logs",
+            headers=_HEADERS,
+            params={
+                "select": "query,nakai_cited",
+                "nakai_cited": "eq.true",
+                "order": "checked_at.desc",
+                "limit": "20",
+            },
+        )
+        rows = resp.json()
+        query_counts: dict = {}
+        for row in rows:
+            q = row.get("query", "unknown")
+            query_counts[q] = query_counts.get(q, 0) + 1
+        top_queries = sorted(query_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+        stats["top_cited_queries"] = [{"query": q, "count": c} for q, c in top_queries]
+    except Exception:
+        stats["top_cited_queries"] = []
+
     return stats
