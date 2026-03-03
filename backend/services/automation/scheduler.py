@@ -125,8 +125,8 @@ async def _scheduler_loop():
                 last_run["seo"] = now.timestamp()
                 asyncio.create_task(run_seo_tracker())
 
-            # Weekly Wednesday 03:xx UTC: Content freshness
-            if weekday == 2 and hour == 3 and (now.timestamp() - last_run["freshness"]) >= 6 * 24 * 3600:
+            # Bi-weekly Wed + Sat 03:xx UTC: Content freshness
+            if weekday in (2, 5) and hour == 3 and (now.timestamp() - last_run["freshness"]) >= 3 * 24 * 3600:
                 last_run["freshness"] = now.timestamp()
                 asyncio.create_task(run_content_freshness())
 

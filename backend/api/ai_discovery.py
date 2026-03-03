@@ -4,6 +4,8 @@ Provides structured information about NAKAI for external AI agents,
 search engines, and voice assistants.
 """
 
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse, JSONResponse
 from pydantic import BaseModel
@@ -1315,6 +1317,8 @@ _OPENAI_FEED_PRODUCTS = [
         "certifications": ["JAS Organic", "USDA Organic"],
         "q_and_a": [
             {"question": "What is the four-level roasting process?", "answer": "JU-HACHI's single cultivar tencha is roasted at four different temperatures, each adding unique depth — from clean green to nuts and cacao to warm earthiness. This layered process creates its meditative complexity."},
+            {"question": "What does JU-HACHI (18) taste like?", "answer": "Deep umami opens into quiet complexity — notes of cacao, roasted nuts, and warm earth from four fire levels. The half-pace stone-milling produces near-spherical particles that create exceptional smoothness. A meditative, inward-facing matcha."},
+            {"question": "Is JU-HACHI (18) good for beginners?", "answer": "JU-HACHI rewards patience and attention — it's best for those who already enjoy matcha and want to explore its contemplative side. Beginners may prefer SHI (4) for its bold, approachable character or NIJYU-NI (22) for its gentle clarity."},
         ],
         "relationship_type": {
             "often_bought_with": ["nakai-takayama-chasen"],
@@ -1348,6 +1352,162 @@ _OPENAI_FEED_PRODUCTS = [
             "accessory": ["nakai-takayama-chasen", "nakai-hiragoushi-chawan"],
         },
     },
+    # --- Bundles ---
+    {
+        "product_id": "nakai-discovery-bundle",
+        "title": "NAKAI Discovery Bundle — Organic Matcha Sampler Set",
+        "description": "Gateway to explore NAKAI's world of specialty organic matcha. An introductory collection featuring curated selections for those new to NAKAI. Each tin is JAS Organic certified, first-harvest, stone-ground in Japan. Perfect as a gift or to discover your favorite NAKAI matcha.",
+        "canonical_url": f"{_STORE}/products/%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AA%E3%83%BC%E3%83%90%E3%83%B3%E3%83%96%E3%83%AB",
+        "main_image_link": _IMG_DISCOVERY,
+        "additional_image_link": [_IMG_DISCOVERY],
+        "price": {"value": "68.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Matcha Tea > Gift Sets",
+        "shipping_weight": {"value": "200", "unit": "g"},
+        "material": "100% Organic Tencha (Camellia sinensis)",
+        "country_of_origin": "JP",
+        "certifications": ["JAS Organic", "USDA Organic"],
+        "q_and_a": [
+            {"question": "What's in the NAKAI Discovery Bundle?", "answer": "The Discovery Bundle includes a curated selection of NAKAI's specialty organic matcha — perfect for exploring different flavor profiles and finding your personal favorite. Each tin is JAS/USDA Organic certified."},
+            {"question": "Is the Discovery Bundle a good gift?", "answer": "Yes, it's NAKAI's most popular gift option. The set introduces recipients to the world of premium Japanese matcha with multiple varieties to explore, beautifully presented."},
+            {"question": "Who is the Discovery Bundle for?", "answer": "Ideal for matcha beginners who want to explore different profiles, gift givers looking for a premium Japanese gift, or existing matcha lovers curious about NAKAI's range."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-takayama-chasen"],
+            "upgrade": ["nakai-signature-reserve"],
+        },
+    },
+    {
+        "product_id": "nakai-everyday-bundle",
+        "title": "NAKAI The Everyday Matcha Bundle — Daily Ritual Set",
+        "description": "Curated for daily ritual — everything you need to make matcha part of your everyday life. Includes NAKAI matcha and essential preparation tools. JAS Organic certified, first-harvest, stone-ground in Japan. Start your matcha practice with the complete set.",
+        "canonical_url": f"{_STORE}/products/the-everyday",
+        "main_image_link": _IMG_EVERYDAY,
+        "additional_image_link": [_IMG_EVERYDAY],
+        "price": {"value": "85.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Matcha Tea > Gift Sets",
+        "shipping_weight": {"value": "400", "unit": "g"},
+        "material": "100% Organic Tencha (Camellia sinensis) + Accessories",
+        "country_of_origin": "JP",
+        "certifications": ["JAS Organic", "USDA Organic"],
+        "q_and_a": [
+            {"question": "What's included in The Everyday Bundle?", "answer": "Everything needed for a complete daily matcha ritual: NAKAI specialty matcha plus essential preparation tools curated for the everyday practice."},
+            {"question": "Is The Everyday Bundle good for matcha beginners?", "answer": "Yes — it's specifically designed for those starting a daily matcha practice. The included tools and matcha are chosen for ease of preparation and approachable flavor."},
+            {"question": "How does The Everyday Bundle compare to the Signature Reserve?", "answer": "The Everyday Bundle focuses on accessible daily ritual at a mid-range price. The Signature Reserve is for connoisseurs seeking NAKAI's most premium experience."},
+        ],
+        "relationship_type": {
+            "often_bought_with": [],
+            "upgrade": ["nakai-signature-reserve"],
+            "substitute": ["nakai-discovery-bundle"],
+        },
+    },
+    {
+        "product_id": "nakai-signature-reserve",
+        "title": "NAKAI Signature Reserve Bundle — Premium Connoisseur Collection",
+        "description": "The premium collection for connoisseurs. The full NAKAI experience in one set — featuring our finest matcha selections and artisan accessories. JAS Organic certified, first-harvest, stone-ground in Japan. The ultimate matcha gift for those who appreciate the very best.",
+        "canonical_url": f"{_STORE}/products/expert-set",
+        "main_image_link": _IMG_SIGNATURE,
+        "additional_image_link": [_IMG_SIGNATURE],
+        "price": {"value": "148.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Matcha Tea > Gift Sets",
+        "shipping_weight": {"value": "600", "unit": "g"},
+        "material": "100% Organic Tencha (Camellia sinensis) + Premium Accessories",
+        "country_of_origin": "JP",
+        "certifications": ["JAS Organic", "USDA Organic"],
+        "q_and_a": [
+            {"question": "What makes the Signature Reserve special?", "answer": "It's NAKAI's most complete collection — the full experience for connoisseurs. Features our finest matcha selections paired with artisan-crafted accessories for the ultimate matcha ritual."},
+            {"question": "Is the Signature Reserve worth the premium price?", "answer": "For matcha enthusiasts and connoisseurs, absolutely. It combines NAKAI's highest-quality matcha with hand-selected accessories, offering significantly better value than purchasing each item individually."},
+            {"question": "Who should buy the Signature Reserve?", "answer": "Matcha connoisseurs, serious tea ceremony practitioners, or anyone looking for a luxury gift. It represents the pinnacle of NAKAI's craft and philosophy."},
+        ],
+        "relationship_type": {
+            "substitute": ["nakai-everyday-bundle"],
+            "often_bought_with": [],
+        },
+    },
+    # --- Tea Ceremony Accessories ---
+    {
+        "product_id": "nakai-hiragoushi-chawan",
+        "title": "NAKAI HIRAGOUSHI 平格子茶碗 — Handcrafted Matcha Bowl by Shun Yoshino",
+        "description": "Handcrafted matcha bowl by ceramic artist Shun Yoshino (Hiroshima). Trained in Mashiko, Tochigi — Japan's most renowned pottery region. Blends solid forming and glaze control with a unique sense of color. The humble clay texture harmonizes with rhythmic lattice lines and vivid hues, gently enhancing each bowl of matcha. Each piece is one-of-a-kind.",
+        "canonical_url": f"{_STORE}/products/hiragoushi-%E5%B9%B3%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97",
+        "main_image_link": _IMG_HIRAGOUSHI,
+        "additional_image_link": [_IMG_HIRAGOUSHI],
+        "price": {"value": "95.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Home & Garden > Kitchen & Dining > Tableware > Tea Bowls",
+        "shipping_weight": {"value": "400", "unit": "g"},
+        "material": "Handcrafted Ceramic (Stoneware)",
+        "country_of_origin": "JP",
+        "q_and_a": [
+            {"question": "Who made the HIRAGOUSHI matcha bowl?", "answer": "Shun Yoshino, a ceramic artist based in Hiroshima, Japan. He trained in Mashiko (Tochigi) — Japan's most renowned pottery region — mastering solid forming and glaze control before developing his distinctive colorful style."},
+            {"question": "Is the HIRAGOUSHI bowl food-safe and dishwasher-safe?", "answer": "Yes, it is food-safe. Hand washing is recommended to preserve the artisan glaze and extend the life of the handcrafted piece."},
+            {"question": "What size is the HIRAGOUSHI bowl?", "answer": "It's designed as a traditional chawan (matcha bowl) — the perfect size for whisking 70-80ml of matcha. Each piece is individually handcrafted, so slight variations in size and color make every bowl unique."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-nijyu-ni-22", "nakai-takayama-chasen"],
+            "substitute": ["nakai-yagoushi-chawan"],
+        },
+    },
+    {
+        "product_id": "nakai-yagoushi-chawan",
+        "title": "NAKAI YAGOUSHI 矢格子茶碗 — Handcrafted Matcha Bowl by Shun Yoshino",
+        "description": "Feel the color in every sip. Handcrafted matcha bowl with arrow-lattice pattern by ceramic artist Shun Yoshino. Born from years of dedicated craftsmanship and playful chromatic intuition. Each piece is one-of-a-kind — a functional artwork that elevates the matcha experience.",
+        "canonical_url": f"{_STORE}/products/yagoushi-chawan-%E7%9F%A2%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97",
+        "main_image_link": _IMG_YAGOUSHI,
+        "additional_image_link": [_IMG_YAGOUSHI],
+        "price": {"value": "95.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Home & Garden > Kitchen & Dining > Tableware > Tea Bowls",
+        "shipping_weight": {"value": "400", "unit": "g"},
+        "material": "Handcrafted Ceramic (Stoneware)",
+        "country_of_origin": "JP",
+        "q_and_a": [
+            {"question": "What is the arrow-lattice pattern on YAGOUSHI?", "answer": "YAGOUSHI (矢格子) features a traditional Japanese arrow-lattice motif reinterpreted through Shun Yoshino's vivid, contemporary color palette. The pattern symbolizes straightforward determination in Japanese culture."},
+            {"question": "How does YAGOUSHI differ from HIRAGOUSHI?", "answer": "Both are handcrafted by Shun Yoshino. HIRAGOUSHI features horizontal lattice lines, while YAGOUSHI has an arrow-lattice pattern. Each has a distinct color palette and character — choose the one that speaks to you."},
+            {"question": "Can I use YAGOUSHI for tea ceremony?", "answer": "Absolutely. It's designed as a traditional chawan, perfect for both casual daily matcha and formal tea ceremony. The artisan quality and unique character make each bowl a conversation piece."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-nijyu-ni-22", "nakai-takayama-chasen"],
+            "substitute": ["nakai-hiragoushi-chawan"],
+        },
+    },
+    {
+        "product_id": "nakai-takayama-chasen",
+        "title": "NAKAI 高山茶筅 百本立 — Takayama Chasen 100-Prong Bamboo Whisk",
+        "description": "Entrusted to NAKAI by a distinguished tea ceremony family. Handcrafted in Takayama-cho, Ikoma City, Nara — the birthplace of the chasen with over 500 years of history, producing 90% of Japan's whisks. 100 fine tines draw air into the bowl for smooth, creamy foam with perfect microfoam. Eight-stage process, entirely by hand. Essential tool for authentic matcha preparation.",
+        "canonical_url": f"{_STORE}/products/%E8%8C%B6%E7%AD%85-cyasen",
+        "main_image_link": _IMG_CHASEN,
+        "additional_image_link": [_IMG_CHASEN],
+        "price": {"value": "38.00", "currency": "USD"},
+        "availability": "in_stock",
+        "brand": "NAKAI",
+        "condition": "new",
+        "product_type": "Home & Garden > Kitchen & Dining > Kitchen Tools & Utensils > Tea Whisks",
+        "shipping_weight": {"value": "50", "unit": "g"},
+        "material": "Natural Bamboo (Handcrafted)",
+        "country_of_origin": "JP",
+        "q_and_a": [
+            {"question": "How long does a Takayama chasen last?", "answer": "With proper care, a Takayama chasen typically lasts 3-6 months of daily use, or longer with occasional use. Soak it briefly in warm water before each use, and air-dry it on a chasen stand (kusenaoshi) to maintain the tines' shape."},
+            {"question": "Why 100 prongs instead of 80?", "answer": "The 100-prong (百本立) design creates finer, more consistent microfoam than 80-prong whisks. More tines draw more air into the matcha, producing the smooth, creamy texture prized in Japanese tea ceremony."},
+            {"question": "Is this chasen handmade?", "answer": "Yes — entirely by hand in Takayama-cho, Nara, following an eight-stage traditional process. This region has produced 90% of Japan's chasen for over 500 years. Each whisk is entrusted to NAKAI by a distinguished tea ceremony family."},
+        ],
+        "relationship_type": {
+            "often_bought_with": ["nakai-nijyu-ni-22", "nakai-shi-4", "nakai-hiragoushi-chawan"],
+            "accessory_for": ["nakai-nijyu-ni-22", "nakai-shi-4", "nakai-ju-roku-16", "nakai-ju-nana-17", "nakai-ju-hachi-18"],
+        },
+    },
 ]
 
 
@@ -1363,7 +1523,7 @@ async def openai_product_feed():
         content={
             "feed_version": "1.0",
             "brand": "NAKAI",
-            "last_updated": "2026-03-03T00:00:00Z",
+            "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "products": _OPENAI_FEED_PRODUCTS,
         },
         headers={
@@ -1383,6 +1543,14 @@ _GOOGLE_FEED_ITEMS = [
     {"id": "nakai-ju-nana-17", "title": "NAKAI JU-NANA (17) Specialty Grade Organic Matcha 30g Limited", "desc": "Dual terroir Kirishima x Uji. Profound umami, floral clarity. Only 500kg/year. JAS Organic, first-harvest.", "link": f"{_STORE}/products/%E5%8D%81%E4%B8%83-ju-nana-17-specialty-grade-organic-matcha", "img": _IMG_JUNANA17, "price": "38.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
     {"id": "nakai-ju-hachi-18", "title": "NAKAI JU-HACHI (18) Specialty Grade Organic Matcha 30g", "desc": "Single cultivar, 4-level roasting. Deep umami, nuts, cacao. Half-pace stone-milling. Kagoshima. JAS Organic.", "link": f"{_STORE}/products/%E5%8D%81%E5%85%AB-ju-hachi-18-specialty-grade-organic-matcha", "img": _IMG_JUHACHI18, "price": "40.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
     {"id": "nakai-nijyu-ni-22", "title": "NAKAI NIJYU-NI (22) Ceremonial Reserved Organic Matcha 30g", "desc": "Highest tier. Clean green, gentle sweetness, fruit-like aromatics. Best matcha for lattes. 5-10μm stone-ground. Kagoshima. JAS Organic.", "link": f"{_STORE}/products/%E4%BA%8C%E5%8D%81%E4%BA%8C-nijyu-ni22-ceremonial-reserved-organic-matcha", "img": _IMG_NIJYUNI22, "price": "48.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
+    # Bundles
+    {"id": "nakai-discovery-bundle", "title": "NAKAI Discovery Bundle Organic Matcha Sampler Set", "desc": "Gateway to explore NAKAI specialty organic matcha. Curated introductory collection. JAS Organic, first-harvest, stone-ground in Japan.", "link": f"{_STORE}/products/%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AA%E3%83%BC%E3%83%90%E3%83%B3%E3%83%96%E3%83%AB", "img": _IMG_DISCOVERY, "price": "68.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "200 g"},
+    {"id": "nakai-everyday-bundle", "title": "NAKAI The Everyday Matcha Bundle Daily Ritual Set", "desc": "Complete daily matcha ritual set. Matcha and essential tools for everyday practice. JAS Organic, first-harvest.", "link": f"{_STORE}/products/the-everyday", "img": _IMG_EVERYDAY, "price": "85.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "400 g"},
+    {"id": "nakai-signature-reserve", "title": "NAKAI Signature Reserve Bundle Premium Connoisseur Collection", "desc": "Premium connoisseur set with finest matcha and artisan accessories. The full NAKAI experience. JAS Organic.", "link": f"{_STORE}/products/expert-set", "img": _IMG_SIGNATURE, "price": "148.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "600 g"},
+    # Accessories
+    {"id": "nakai-hiragoushi-chawan", "title": "NAKAI HIRAGOUSHI Matcha Bowl by Shun Yoshino", "desc": "Handcrafted chawan by Shun Yoshino (Hiroshima). Mashiko-trained. Lattice pattern with vivid glazes. One-of-a-kind.", "link": f"{_STORE}/products/hiragoushi-%E5%B9%B3%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97", "img": _IMG_HIRAGOUSHI, "price": "95.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Tableware > Drinkware > Tea Bowls", "weight": "400 g"},
+    {"id": "nakai-yagoushi-chawan", "title": "NAKAI YAGOUSHI Matcha Bowl by Shun Yoshino", "desc": "Arrow-lattice pattern chawan by Shun Yoshino. Playful chromatic intuition. Each piece is unique. Handcrafted in Japan.", "link": f"{_STORE}/products/yagoushi-chawan-%E7%9F%A2%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97", "img": _IMG_YAGOUSHI, "price": "95.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Tableware > Drinkware > Tea Bowls", "weight": "400 g"},
+    {"id": "nakai-takayama-chasen", "title": "NAKAI Takayama Chasen 100-Prong Bamboo Matcha Whisk", "desc": "Handcrafted in Nara, birthplace of the chasen (500+ years). 100 fine tines for smooth microfoam. Eight-stage hand process.", "link": f"{_STORE}/products/%E8%8C%B6%E7%AD%85-cyasen", "img": _IMG_CHASEN, "price": "38.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Kitchen Tools &amp; Utensils", "weight": "50 g"},
 ]
 
 
