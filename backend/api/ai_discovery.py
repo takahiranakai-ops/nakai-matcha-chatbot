@@ -1125,6 +1125,43 @@ async def product_catalog():
 
 
 @ai_router.get(
+    "/api/products/feed",
+    summary="OpenAI Product Feed (ChatGPT Shopping)",
+    description="Returns product data in OpenAI Product Feed Specification format for ChatGPT Shopping integration.",
+    tags=["AI Discovery"],
+)
+async def openai_product_feed():
+    """OpenAI Product Feed for ChatGPT Shopping."""
+    return JSONResponse(
+        content={
+            "feed_version": "1.0",
+            "brand": "NAKAI",
+            "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "products": _OPENAI_FEED_PRODUCTS,
+        },
+        headers={
+            "Cache-Control": "public, max-age=3600",
+            "X-Feed-Type": "openai-product-feed",
+        },
+    )
+
+
+@ai_router.get(
+    "/api/products/google-feed.xml",
+    summary="Google Shopping XML Feed",
+    description="Google Merchant Center compatible product feed in XML format.",
+    tags=["AI Discovery"],
+)
+async def google_shopping_feed():
+    """Google Merchant Center XML product feed."""
+    return PlainTextResponse(
+        content=_build_google_feed_xml(),
+        media_type="application/xml",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
+
+@ai_router.get(
     "/api/products/{handle}",
     summary="Individual product detail",
     description="Returns Schema.org Product JSON-LD for a single product by handle.",
@@ -1511,28 +1548,6 @@ _OPENAI_FEED_PRODUCTS = [
 ]
 
 
-@ai_router.get(
-    "/api/products/feed",
-    summary="OpenAI Product Feed (ChatGPT Shopping)",
-    description="Returns product data in OpenAI Product Feed Specification format for ChatGPT Shopping integration.",
-    tags=["AI Discovery"],
-)
-async def openai_product_feed():
-    """OpenAI Product Feed for ChatGPT Shopping."""
-    return JSONResponse(
-        content={
-            "feed_version": "1.0",
-            "brand": "NAKAI",
-            "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "products": _OPENAI_FEED_PRODUCTS,
-        },
-        headers={
-            "Cache-Control": "public, max-age=3600",
-            "X-Feed-Type": "openai-product-feed",
-        },
-    )
-
-
 # ---------------------------------------------------------------------------
 # WS5: Google Shopping XML Feed (Merchant Center)
 # ---------------------------------------------------------------------------
@@ -1581,21 +1596,6 @@ def _build_google_feed_xml() -> str:
     <description>Premium organic Japanese matcha from Kagoshima and Kyoto</description>
 {items_xml}  </channel>
 </rss>"""
-
-
-@ai_router.get(
-    "/api/products/google-feed.xml",
-    summary="Google Shopping XML Feed",
-    description="Google Merchant Center compatible product feed in XML format.",
-    tags=["AI Discovery"],
-)
-async def google_shopping_feed():
-    """Google Merchant Center XML product feed."""
-    return PlainTextResponse(
-        content=_build_google_feed_xml(),
-        media_type="application/xml",
-        headers={"Cache-Control": "public, max-age=3600"},
-    )
 
 
 @ai_router.get(
