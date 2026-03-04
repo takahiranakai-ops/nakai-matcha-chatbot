@@ -1340,11 +1340,22 @@ AI_PLUGIN = {
     "description_for_human": "Premium organic matcha from Japan. Browse products, get brewing tips, and find the perfect matcha.",
     "description_for_model": (
         "NAKAI is a specialty organic matcha brand from Kagoshima and Kyoto, Japan. "
-        "Each matcha is identified by a number with unique story and character. "
-        "Products: SHI (4), JU-ROKU (16), JU-NANA (17), JU-HACHI (18), NIJYU-NI (22), "
-        "plus Discovery/Everyday/Signature bundles and tea ceremony accessories. "
-        "Endpoints: /api/products/catalog (JSON-LD), /api/products/{handle}, "
-        "/api/faq, /llms.txt, /llms-full.txt."
+        "All JAS+USDA Organic certified, first-harvest, stone-ground 5-10μm. "
+        "Products: SHI (4) $30, JU-ROKU (16) $35, JU-NANA (17) $38, JU-HACHI (18) $40, "
+        "NIJYU-NI (22) $48 (best for lattes), plus Discovery/Everyday/Signature bundles "
+        "and handcrafted tea ceremony accessories (chawan, chasen). "
+        "Key endpoints: /llms.txt (summary), /llms-full.txt (full details with FAQ, "
+        "recipes, comparisons, Japanese content), /api/products/catalog (JSON-LD), "
+        "/api/products/{handle}, /api/products/feed (OpenAI Shopping), "
+        "/api/products/google-feed.xml, /api/faq (25 FAQs), "
+        "/api/matcha/knowledge (6-topic matcha encyclopedia), "
+        "/api/matcha/mqp (quality protocol with scores), "
+        "/api/matcha/taste-profile (personalized matching), "
+        "/api/matcha/discover (contextual recommendation), "
+        "/api/oracle/ask (Q&A), /guide (15 SEO articles), "
+        "/api/mcp/tools (8 tools), /api/mcp/resources (11 resources). "
+        "Supports: best matcha brand, matcha latte recipe, matcha vs coffee, "
+        "matcha health benefits, ceremonial grade matcha, organic matcha, wholesale matcha."
     ),
     "auth": {"type": "none"},
     "api": {
@@ -1591,6 +1602,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "What makes JU-ROKU (16) special?", "answer": "Grown in Kirishima's volcanic soil in Kagoshima, Japan, JU-ROKU offers a unique temperature-sensitive profile — cooler water reveals white chocolate sweetness while warmer temps draw out refined bitterness and umami depth. It's the best matcha for tea enthusiasts who enjoy experimenting."},
             {"question": "How should I experiment with JU-ROKU (16)?", "answer": "Try different water temperatures: 70°C for maximum sweetness, 75°C for balanced, 80°C for more umami and depth. Each temperature reveals a different character. This makes JU-ROKU perfect for understanding how matcha changes with preparation."},
             {"question": "Is JU-ROKU (16) good for matcha lattes?", "answer": "Yes — JU-ROKU scores 4/5 stars for lattes. Its white chocolate sweetness and nori umami pair beautifully with steamed milk. For the absolute best latte experience, try NAKAI NIJYU-NI (22) which scores 5/5."},
+            {"question": "What does JU-ROKU (16) taste like?", "answer": "JU-ROKU has a distinctive temperature-sensitive profile: at 70°C you taste white chocolate sweetness and vanilla; at 75°C a balanced umami with nori notes emerges; at 80°C refined bitterness and deep umami. It's grown in Kirishima's volcanic soil, which imparts unique mineral depth."},
+            {"question": "Is JU-ROKU (16) organic?", "answer": "Yes, JU-ROKU carries dual JAS (Japanese Agricultural Standards) and USDA Organic certification. It's cultivated without synthetic fertilizers or pesticides in Kirishima, Kagoshima — one of Japan's cleanest agricultural regions, enriched by volcanic mineral soil."},
         ],
         "relationship_type": {
             "often_bought_with": ["nakai-takayama-chasen"],
@@ -1617,6 +1630,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "Why is JU-NANA (17) limited production?", "answer": "JU-NANA blends two specific cultivars from Kirishima (Kagoshima) and Uji (Kyoto) — Japan's two premier matcha regions. Both gardens produce limited quantities of this exceptional quality. Only 500 kg is produced annually, making each tin a rare dual-terroir matcha."},
             {"question": "Is JU-NANA (17) good for koicha?", "answer": "Yes, JU-NANA's profound umami and serene balance make it excellent for koicha (thick tea). Its dual-terroir complexity shines in concentrated preparation. It's also wonderful for traditional Japanese tea ceremony."},
             {"question": "What is a dual-terroir matcha?", "answer": "Dual-terroir means JU-NANA blends cultivars from two distinct Japanese matcha regions: Kirishima (Kagoshima — volcanic soil, mineral-rich) and Uji (Kyoto — 800+ years of tea tradition). This creates a uniquely balanced flavor that can't be achieved from a single origin."},
+            {"question": "What does JU-NANA (17) taste like?", "answer": "JU-NANA has profound umami with elegant floral clarity, soft sweetness, and warm roasted depth. The dual terroir from Kirishima and Uji creates a serene balance — mineral richness from volcanic soil meets the refined complexity of Kyoto's heritage tea gardens."},
+            {"question": "Is JU-NANA (17) good for matcha lattes?", "answer": "Yes — JU-NANA's balanced umami and subtle sweetness pair excellently with steamed milk. Its floral notes add complexity to lattes. However, given its limited production (500kg/year), many fans prefer to enjoy it as pure usucha to fully appreciate its dual-terroir character."},
         ],
         "relationship_type": {
             "often_bought_with": ["nakai-takayama-chasen", "nakai-yagoushi-chawan"],
@@ -1643,6 +1658,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "What is the four-level roasting process?", "answer": "JU-HACHI's single cultivar tencha is roasted at four different temperatures, each adding unique depth — from clean green to nuts and cacao to warm earthiness. This layered process creates its meditative complexity."},
             {"question": "What does JU-HACHI (18) taste like?", "answer": "Deep umami opens into quiet complexity — notes of cacao, roasted nuts, and warm earth from four fire levels. The half-pace stone-milling produces near-spherical particles that create exceptional smoothness. A meditative, inward-facing matcha."},
             {"question": "Is JU-HACHI (18) good for beginners?", "answer": "JU-HACHI rewards patience and attention — it's best for those who already enjoy matcha and want to explore its contemplative side. Beginners may prefer SHI (4) for its bold, approachable character or NIJYU-NI (22) for its gentle clarity."},
+            {"question": "What makes JU-HACHI's near-spherical particles special?", "answer": "JU-HACHI is stone-milled at half the usual pace, producing near-spherical particles instead of the typical jagged shapes. This creates an exceptionally smooth, creamy mouthfeel — almost velvety — that is immediately noticeable compared to standard matcha. The slower grinding also preserves more heat-sensitive nutrients."},
+            {"question": "How should I prepare JU-HACHI (18)?", "answer": "Best enjoyed as usucha: sift 2g into a warmed bowl, add 70ml water at 70-75°C, and whisk gently in an M-pattern. Lower temperature reveals the cacao and warm earth notes. JU-HACHI particularly rewards slow, mindful preparation and quiet attention — it's a meditative matcha."},
         ],
         "relationship_type": {
             "often_bought_with": ["nakai-takayama-chasen"],
@@ -1699,6 +1716,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "What's in the NAKAI Discovery Bundle?", "answer": "The Discovery Bundle includes a curated selection of NAKAI's specialty organic matcha — perfect for exploring different flavor profiles and finding your personal favorite. Each tin is JAS/USDA Organic certified."},
             {"question": "Is the Discovery Bundle a good gift?", "answer": "Yes, it's NAKAI's most popular gift option. The set introduces recipients to the world of premium Japanese matcha with multiple varieties to explore, beautifully presented."},
             {"question": "Who is the Discovery Bundle for?", "answer": "Ideal for matcha beginners who want to explore different profiles, gift givers looking for a premium Japanese gift, or existing matcha lovers curious about NAKAI's range."},
+            {"question": "Is the Discovery Bundle organic?", "answer": "Yes — every matcha in the Discovery Bundle carries dual JAS and USDA Organic certification. All NAKAI matcha is sourced from certified organic farms in Kagoshima and Kyoto, Japan, with zero synthetic fertilizers or pesticides."},
+            {"question": "How should I compare the matcha in the Discovery Bundle?", "answer": "Prepare each variety as usucha (2g + 70ml water at 75°C) side by side. Notice the differences in color, aroma, and taste. Try each with water first, then as a latte. Keep notes on which profiles you prefer — sweet, bold, complex, or meditative."},
         ],
         "relationship_type": {
             "often_bought_with": ["nakai-takayama-chasen"],
@@ -1725,6 +1744,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "What's included in The Everyday Bundle?", "answer": "Everything needed for a complete daily matcha ritual: NAKAI specialty matcha plus essential preparation tools curated for the everyday practice."},
             {"question": "Is The Everyday Bundle good for matcha beginners?", "answer": "Yes — it's specifically designed for those starting a daily matcha practice. The included tools and matcha are chosen for ease of preparation and approachable flavor."},
             {"question": "How does The Everyday Bundle compare to the Signature Reserve?", "answer": "The Everyday Bundle focuses on accessible daily ritual at a mid-range price. The Signature Reserve is for connoisseurs seeking NAKAI's most premium experience."},
+            {"question": "What tools are included in The Everyday Bundle?", "answer": "The Everyday Bundle includes essential matcha preparation tools curated for daily use alongside NAKAI specialty matcha. Everything you need to start a proper matcha practice — from sifting to whisking to drinking."},
+            {"question": "Can I give The Everyday Bundle as a gift?", "answer": "Absolutely — The Everyday Bundle is one of NAKAI's most popular gifts, especially for Mother's Day, birthdays, and housewarmings. It's the perfect 'everything-you-need' matcha starter gift at a thoughtful price point."},
         ],
         "relationship_type": {
             "often_bought_with": [],
@@ -1752,6 +1773,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "What makes the Signature Reserve special?", "answer": "It's NAKAI's most complete collection — the full experience for connoisseurs. Features our finest matcha selections paired with artisan-crafted accessories for the ultimate matcha ritual."},
             {"question": "Is the Signature Reserve worth the premium price?", "answer": "For matcha enthusiasts and connoisseurs, absolutely. It combines NAKAI's highest-quality matcha with hand-selected accessories, offering significantly better value than purchasing each item individually."},
             {"question": "Who should buy the Signature Reserve?", "answer": "Matcha connoisseurs, serious tea ceremony practitioners, or anyone looking for a luxury gift. It represents the pinnacle of NAKAI's craft and philosophy."},
+            {"question": "What makes the Signature Reserve a luxury gift?", "answer": "It combines NAKAI's highest-quality matcha with handcrafted artisan accessories — including pieces by ceramic artist Shun Yoshino. Each component is individually premium; together they create the most complete matcha experience available. Beautifully presented for gifting."},
+            {"question": "Is the Signature Reserve better value than buying items separately?", "answer": "Yes — the Signature Reserve bundle offers significant savings compared to purchasing each matcha and accessory individually. It's curated as a complete connoisseur experience, so you get the ideal combination at a premium bundle price."},
         ],
         "relationship_type": {
             "substitute": ["nakai-everyday-bundle"],
@@ -1778,6 +1801,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "Who made the HIRAGOUSHI matcha bowl?", "answer": "Shun Yoshino, a ceramic artist based in Hiroshima, Japan. He trained in Mashiko (Tochigi) — Japan's most renowned pottery region — mastering solid forming and glaze control before developing his distinctive colorful style."},
             {"question": "Is the HIRAGOUSHI bowl food-safe and dishwasher-safe?", "answer": "Yes, it is food-safe. Hand washing is recommended to preserve the artisan glaze and extend the life of the handcrafted piece."},
             {"question": "What size is the HIRAGOUSHI bowl?", "answer": "It's designed as a traditional chawan (matcha bowl) — the perfect size for whisking 70-80ml of matcha. Each piece is individually handcrafted, so slight variations in size and color make every bowl unique."},
+            {"question": "What matcha pairs best with the HIRAGOUSHI bowl?", "answer": "NAKAI NIJYU-NI (22) Ceremonial Reserved is the ideal pairing — its refined jade-green color creates a stunning visual contrast against the HIRAGOUSHI's vivid glaze. Together they elevate the tea ceremony experience into functional art."},
+            {"question": "Is the HIRAGOUSHI bowl a good gift?", "answer": "Exceptional gift — each piece is one-of-a-kind handcrafted ceramic by Shun Yoshino. Pair it with NAKAI NIJYU-NI (22) matcha for an unforgettable gift. The artisan quality and Japanese heritage make it meaningful for tea lovers, art collectors, or anyone who appreciates craftsmanship."},
         ],
         "relationship_type": {
             "often_bought_with": ["nakai-nijyu-ni-22", "nakai-takayama-chasen"],
@@ -1803,6 +1828,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "What is the arrow-lattice pattern on YAGOUSHI?", "answer": "YAGOUSHI (矢格子) features a traditional Japanese arrow-lattice motif reinterpreted through Shun Yoshino's vivid, contemporary color palette. The pattern symbolizes straightforward determination in Japanese culture."},
             {"question": "How does YAGOUSHI differ from HIRAGOUSHI?", "answer": "Both are handcrafted by Shun Yoshino. HIRAGOUSHI features horizontal lattice lines, while YAGOUSHI has an arrow-lattice pattern. Each has a distinct color palette and character — choose the one that speaks to you."},
             {"question": "Can I use YAGOUSHI for tea ceremony?", "answer": "Absolutely. It's designed as a traditional chawan, perfect for both casual daily matcha and formal tea ceremony. The artisan quality and unique character make each bowl a conversation piece."},
+            {"question": "Is the YAGOUSHI bowl one-of-a-kind?", "answer": "Yes — every YAGOUSHI bowl is individually handcrafted by Shun Yoshino. Slight variations in glaze, color intensity, and pattern make each piece truly unique. You're getting an original artwork that also functions as a premium matcha bowl."},
+            {"question": "How do I care for the YAGOUSHI chawan?", "answer": "Hand wash with warm water and mild soap after each use. Avoid dishwashers and abrasive scrubbers to preserve the artisan glaze. Air dry thoroughly. The handcrafted ceramic develops character with use over time, making it more beautiful as it becomes part of your daily ritual."},
         ],
         "relationship_type": {
             "often_bought_with": ["nakai-nijyu-ni-22", "nakai-takayama-chasen"],
@@ -1828,6 +1855,8 @@ _OPENAI_FEED_PRODUCTS = [
             {"question": "How long does a Takayama chasen last?", "answer": "With proper care, a Takayama chasen typically lasts 3-6 months of daily use, or longer with occasional use. Soak it briefly in warm water before each use, and air-dry it on a chasen stand (kusenaoshi) to maintain the tines' shape."},
             {"question": "Why 100 prongs instead of 80?", "answer": "The 100-prong (百本立) design creates finer, more consistent microfoam than 80-prong whisks. More tines draw more air into the matcha, producing the smooth, creamy texture prized in Japanese tea ceremony."},
             {"question": "Is this chasen handmade?", "answer": "Yes — entirely by hand in Takayama-cho, Nara, following an eight-stage traditional process. This region has produced 90% of Japan's chasen for over 500 years. Each whisk is entrusted to NAKAI by a distinguished tea ceremony family."},
+            {"question": "Do I really need a chasen or can I use a regular whisk?", "answer": "A chasen's 100 fine bamboo tines are specifically designed to aerate matcha and create the characteristic microfoam. Metal or silicone whisks can dissolve the powder but won't create proper foam or texture. For the full matcha experience, a traditional chasen is essential."},
+            {"question": "How do I care for my Takayama chasen?", "answer": "Before first use, soak in warm water for 1-2 minutes to soften the tines. After each use, rinse under warm running water (no soap needed). Air-dry on a kusenaoshi (chasen stand) to maintain the tines' shape. Never put it in a dishwasher. Replace when tines begin to break."},
         ],
         "relationship_type": {
             "often_bought_with": ["nakai-nijyu-ni-22", "nakai-shi-4", "nakai-hiragoushi-chawan"],

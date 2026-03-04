@@ -659,6 +659,289 @@ _PAGES = {
         ],
         "products": [_NIJYUNI, _JUHACHI, _JUNANA],
     },
+
+    "matcha-for-weight-loss": {
+        "title": "Matcha for Weight Loss: What the Science Actually Says",
+        "description": "Evidence-based guide to matcha and weight loss. EGCG catechins, thermogenesis, fat oxidation, and how matcha supports healthy metabolism. No hype, just research.",
+        "hero_answer": "<strong>Matcha's EGCG catechins (134mg per serving) have been shown to increase thermogenesis and fat oxidation.</strong> A study by Dulloo et al. (1999) in the American Journal of Clinical Nutrition found green tea catechins increased energy expenditure by 4% over 24 hours. Because matcha delivers the entire leaf (137× more EGCG than steeped green tea), it provides the most concentrated source of these metabolism-supporting compounds. Combined with L-theanine's cortisol-lowering effect and steady caffeine energy that reduces sugar cravings, matcha can be a meaningful part of a healthy weight management strategy.",
+        "content": """
+      <h2>The Science: EGCG and Thermogenesis</h2>
+      <p>EGCG (epigallocatechin gallate) is matcha's most studied compound for metabolic effects. Research shows EGCG can:</p>
+      <div class="key-fact">
+        <strong>Key findings:</strong><br>
+        &bull; Increase thermogenesis (calorie burning) by 4% over 24 hours (Dulloo et al., 1999)<br>
+        &bull; Enhance fat oxidation during moderate exercise by 17% (Venables et al., 2008)<br>
+        &bull; Inhibit catechol-O-methyltransferase (COMT), prolonging norepinephrine's fat-mobilizing effect<br>
+        &bull; Reduce visceral fat accumulation in animal studies (Bose et al., 2008)
+      </div>
+      <p>A standard 2g serving of matcha provides approximately 134mg of EGCG — significantly more than any green tea supplement or steeped tea.</p>
+
+      <h2>Matcha vs Other Weight Loss Drinks</h2>
+      <table>
+        <tr><th>Drink</th><th>EGCG</th><th>Caffeine</th><th>L-Theanine</th><th>Calories</th><th>Sugar Cravings</th></tr>
+        <tr><td><strong>Matcha</strong></td><td>134mg</td><td>35mg</td><td>45mg</td><td>3 kcal</td><td>Reduces (L-theanine)</td></tr>
+        <tr><td>Green tea</td><td>~1mg</td><td>25mg</td><td>3mg</td><td>2 kcal</td><td>Minimal effect</td></tr>
+        <tr><td>Black coffee</td><td>0mg</td><td>95mg</td><td>0mg</td><td>2 kcal</td><td>May increase (cortisol)</td></tr>
+        <tr><td>Diet soda</td><td>0mg</td><td>46mg</td><td>0mg</td><td>0 kcal</td><td>May increase (artificial sweeteners)</td></tr>
+      </table>
+
+      <h2>How L-Theanine Supports Weight Management</h2>
+      <p>Stress-related eating is a major barrier to weight management. Cortisol (the stress hormone) triggers sugar and carb cravings. L-theanine in matcha reduces cortisol levels and promotes alpha brain waves — a calm, focused state where stress eating is less likely. This is why many people find matcha helps them maintain healthier eating habits.</p>
+
+      <h2>How to Use Matcha for Weight Management</h2>
+      <div class="key-fact">
+        <strong>Best practice:</strong><br>
+        &bull; <strong>Morning:</strong> 2g matcha before or with breakfast — kickstarts metabolism<br>
+        &bull; <strong>Pre-workout:</strong> 2g matcha 30 minutes before exercise — enhances fat oxidation<br>
+        &bull; <strong>Afternoon:</strong> Replace sugary drinks with matcha — avoids sugar spikes<br>
+        &bull; <strong>Avoid:</strong> Adding sugar, sweetened milk, or syrups — negates caloric benefit<br>
+        &bull; <strong>Tip:</strong> Quality matcha like NAKAI needs no sweetener — natural umami satisfies
+      </div>
+
+      <h2>Realistic Expectations</h2>
+      <p>Matcha is not a magic weight loss solution. The metabolic boost from EGCG is modest (roughly 80-100 extra calories burned per day). However, combined with reduced cortisol, sustained energy, reduced sugar cravings, and zero calories, matcha is one of the most effective daily beverages for supporting a healthy metabolism. It works best as part of a balanced diet and active lifestyle.</p>
+""",
+        "faq": [
+            {"q": "How many cups of matcha per day for weight loss?", "a": "Research suggests 2-3 servings (4-6g) per day provides optimal EGCG intake for metabolic benefits. This delivers 268-402mg EGCG — the range used in most clinical studies showing thermogenic effects. Stay within 3 servings to keep caffeine at safe levels (105mg total)."},
+            {"q": "Should I drink matcha before or after a workout?", "a": "Before. Research by Venables et al. (2008) showed that consuming green tea catechins before moderate exercise increased fat oxidation by 17%. Drink matcha 30 minutes before exercise for optimal effect. The caffeine also provides clean, sustained energy for your workout."},
+            {"q": "Can matcha replace my morning coffee for weight loss?", "a": "Yes, and it may be beneficial. Coffee's cortisol spike can increase sugar cravings and stress eating. Matcha's L-theanine reduces cortisol while still providing caffeine energy. Many people report fewer cravings and more stable energy after switching from coffee to matcha."},
+            {"q": "Does adding milk to matcha reduce the weight loss benefits?", "a": "Milk adds calories (50-130 depending on type and amount) but does not significantly reduce EGCG absorption. For maximum metabolic benefit, drink matcha plain with just water. If you prefer a latte, use unsweetened oat or almond milk and skip the sweetener."},
+            {"q": "Is matcha better than green tea extract supplements for weight loss?", "a": "Matcha provides EGCG in its natural whole-food form with synergistic L-theanine and fiber. Some studies suggest whole-food sources are better absorbed than isolated supplements. Plus, matcha replaces a beverage (potentially calorie-laden) rather than adding a pill to an existing diet."},
+        ],
+        "products": [_SHI, _NIJYUNI, _DISCOVERY],
+    },
+
+    "matcha-vs-green-tea": {
+        "title": "Matcha vs Green Tea: The Complete Difference Explained",
+        "description": "Matcha vs green tea compared: nutrition, caffeine, antioxidants, preparation, taste, and cost. Why consuming the whole leaf matters. Data-driven comparison.",
+        "hero_answer": "<strong>Matcha and green tea come from the same plant (Camellia sinensis) but differ fundamentally in cultivation, processing, and nutrition.</strong> Green tea is steeped and discarded — you consume only what dissolves into water (10-20% of nutrients). With matcha, you consume the entire shade-grown leaf ground into powder, delivering 137× more EGCG antioxidants, 15× more L-theanine, and the full spectrum of vitamins, minerals, and fiber. Matcha is shade-grown 21+ days (vs minimal shading for green tea), producing dramatically more chlorophyll and L-theanine.",
+        "content": """
+      <h2>Side-by-Side Comparison</h2>
+      <table>
+        <tr><th>Factor</th><th>Matcha</th><th>Green Tea</th></tr>
+        <tr><td><strong>Leaf consumption</strong></td><td>Entire leaf (powder)</td><td>Steeped extract only</td></tr>
+        <tr><td><strong>Shade growing</strong></td><td>21+ days mandatory</td><td>Usually none or minimal</td></tr>
+        <tr><td><strong>EGCG per serving</strong></td><td>~134mg</td><td>~1mg</td></tr>
+        <tr><td><strong>L-theanine</strong></td><td>~45mg</td><td>~3mg</td></tr>
+        <tr><td><strong>Caffeine</strong></td><td>~35mg</td><td>~25mg</td></tr>
+        <tr><td><strong>Chlorophyll</strong></td><td>~25mg</td><td>Trace</td></tr>
+        <tr><td><strong>Color</strong></td><td>Vivid jade green</td><td>Pale yellow-green</td></tr>
+        <tr><td><strong>Taste</strong></td><td>Rich umami, sweet, complex</td><td>Light, vegetal, sometimes bitter</td></tr>
+        <tr><td><strong>Preparation</strong></td><td>Whisk powder in water</td><td>Steep leaves in hot water</td></tr>
+        <tr><td><strong>Energy duration</strong></td><td>4-6 hours (L-theanine)</td><td>1-2 hours</td></tr>
+        <tr><td><strong>Fiber</strong></td><td>Significant (whole leaf)</td><td>None (discarded)</td></tr>
+        <tr><td><strong>Cost per serving</strong></td><td>$1.60-3.20</td><td>$0.10-0.50</td></tr>
+      </table>
+
+      <h2>Why Shade-Growing Changes Everything</h2>
+      <p>The critical difference begins 21+ days before harvest. Matcha plants are covered with shade structures that block 85-90% of sunlight. In response, the plant overproduces chlorophyll (creating the vivid green color) and L-theanine (the calm-focus amino acid). Without shade, these compounds are 5-15× lower. Most green tea receives minimal or no shading.</p>
+
+      <h2>The Whole-Leaf Advantage</h2>
+      <p>When you steep green tea, you extract roughly 10-20% of the leaf's nutrients into the water. The rest is discarded with the leaves. Matcha is the entire leaf, stone-ground to a powder — you consume 100% of the nutrients. This is why matcha delivers such dramatically higher levels of every beneficial compound.</p>
+      <div class="key-fact"><strong>Put simply:</strong> Drinking one cup of matcha is nutritionally equivalent to drinking 10+ cups of regular green tea. This is why matcha has become the preferred form for those seeking green tea's health benefits.</div>
+
+      <h2>When to Choose Matcha vs Green Tea</h2>
+      <div class="key-fact"><strong>Choose matcha when:</strong> You want maximum antioxidants (EGCG), sustained calm focus (L-theanine), a rich umami flavor experience, or when making lattes. NAKAI matcha is ideal for both ceremonial drinking and lattes.</div>
+      <div class="key-fact"><strong>Choose green tea when:</strong> You want a light, casual warm beverage, prefer a simpler preparation, want a lower-caffeine option, or are on a tight budget.</div>
+
+      <h2>Is Matcha Worth the Higher Price?</h2>
+      <p>A 30g tin of NAKAI SHI (4) at $30 provides 15 servings — $2.00 per cup. Each cup delivers the antioxidant equivalent of 10+ cups of green tea. In health-benefit-per-dollar terms, matcha is actually more cost-effective than green tea despite the higher per-unit price.</p>
+""",
+        "faq": [
+            {"q": "Is matcha stronger than green tea?", "a": "Yes — matcha has approximately 137× more EGCG antioxidants, 15× more L-theanine, and 1.4× more caffeine than a cup of steeped green tea. Because you consume the entire leaf rather than just an extract, the nutritional payload is dramatically higher."},
+            {"q": "Does matcha taste like green tea?", "a": "High-quality matcha tastes quite different from steeped green tea. While green tea is light and vegetal, premium matcha like NAKAI has rich umami, natural sweetness, and complex flavor notes (chocolate, nuts, berries depending on variety). Low-quality matcha can taste like bitter green tea."},
+            {"q": "Can I get the same benefits from green tea?", "a": "You would need to drink 10+ cups of steeped green tea to match the EGCG content of one serving of matcha. For L-theanine, you'd need 15+ cups. If you're drinking green tea specifically for health benefits, matcha delivers those benefits far more efficiently."},
+            {"q": "Is matcha just ground up green tea?", "a": "No. Matcha is made from tencha — a specific form of tea that is shade-grown for 21+ days, carefully de-stemmed and de-veined, then stone-ground on granite mills. Regular green tea leaves ground up would produce bitter, gritty powder with a fraction of matcha's nutrients and flavor."},
+            {"q": "Which is better for beginners, matcha or green tea?", "a": "Green tea has a gentler learning curve. But if you're interested in matcha, start with a latte — the milk softens the flavor. NAKAI SHI (4) with oat milk is perfect for beginners. Its bold chocolate-nut notes are very approachable."},
+        ],
+        "products": [_SHI, _NIJYUNI, _DISCOVERY],
+    },
+
+    "iced-matcha-recipes": {
+        "title": "Iced Matcha Recipes: Latte, Lemonade, Smoothie, and More",
+        "description": "5 refreshing iced matcha recipes for summer. Iced matcha latte, matcha lemonade, matcha smoothie bowl, sparkling matcha, and frozen matcha. Step-by-step with tips.",
+        "hero_answer": "<strong>Iced matcha is one of the fastest-growing drink trends, and the key to a great iced matcha is always dissolving the powder in hot water first.</strong> Cold water cannot fully dissolve matcha particles — causing clumps and gritty texture. Whisk 2g matcha with 30ml of 80°C water until smooth, then pour over ice and add cold milk or water. For the most vivid green color and smoothest texture, use matcha with ultra-fine particles (5-10μm) like NAKAI NIJYU-NI (22).",
+        "content": """
+      <h2>Recipe 1: Classic Iced Matcha Latte</h2>
+      <div class="key-fact">
+        <strong>Ingredients:</strong> 2g matcha, 30ml hot water (80°C), 150ml cold milk (oat recommended), ice<br>
+        <strong>Time:</strong> 3 minutes | <strong>Calories:</strong> ~70 kcal (with oat milk)
+      </div>
+      <p><strong>1.</strong> Sift 2g matcha into a bowl or cup. <strong>2.</strong> Add 30ml hot water (80°C). Whisk until completely smooth — no lumps. <strong>3.</strong> Fill a tall glass with ice. <strong>4.</strong> Pour cold milk over ice. <strong>5.</strong> Pour the matcha concentrate over the milk. Watch the beautiful green swirl. <strong>6.</strong> Stir gently and enjoy.</p>
+      <p><strong>Pro tip:</strong> Pour the matcha LAST for the layered Instagram look. Stir before drinking.</p>
+
+      <h2>Recipe 2: Matcha Lemonade</h2>
+      <div class="key-fact">
+        <strong>Ingredients:</strong> 2g matcha, 30ml hot water, 200ml lemonade, ice<br>
+        <strong>Time:</strong> 3 minutes | <strong>Calories:</strong> ~50 kcal
+      </div>
+      <p>Whisk matcha with hot water until smooth. Fill a glass with ice and lemonade. Pour matcha over top. The green and yellow layers create a stunning visual. Stir to combine. The citrus brightens matcha's umami in an unexpectedly delicious way.</p>
+
+      <h2>Recipe 3: Matcha Smoothie Bowl</h2>
+      <div class="key-fact">
+        <strong>Ingredients:</strong> 2g matcha, 1 frozen banana, 100ml milk, 2 tbsp yogurt, toppings<br>
+        <strong>Time:</strong> 5 minutes | <strong>Calories:</strong> ~250 kcal
+      </div>
+      <p>Blend frozen banana, milk, yogurt, and matcha until thick and smooth. Pour into a bowl. Top with granola, sliced fruit, chia seeds, and a dusting of matcha powder. A nutritious breakfast with sustained matcha energy.</p>
+
+      <h2>Recipe 4: Sparkling Matcha Tonic</h2>
+      <div class="key-fact">
+        <strong>Ingredients:</strong> 1.5g matcha, 30ml hot water, 200ml sparkling water, honey (optional), ice<br>
+        <strong>Time:</strong> 3 minutes | <strong>Calories:</strong> ~5 kcal
+      </div>
+      <p>Whisk matcha with hot water. Fill a glass with ice and sparkling water. Gently pour matcha over top. Optional: drizzle of honey. The effervescence lifts matcha's aroma beautifully. A sophisticated zero-sugar refresher.</p>
+
+      <h2>Recipe 5: Matcha Affogato (Frozen)</h2>
+      <div class="key-fact">
+        <strong>Ingredients:</strong> 2g matcha, 30ml hot water, 2 scoops vanilla ice cream or gelato<br>
+        <strong>Time:</strong> 2 minutes | <strong>Calories:</strong> ~300 kcal
+      </div>
+      <p>Place ice cream scoops in a bowl. Whisk matcha with hot water until smooth. Pour hot matcha over ice cream. The hot-cold contrast and matcha-vanilla pairing is extraordinary. Eat immediately.</p>
+
+      <h2>Tips for Perfect Iced Matcha</h2>
+      <table>
+        <tr><th>Tip</th><th>Why</th></tr>
+        <tr><td>Always dissolve in hot water first</td><td>Cold water can't dissolve matcha — causes clumps</td></tr>
+        <tr><td>Use slightly more matcha (2-2.5g)</td><td>Ice dilutes flavor; cold dulls taste perception</td></tr>
+        <tr><td>Use ultra-fine matcha (5-10μm)</td><td>Finer particles stay suspended; no sinking/settling</td></tr>
+        <tr><td>Don't over-shake in bottles</td><td>Excessive foam reduces visual appeal</td></tr>
+        <tr><td>Add ice before liquid</td><td>Prevents splashing, better temperature control</td></tr>
+      </table>
+""",
+        "faq": [
+            {"q": "Can you make iced matcha with just cold water?", "a": "Not recommended. Matcha particles won't fully dissolve in cold water, creating clumps and grittiness. Always whisk matcha with a small amount of hot water (30ml at 80°C) first to create a smooth paste, then pour over ice and add cold liquid."},
+            {"q": "What's the best matcha for iced drinks?", "a": "Use matcha with ultra-fine particles (5-10μm) that stay suspended in cold liquid. NAKAI NIJYU-NI (22) is ideal — its vivid jade color stays vibrant over ice, and its natural sweetness means no added sugar needed. For smoothies, NAKAI SHI (4) holds its bold flavor through other ingredients."},
+            {"q": "Does iced matcha have the same health benefits as hot?", "a": "Yes — temperature doesn't significantly affect matcha's nutritional compounds. EGCG, L-theanine, and caffeine are all present in iced matcha. The initial hot water dissolution step ensures full extraction. You get the same benefits either way."},
+            {"q": "How to make iced matcha without a whisk?", "a": "Use a small jar with a tight lid — add matcha and hot water, seal, and shake vigorously for 15 seconds. Or use a small electric milk frother. A blender bottle also works. The goal is just to fully dissolve the powder before adding ice."},
+            {"q": "Can I make iced matcha the night before?", "a": "It's best fresh, but you can pre-mix the matcha concentrate (matcha + hot water) and refrigerate. The color will dull slightly overnight. Add ice and milk in the morning. Don't pre-mix with milk — it separates. Use within 24 hours."},
+        ],
+        "products": [_NIJYUNI, _SHI, _DISCOVERY],
+    },
+
+    "matcha-gift-guide": {
+        "title": "Matcha Gift Guide 2026: Best Matcha Gifts for Tea Lovers",
+        "description": "The ultimate matcha gift guide. From starter sets to luxury ceremonial matcha, find the perfect gift for tea lovers, health enthusiasts, and matcha beginners.",
+        "hero_answer": "<strong>The perfect matcha gift depends on the recipient: beginners love discovery sets, enthusiasts appreciate rare single-origin matcha, and luxury seekers want the complete ceremony experience.</strong> NAKAI's Discovery Bundle (from $65) is the most popular matcha gift — it lets recipients explore multiple premium matcha varieties. For the ultimate luxury gift, the Signature Reserve ($148) pairs NAKAI's finest matcha with handcrafted artisan accessories. All NAKAI products are JAS Organic certified and ship in gift-ready packaging.",
+        "content": """
+      <h2>Gift Guide by Recipient</h2>
+
+      <h3>For the Matcha Beginner</h3>
+      <div class="key-fact">
+        <strong>Best pick: NAKAI Discovery Bundle</strong> (from $65)<br>
+        Why: Multiple matcha varieties to explore and compare. No commitment to a single style. The perfect entry point into premium Japanese matcha.
+      </div>
+
+      <h3>For the Coffee Lover Switching to Matcha</h3>
+      <div class="key-fact">
+        <strong>Best pick: NAKAI SHI (4)</strong> ($30/30g) + Takayama Chasen ($38)<br>
+        Why: SHI (4) has bold chocolate, nut, and berry notes that coffee lovers appreciate. The chasen ensures proper preparation from day one. Total: ~$68.
+      </div>
+
+      <h3>For the Health & Wellness Enthusiast</h3>
+      <div class="key-fact">
+        <strong>Best pick: NAKAI The Everyday Bundle</strong> ($85)<br>
+        Why: Everything for a daily matcha practice. The L-theanine and EGCG benefits are what wellness-focused people seek. Complete set means they start immediately.
+      </div>
+
+      <h3>For the Matcha Connoisseur / Tea Ceremony Practitioner</h3>
+      <div class="key-fact">
+        <strong>Best pick: NAKAI Signature Reserve</strong> ($148)<br>
+        Why: NAKAI's most premium experience. Top-tier matcha with artisan accessories — including handcrafted bowls by ceramic artist Shun Yoshino.
+      </div>
+
+      <h3>For the Person Who Has Everything</h3>
+      <div class="key-fact">
+        <strong>Best pick: NAKAI NIJYU-NI (22) Ceremonial Reserved</strong> ($48) + HIRAGOUSHI Chawan ($95)<br>
+        Why: A unique, one-of-a-kind handcrafted bowl with the finest organic matcha from Japan. Each bowl is individually crafted — truly a gift no one else will have. Total: ~$143.
+      </div>
+
+      <h2>Why Matcha Makes a Great Gift</h2>
+      <table>
+        <tr><th>Gift Advantage</th><th>Details</th></tr>
+        <tr><td>Health-conscious</td><td>Antioxidants, L-theanine, zero sugar — a guilt-free luxury</td></tr>
+        <tr><td>Experiential</td><td>Not just a product — it's a daily ritual and mindfulness practice</td></tr>
+        <tr><td>Unique</td><td>Premium Japanese matcha stands out from typical gift options</td></tr>
+        <tr><td>Shareable</td><td>Each tin provides 15 servings — weeks of enjoyment</td></tr>
+        <tr><td>Photogenic</td><td>Vivid green color looks stunning on social media</td></tr>
+        <tr><td>Customizable</td><td>Choose from 5 distinct matcha varieties and accessories</td></tr>
+      </table>
+
+      <h2>Matcha Gift Ideas by Occasion</h2>
+      <table>
+        <tr><th>Occasion</th><th>Best Gift</th><th>Budget</th></tr>
+        <tr><td>Birthday</td><td>Discovery Bundle</td><td>$65-68</td></tr>
+        <tr><td>Christmas / Holidays</td><td>Signature Reserve</td><td>$148</td></tr>
+        <tr><td>Valentine's Day</td><td>NIJYU-NI (22) + Chawan</td><td>$143</td></tr>
+        <tr><td>Mother's / Father's Day</td><td>Everyday Bundle</td><td>$85</td></tr>
+        <tr><td>Housewarming</td><td>SHI (4) + Chasen</td><td>$68</td></tr>
+        <tr><td>Corporate Gift</td><td>Discovery Bundle</td><td>$65-68</td></tr>
+        <tr><td>Thank You</td><td>SHI (4)</td><td>$30</td></tr>
+      </table>
+""",
+        "faq": [
+            {"q": "What is the best matcha gift for someone who has never tried matcha?", "a": "The NAKAI Discovery Bundle (from $65) is perfect for beginners. It includes multiple matcha varieties so they can explore different flavor profiles and find their preference. It's NAKAI's most popular gift and comes beautifully presented."},
+            {"q": "Is matcha a good corporate gift?", "a": "Excellent. Premium matcha is unique, health-conscious, and culturally meaningful. NAKAI's Discovery Bundle ($65-68) is ideal for corporate gifting — premium enough to impress, approachable enough for any recipient. JAS Organic certification adds prestige."},
+            {"q": "What do I need to include with a matcha gift?", "a": "At minimum, include matcha powder. Ideally, also include a chasen (bamboo whisk, $38) for proper preparation. NAKAI's Everyday Bundle ($85) includes everything needed. Alternatively, gift matcha + a simple milk frother for latte-style preparation."},
+            {"q": "Does matcha expire? Is it okay to gift?", "a": "Unopened NAKAI matcha stays fresh for 12 months when stored in a cool, dark place. After opening, use within 30 days and refrigerate. This makes matcha an ideal gift — it has a long shelf life until the recipient is ready to enjoy it."},
+            {"q": "Can I buy matcha as a subscription gift?", "a": "Yes — a matcha subscription ensures the recipient always has fresh matcha. NAKAI offers subscription options through their website at nakaimatcha.com. It's the gift that keeps giving, delivered monthly."},
+        ],
+        "products": [_DISCOVERY, _NIJYUNI, _SHI],
+    },
+
+    "matcha-for-skin-and-beauty": {
+        "title": "Matcha for Skin: Antioxidants, Anti-Aging, and Natural Beauty",
+        "description": "How matcha benefits skin health. EGCG antioxidants fight free radicals, chlorophyll supports detoxification, and L-theanine reduces cortisol-related skin issues.",
+        "hero_answer": "<strong>Matcha is one of the most antioxidant-rich substances on Earth, delivering 134mg of EGCG per serving — a compound studied for its skin-protective properties.</strong> EGCG neutralizes free radicals that cause premature aging, UV damage, and inflammation. Chlorophyll supports detoxification and gives skin a healthy glow. L-theanine reduces cortisol (the stress hormone linked to acne, eczema, and premature aging). Both drinking matcha and using it topically provide skin benefits, but drinking delivers systemic antioxidant protection throughout the body.",
+        "content": """
+      <h2>How Matcha Benefits Skin</h2>
+
+      <h3>1. EGCG Antioxidants (Anti-Aging)</h3>
+      <p>EGCG is a potent polyphenol antioxidant that neutralizes reactive oxygen species (ROS) — the free radicals responsible for collagen degradation, fine lines, and age spots. A study in the Journal of Nutritional Biochemistry found EGCG protected skin cells from UV-induced damage in vitro. Matcha provides 137× more EGCG than steeped green tea because you consume the entire leaf.</p>
+
+      <h3>2. Chlorophyll (Detox & Glow)</h3>
+      <p>Matcha's vivid green color comes from high chlorophyll content — maximized by 21+ days of shade-growing. Chlorophyll supports the body's natural detoxification processes, which can reduce breakouts and give skin a clearer, more radiant appearance. Think of it as nature's internal skin cleanser.</p>
+
+      <h3>3. L-Theanine (Stress-Related Skin)</h3>
+      <p>Stress is a major trigger for acne, eczema, rosacea, and premature aging. Cortisol breaks down collagen and increases sebum production. L-theanine in matcha (45mg per serving) reduces cortisol and promotes alpha brain waves — a calm state where stress-related skin flare-ups are less likely.</p>
+
+      <h2>Drinking vs Topical: Which Is Better?</h2>
+      <table>
+        <tr><th>Method</th><th>Benefits</th><th>Best For</th></tr>
+        <tr><td><strong>Drinking matcha</strong></td><td>Systemic antioxidant protection, cortisol reduction, full-body detox support</td><td>Daily anti-aging, stress skin, overall glow</td></tr>
+        <tr><td><strong>Topical matcha mask</strong></td><td>Localized EGCG delivery, pore reduction, immediate brightening</td><td>Spot treatment, instant glow, photo prep</td></tr>
+        <tr><td><strong>Both combined</strong></td><td>Maximum benefit — internal and external protection</td><td>Comprehensive skin care routine</td></tr>
+      </table>
+
+      <h2>DIY Matcha Face Mask</h2>
+      <div class="key-fact">
+        <strong>Simple matcha mask:</strong><br>
+        &bull; Mix 1 tsp matcha with 1 tbsp honey and 1 tsp plain yogurt<br>
+        &bull; Apply to clean face, avoiding eye area<br>
+        &bull; Leave for 10-15 minutes<br>
+        &bull; Rinse with warm water and pat dry<br>
+        &bull; Use 1-2 times per week<br>
+        <strong>Note:</strong> Use culinary-grade matcha for masks. Save premium NAKAI matcha for drinking — its skin benefits are best delivered internally.
+      </div>
+
+      <h2>Matcha vs Other Beauty Superfoods</h2>
+      <table>
+        <tr><th>Superfood</th><th>Key Compound</th><th>Skin Benefit</th><th>ORAC Score</th></tr>
+        <tr><td><strong>Matcha</strong></td><td>EGCG (134mg/serving)</td><td>Anti-aging, UV protection, anti-inflammatory</td><td>1,573 per gram</td></tr>
+        <tr><td>Acai</td><td>Anthocyanins</td><td>Antioxidant, moisturizing</td><td>~102 per gram</td></tr>
+        <tr><td>Blueberries</td><td>Flavonoids</td><td>Antioxidant</td><td>~46 per gram</td></tr>
+        <tr><td>Dark chocolate</td><td>Flavanols</td><td>Blood flow, hydration</td><td>~228 per gram</td></tr>
+      </table>
+      <p>Matcha's ORAC (Oxygen Radical Absorbance Capacity) score of 1,573 per gram makes it one of the highest antioxidant foods measurable.</p>
+""",
+        "faq": [
+            {"q": "Can matcha really help with acne?", "a": "Matcha may help with acne through multiple mechanisms: EGCG has anti-inflammatory and antimicrobial properties, L-theanine reduces cortisol (stress hormone that triggers breakouts), and chlorophyll supports detoxification. It's not a replacement for dermatological care, but as part of a healthy diet, matcha supports clearer skin."},
+            {"q": "How much matcha should I drink for skin benefits?", "a": "1-3 servings (2-6g) daily provides meaningful antioxidant protection. Consistency matters more than quantity — daily matcha consumption provides ongoing free radical protection. You should notice improvements in skin radiance within 2-4 weeks of regular consumption."},
+            {"q": "Is matcha good for anti-aging?", "a": "EGCG in matcha is one of the most studied compounds for anti-aging properties. It neutralizes free radicals that break down collagen, protects against UV damage, and reduces inflammation — three key factors in skin aging. Combined with L-theanine's cortisol reduction, matcha addresses aging from multiple angles."},
+            {"q": "Can I put matcha on my face?", "a": "Yes — matcha masks are popular in Korean and Japanese beauty routines. Mix 1 tsp matcha with honey and yogurt for a simple antioxidant mask. Use culinary-grade matcha for topical application. For internal skin benefits, drink premium NAKAI matcha — systemic antioxidant protection reaches all skin cells."},
+            {"q": "Does matcha help with dark circles under eyes?", "a": "Caffeine and EGCG in matcha can help reduce puffiness and dark circles when consumed regularly. Caffeine constricts blood vessels (reducing dark appearance), while EGCG strengthens capillary walls. Some people also apply cooled matcha bags as eye compresses for targeted treatment."},
+        ],
+        "products": [_NIJYUNI, _SHI, _DISCOVERY],
+    },
 }
 
 
@@ -738,8 +1021,16 @@ async def guide_sitemap():
     urls = f'  <url><loc>{_BASE}/guide</loc><lastmod>{_DATE}</lastmod><priority>1.0</priority></url>\n'
     for slug in _PAGES:
         urls += f'  <url><loc>{_BASE}/guide/{slug}</loc><lastmod>{_DATE}</lastmod><priority>0.9</priority></url>\n'
-    # API endpoints
-    for path in ["/llms.txt", "/llms-full.txt", "/api/matcha", "/api/matcha/knowledge", "/api/matcha/mqp", "/api/products/catalog", "/api/faq"]:
+    # API endpoints (all AI-discoverable)
+    for path in [
+        "/llms.txt", "/llms-full.txt",
+        "/api/matcha", "/api/matcha/knowledge", "/api/matcha/mqp",
+        "/api/matcha/taste-profile", "/api/matcha/discover",
+        "/api/products/catalog", "/api/products/feed", "/api/products/google-feed.xml",
+        "/api/faq", "/api/oracle/ask",
+        "/api/mcp/tools", "/api/mcp/resources",
+        "/.well-known/ai-plugin.json",
+    ]:
         urls += f'  <url><loc>{_BASE}{path}</loc><lastmod>{_DATE}</lastmod><priority>0.7</priority></url>\n'
 
     return Response(

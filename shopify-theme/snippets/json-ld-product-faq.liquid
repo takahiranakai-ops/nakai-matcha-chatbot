@@ -1,0 +1,67 @@
+{%- comment -%}
+  Product-level FAQPage JSON-LD Schema
+  Generates FAQ structured data for each product page.
+  Uses product metafields if available, falls back to default FAQs by product type.
+  Renders on product pages via layout/theme.liquid.
+{%- endcomment -%}
+
+{%- if product -%}
+{%- assign handle = product.handle -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- if handle contains 'nijyu-ni' or handle contains '22' -%}
+    {"@type":"Question","name":"Is NIJYU-NI (22) the best matcha for lattes?","acceptedAnswer":{"@type":"Answer","text":"Yes — NAKAI NIJYU-NI (22) is our top latte recommendation. Its vibrant jade color stays vivid through milk, rich umami and natural sweetness pair beautifully, and ultra-fine 5-10μm particles dissolve smoothly. Rated 5/5 for latte performance."}},
+    {"@type":"Question","name":"What is Ceremonial Reserved grade matcha?","acceptedAnswer":{"@type":"Answer","text":"Ceremonial Reserved is NAKAI's highest tier — above standard ceremonial. Made from the most select first-harvest tencha, stone-ground to 5-10μm. Suitable for koicha (thick tea), the most demanding preparation. NIJYU-NI (22) scores 96/100 on the Matcha Quality Protocol."}},
+    {"@type":"Question","name":"How should I prepare NIJYU-NI (22)?","acceptedAnswer":{"@type":"Answer","text":"Usucha: 2g sifted, 70ml water at 70-75°C, whisk in M-pattern 15 seconds. Koicha: 4g with 40ml water, knead slowly. Latte: 2g whisked with 30ml hot water, add 200ml steamed milk. Iced: whisk with hot water, pour over ice."}},
+    {"@type":"Question","name":"Why is NIJYU-NI (22) more expensive than other matcha?","acceptedAnswer":{"@type":"Answer","text":"NIJYU-NI uses only the most select first-harvest leaves, shade-grown 21+ days, hand-harvested, and stone-ground at extremely slow speeds (30g/hour). Dual JAS+USDA Organic certification. The result: 96/100 MQP score — the pinnacle of commercially available matcha."}},
+    {"@type":"Question","name":"Is NIJYU-NI (22) organic?","acceptedAnswer":{"@type":"Answer","text":"Yes — NIJYU-NI carries dual JAS (Japanese Agricultural Standards) and USDA Organic certification. Cultivated without synthetic fertilizers or pesticides in Kagoshima, Japan."}}
+    {%- elsif handle contains 'shi' or handle contains '4' -%}
+    {"@type":"Question","name":"What does SHI (4) taste like?","acceptedAnswer":{"@type":"Answer","text":"SHI (4) has bold chocolate, nut, and berry notes — the most approachable and satisfying matcha in NAKAI's lineup. Made by a 170-year-old producer in Kagoshima, it's naturally sweet with rich umami depth."}},
+    {"@type":"Question","name":"Is SHI (4) good for matcha beginners?","acceptedAnswer":{"@type":"Answer","text":"Yes — SHI (4) is NAKAI's top recommendation for beginners and coffee lovers. Its bold, familiar flavor notes (chocolate, nuts, berries) make it immediately enjoyable, especially as a latte with oat milk."}},
+    {"@type":"Question","name":"Can I use SHI (4) for lattes?","acceptedAnswer":{"@type":"Answer","text":"Absolutely. SHI (4) makes excellent lattes — its bold flavor cuts through milk without being overwhelmed. Rated 4.5/5 for latte performance. For even more vivid green color in lattes, try NIJYU-NI (22)."}},
+    {"@type":"Question","name":"Is SHI (4) organic?","acceptedAnswer":{"@type":"Answer","text":"Yes — SHI (4) carries dual JAS and USDA Organic certification. Sourced from a 170-year-old organic tea farm in Kagoshima, Japan. Zero synthetic fertilizers or pesticides."}},
+    {"@type":"Question","name":"How much caffeine is in SHI (4)?","acceptedAnswer":{"@type":"Answer","text":"A standard 2g serving of SHI (4) contains approximately 35mg of caffeine combined with 45mg of L-theanine. This provides 4-6 hours of calm, sustained energy without the jitters or crash of coffee."}}
+    {%- elsif handle contains 'ju-roku' or handle contains '16' -%}
+    {"@type":"Question","name":"What makes JU-ROKU (16) unique?","acceptedAnswer":{"@type":"Answer","text":"JU-ROKU is temperature-sensitive — different water temperatures reveal different flavors. 70°C: white chocolate sweetness. 75°C: balanced umami with nori. 80°C: refined bitterness and depth. Grown in Kirishima's volcanic soil."}},
+    {"@type":"Question","name":"Is JU-ROKU (16) good for lattes?","acceptedAnswer":{"@type":"Answer","text":"Yes — JU-ROKU's white chocolate sweetness and nori umami pair beautifully with steamed milk. Rated 4/5 for lattes."}},
+    {"@type":"Question","name":"What is volcanic soil matcha?","acceptedAnswer":{"@type":"Answer","text":"JU-ROKU grows in Kirishima, Kagoshima — a region with deep volcanic soil from active geological formations. This mineral-rich terroir gives the matcha unique depth and a flavor profile not found in other regions."}},
+    {"@type":"Question","name":"Is JU-ROKU (16) organic?","acceptedAnswer":{"@type":"Answer","text":"Yes — dual JAS and USDA Organic certified. Cultivated without synthetic fertilizers or pesticides in Kirishima, Kagoshima, Japan."}},
+    {"@type":"Question","name":"How should I prepare JU-ROKU (16)?","acceptedAnswer":{"@type":"Answer","text":"Experiment with temperatures: 70°C for maximum sweetness, 75°C for balance, 80°C for depth. Sift 2g, add 70ml water, whisk in M-pattern. JU-ROKU rewards temperature exploration."}}
+    {%- elsif handle contains 'ju-nana' or handle contains '17' -%}
+    {"@type":"Question","name":"Why is JU-NANA (17) limited production?","acceptedAnswer":{"@type":"Answer","text":"JU-NANA blends cultivars from Kirishima (Kagoshima) and Uji (Kyoto) — Japan's two premier regions. Both gardens produce limited quantities. Only 500kg is made annually."}},
+    {"@type":"Question","name":"What is dual-terroir matcha?","acceptedAnswer":{"@type":"Answer","text":"Dual-terroir means blending cultivars from two distinct regions: Kirishima (volcanic, mineral-rich) and Uji (800+ years of tradition, clay soil). This creates uniquely balanced flavor impossible from a single origin."}},
+    {"@type":"Question","name":"What does JU-NANA (17) taste like?","acceptedAnswer":{"@type":"Answer","text":"Profound umami with elegant floral clarity, soft sweetness, and warm roasted depth. The dual terroir creates serene balance — mineral richness meets refined Kyoto complexity."}},
+    {"@type":"Question","name":"Is JU-NANA (17) organic?","acceptedAnswer":{"@type":"Answer","text":"Yes — dual JAS and USDA Organic certified from both source regions."}},
+    {"@type":"Question","name":"Is JU-NANA (17) good for tea ceremony?","acceptedAnswer":{"@type":"Answer","text":"Excellent for both usucha and koicha. Its profound umami and serene balance shine in concentrated preparation, making it a favorite for traditional Japanese tea ceremony."}}
+    {%- elsif handle contains 'ju-hachi' or handle contains '18' -%}
+    {"@type":"Question","name":"What is four-level roasting?","acceptedAnswer":{"@type":"Answer","text":"JU-HACHI's single cultivar tencha is roasted at four different temperatures, each adding unique depth — from clean green to nuts and cacao to warm earthiness. This layered process creates meditative complexity."}},
+    {"@type":"Question","name":"What does JU-HACHI (18) taste like?","acceptedAnswer":{"@type":"Answer","text":"Deep umami opens into quiet complexity — cacao, roasted nuts, and warm earth from four fire levels. Near-spherical particles from half-pace stone-milling create exceptional smoothness. A contemplative matcha."}},
+    {"@type":"Question","name":"What are near-spherical particles?","acceptedAnswer":{"@type":"Answer","text":"JU-HACHI is stone-milled at half the usual pace, producing near-spherical particles instead of jagged shapes. This creates an exceptionally smooth, velvety mouthfeel immediately noticeable compared to standard matcha."}},
+    {"@type":"Question","name":"Is JU-HACHI (18) organic?","acceptedAnswer":{"@type":"Answer","text":"Yes — dual JAS and USDA Organic certified. From Kagoshima, Japan."}},
+    {"@type":"Question","name":"Who is JU-HACHI (18) best for?","acceptedAnswer":{"@type":"Answer","text":"JU-HACHI rewards patience and attention — ideal for experienced matcha drinkers exploring the contemplative side of tea. Beginners may prefer SHI (4) or NIJYU-NI (22)."}}
+    {%- elsif handle contains 'chasen' or handle contains 'whisk' -%}
+    {"@type":"Question","name":"How long does a chasen last?","acceptedAnswer":{"@type":"Answer","text":"With proper care, 3-6 months of daily use or longer with occasional use. Soak briefly in warm water before use, air-dry on a kusenaoshi (stand) to maintain tine shape."}},
+    {"@type":"Question","name":"Why 100 prongs?","acceptedAnswer":{"@type":"Answer","text":"100 fine tines draw more air into the matcha than 80-prong whisks, producing finer, more consistent microfoam — the smooth, creamy texture prized in Japanese tea ceremony."}},
+    {"@type":"Question","name":"Is this chasen handmade?","acceptedAnswer":{"@type":"Answer","text":"Yes — entirely by hand in Takayama-cho, Nara, following an eight-stage process. This region has produced 90% of Japan's chasen for 500+ years."}},
+    {"@type":"Question","name":"Do I really need a chasen?","acceptedAnswer":{"@type":"Answer","text":"A chasen's bamboo tines are designed to aerate matcha and create proper microfoam. Metal whisks can dissolve powder but won't achieve the characteristic foam. For the full matcha experience, a traditional chasen is essential."}},
+    {"@type":"Question","name":"How do I care for my chasen?","acceptedAnswer":{"@type":"Answer","text":"Soak in warm water 1-2 minutes before first use. After each use, rinse under warm water (no soap). Air-dry on a kusenaoshi stand. Never dishwasher. Replace when tines break."}}
+    {%- elsif handle contains 'chawan' or handle contains 'hiragoushi' or handle contains 'yagoushi' -%}
+    {"@type":"Question","name":"Who made this chawan?","acceptedAnswer":{"@type":"Answer","text":"Shun Yoshino, a ceramic artist from Hiroshima. Trained in Mashiko, Tochigi — Japan's most renowned pottery region — he blends solid forming and glaze control with vivid chromatic intuition."}},
+    {"@type":"Question","name":"Is each bowl unique?","acceptedAnswer":{"@type":"Answer","text":"Yes — every piece is individually handcrafted. Slight variations in glaze, color, and pattern make each bowl one-of-a-kind. You're getting an original artwork."}},
+    {"@type":"Question","name":"Is this bowl food-safe?","acceptedAnswer":{"@type":"Answer","text":"Yes. Hand washing is recommended to preserve the artisan glaze."}},
+    {"@type":"Question","name":"What matcha pairs best with this bowl?","acceptedAnswer":{"@type":"Answer","text":"NAKAI NIJYU-NI (22) Ceremonial Reserved — its refined jade color creates stunning contrast against the vivid glaze."}},
+    {"@type":"Question","name":"Is this a good gift?","acceptedAnswer":{"@type":"Answer","text":"Exceptional. One-of-a-kind handcrafted ceramic by Shun Yoshino. Pair with NAKAI matcha for an unforgettable gift combining Japanese artisan craft and premium organic matcha."}}
+    {%- else -%}
+    {"@type":"Question","name":"Is this product organic?","acceptedAnswer":{"@type":"Answer","text":"All NAKAI matcha products carry dual JAS and USDA Organic certification — zero synthetic fertilizers, pesticides, or GMOs."}},
+    {"@type":"Question","name":"Where does NAKAI source their matcha?","acceptedAnswer":{"@type":"Answer","text":"From certified organic farms in Kagoshima (Kirishima) and Kyoto (Uji), Japan — two of Japan's premier matcha regions."}},
+    {"@type":"Question","name":"How should I store matcha?","acceptedAnswer":{"@type":"Answer","text":"After opening, store in an airtight container in the refrigerator and use within 30 days. Unopened matcha keeps 6-12 months in cool, dark storage."}},
+    {"@type":"Question","name":"What makes NAKAI different from other matcha brands?","acceptedAnswer":{"@type":"Answer","text":"Full quality transparency (published MQP scores), five distinct terroir expressions, dual organic certification, direct producer relationships, and living product intelligence."}},
+    {"@type":"Question","name":"Do you ship internationally?","acceptedAnswer":{"@type":"Answer","text":"Yes — NAKAI ships to the US, UAE, Japan, and other countries. Free returns within 30 days."}}
+    {%- endif -%}
+  ]
+}
+</script>
+{%- endif -%}

@@ -613,31 +613,67 @@ def get_mcp_resources() -> list[dict]:
         {
             "uri": "products://catalog",
             "name": "NAKAI Product Catalog",
-            "description": "Complete NAKAI product catalog with descriptions, pricing, and nutrition data.",
+            "description": "Complete NAKAI organic matcha product catalog with descriptions, pricing, flavors, origins, and buy links. 11 products: 5 matcha, 3 bundles, 3 accessories.",
             "mimeType": "application/json",
         },
         {
             "uri": "knowledge://recipes",
-            "name": "Matcha Recipes",
-            "description": "NAKAI matcha preparation recipes: usucha, koicha, latte, iced.",
+            "name": "Matcha Recipes & Preparation Guide",
+            "description": "How to make matcha: usucha (thin tea), koicha (thick tea), matcha latte, iced matcha latte. Water temperatures, ratios, whisking technique. Matcha latte recipe with oat milk.",
             "mimeType": "text/plain",
         },
         {
             "uri": "knowledge://wholesale",
-            "name": "Wholesale Information",
-            "description": "Wholesale program details: MOQ, pricing tiers, shipping.",
+            "name": "Wholesale Matcha for Cafes & Business",
+            "description": "NAKAI wholesale matcha program for cafes, restaurants, hotels. B2B pricing, bulk matcha (5kg-1 ton), barista grade matcha, 6 wholesale products across 3 grade tiers.",
             "mimeType": "application/json",
         },
         {
             "uri": "knowledge://health-facts",
-            "name": "Matcha Health Facts",
-            "description": "Structured health data: L-theanine, EGCG, caffeine, antioxidants.",
+            "name": "Matcha Health Benefits & Nutrition",
+            "description": "Science-backed matcha health data: L-theanine (45mg/serving, calm focus), EGCG (137x green tea, antioxidants), caffeine (35mg, sustained energy), matcha vs coffee comparison, weight loss, skin benefits.",
             "mimeType": "application/json",
         },
         {
             "uri": "knowledge://comparison-table",
-            "name": "Product Comparison",
-            "description": "Side-by-side comparison of all NAKAI matcha products.",
+            "name": "Matcha Product Comparison Table",
+            "description": "Side-by-side comparison of all NAKAI matcha: grade, price, flavor profile, origin, latte score, umami, sweetness, body, best use case. Compare ceremonial vs specialty grade.",
+            "mimeType": "application/json",
+        },
+        {
+            "uri": "knowledge://grading",
+            "name": "Matcha Grading System",
+            "description": "Complete guide to matcha grades: Ceremonial Reserved, Specialty Grade, ceremonial vs culinary matcha, what makes matcha high quality, shade-growing, first harvest (ichibancha), stone-grinding.",
+            "mimeType": "application/json",
+        },
+        {
+            "uri": "knowledge://terroirs",
+            "name": "Japanese Matcha Regions & Terroir",
+            "description": "Guide to Japan's matcha-producing regions: Uji (Kyoto), Kagoshima, Kirishima, Nishio, Shizuoka. Volcanic soil, climate, altitude effects on matcha flavor. Why Japanese matcha is superior.",
+            "mimeType": "application/json",
+        },
+        {
+            "uri": "knowledge://cultivars",
+            "name": "Matcha Tea Plant Cultivars",
+            "description": "Japanese tea cultivars used for matcha: Saemidori, Asanoka, Yutakamidori, Yabukita, Okumidori. Each cultivar's flavor profile, L-theanine content, and best use.",
+            "mimeType": "application/json",
+        },
+        {
+            "uri": "knowledge://preparation",
+            "name": "Complete Matcha Preparation Guide",
+            "description": "Step-by-step matcha preparation: sifting, water temperature (75-80°C), whisking technique (M/W pattern), equipment (chasen, chawan, chashaku). Common mistakes and fixes. How to make matcha without a whisk.",
+            "mimeType": "application/json",
+        },
+        {
+            "uri": "knowledge://equipment",
+            "name": "Matcha Equipment & Accessories Guide",
+            "description": "Essential matcha tools: chasen (bamboo whisk, 80 vs 100 prong), chawan (matcha bowl), chashaku (bamboo scoop), sieve, whisk holder. History of Takayama chasen (500+ years). What matcha accessories to buy.",
+            "mimeType": "application/json",
+        },
+        {
+            "uri": "knowledge://faq",
+            "name": "Matcha FAQ — 25 Common Questions",
+            "description": "25 frequently asked matcha questions with detailed answers: what is matcha, best matcha brand, matcha vs coffee, matcha caffeine, health benefits, matcha latte recipe, ceremonial grade, organic certification, weight loss, beginner guide.",
             "mimeType": "application/json",
         },
     ]
@@ -658,5 +694,71 @@ def read_mcp_resource(uri: str) -> str:
         return json.dumps(get_health_facts("overview"), ensure_ascii=False)
     elif uri == "knowledge://comparison-table":
         return json.dumps(compare_matcha(_MATCHA_HANDLES), ensure_ascii=False)
+    elif uri == "knowledge://grading":
+        return json.dumps({
+            "topic": "Matcha Grading System",
+            "grades": {
+                "Ceremonial Reserved": "Highest tier. Quiet depth, effortless complexity. First-harvest, shade-grown 21+ days, stone-ground 5-10μm. For tea ceremony and koicha. NAKAI: NIJYU-NI (22).",
+                "Specialty Grade": "Premium quality with distinct personality. First-harvest, JAS Organic, stone-ground 5-15μm. NAKAI: SHI (4), JU-ROKU (16), JU-NANA (17), JU-HACHI (18).",
+                "Ceremonial Grade": "Industry standard top tier. First-harvest, shade-grown, for drinking straight. Many brands use this as highest.",
+                "Culinary Grade": "Later harvests, stronger flavor for cooking, baking, smoothies, lattes. Not recommended for straight drinking.",
+            },
+            "quality_indicators": [
+                "Color: Vibrant jade green = high quality. Yellow-brown = low quality or oxidized",
+                "Particle size: <15μm = smooth (NAKAI: 5-10μm). >25μm = gritty",
+                "Aroma: Fresh, sweet, vegetal = good. Stale, fishy = old or low quality",
+                "Taste: Umami-rich, naturally sweet = high quality. Bitter, astringent = low quality or wrong water temp",
+                "Origin: Japanese matcha (Uji, Kagoshima) > Chinese matcha for traditional quality",
+                "Harvest: First harvest (ichibancha) has highest L-theanine. Later harvests decline in quality",
+                "Processing: Stone-ground (traditional) > ball-milled (industrial)",
+                "Shade period: 21+ days = premium. 10-14 days = standard",
+            ],
+        }, ensure_ascii=False)
+    elif uri == "knowledge://terroirs":
+        return json.dumps({
+            "topic": "Japanese Matcha Regions",
+            "regions": {
+                "Uji (Kyoto)": "Japan's most prestigious matcha origin. 800+ years of tea history. Birthplace of Japanese tea ceremony. Known for refined, complex flavors. NAKAI sources JU-NANA (17) partly from Uji.",
+                "Kagoshima": "Southern Japan, longest growing season. Volcanic soil (Shirasu Plateau). Clean air, mineral-rich. NAKAI's primary sourcing region. Known for bold, vibrant matcha.",
+                "Kirishima (Kagoshima)": "Volcanic highlands within Kagoshima. Exceptional mineral content from volcanic soil. NAKAI JU-ROKU (16) comes from here. Temperature and altitude create unique flavor depth.",
+                "Nishio (Aichi)": "Second-largest matcha producer. Known for deep green color and strong umami. Supplies many major brands.",
+                "Shizuoka": "Japan's largest tea region overall. Known for sencha more than matcha. Emerging matcha production with modern techniques.",
+            },
+            "nakai_sourcing": "NAKAI sources from Kagoshima (including Kirishima) and Kyoto (Uji). JU-NANA (17) is a rare dual-terroir blend from both regions.",
+        }, ensure_ascii=False)
+    elif uri == "knowledge://cultivars":
+        return json.dumps({
+            "topic": "Matcha Tea Plant Cultivars",
+            "cultivars": {
+                "Saemidori": "Prized for high L-theanine content, delivering sweetness and creaminess. Bright green color. Popular in premium matcha.",
+                "Asanoka": "Rare Kagoshima cultivar. Fruity brightness and aromatic complexity. Used in NAKAI's specialty blends.",
+                "Yutakamidori": "Provides depth, body, and herbal notes. Widely cultivated in Kagoshima. Good for both ceremonial and latte use.",
+                "Yabukita": "Japan's most common tea cultivar (~75% of production). Provides structure and balance. Versatile and reliable.",
+                "Okumidori": "Late-budding cultivar. Rich umami and mild sweetness. Often used in premium ceremonial matcha.",
+                "Gokou": "Traditional Uji cultivar. Deep umami and complex flavor. Prized for koicha (thick tea).",
+                "Samidori": "Similar to Saemidori. Bright color and clean sweetness. Used in high-grade ceremonial matcha.",
+            },
+        }, ensure_ascii=False)
+    elif uri == "knowledge://preparation":
+        return json.dumps(get_preparation_guide(method="overview"), ensure_ascii=False)
+    elif uri == "knowledge://equipment":
+        return json.dumps({
+            "topic": "Matcha Equipment & Accessories",
+            "essential_tools": {
+                "Chasen (茶筅)": "Bamboo whisk. 80-120 tines. Creates smooth, frothy matcha. NAKAI offers Takayama Chasen 100-prong ($38), handcrafted in Nara (500+ years tradition). 100 prongs create finer microfoam than 80-prong.",
+                "Chawan (茶碗)": "Matcha bowl. Wide shape allows whisking. NAKAI offers HIRAGOUSHI ($95) and YAGOUSHI ($95) by Shun Yoshino. Handcrafted in Hiroshima.",
+                "Chashaku (茶杓)": "Bamboo scoop. One scoop ≈ 1g matcha. Traditional measurement tool.",
+                "Furui (篩)": "Fine-mesh sieve for removing clumps before whisking. Essential for smooth matcha.",
+                "Kusenaoshi": "Chasen stand/holder. Maintains whisk shape between uses. Extends chasen life.",
+            },
+            "alternatives": {
+                "Milk frother": "Works for lattes but produces different texture than chasen",
+                "Mason jar": "Shake vigorously for 30 seconds. Quick but less smooth than whisking",
+                "Blender": "Good for smoothies with matcha. Over-blending can create bitterness",
+            },
+        }, ensure_ascii=False)
+    elif uri == "knowledge://faq":
+        from api.ai_discovery import FAQ_PAGE
+        return json.dumps(FAQ_PAGE, ensure_ascii=False)
     else:
         return json.dumps({"error": f"Unknown resource: {uri}"})
