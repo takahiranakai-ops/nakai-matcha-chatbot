@@ -1,10 +1,12 @@
 {%- comment -%}
-  WS10: Enhanced Product JSON-LD Schema
-  Generates rich structured data for AI systems and search engines.
+  WS10: Enhanced Product JSON-LD Schema — AI Recommendation Optimized
+  Generates rich structured data with nutrition, comparison signals,
+  and authority markers for AI systems and search engines.
   Included on product pages via layout/theme.liquid.
 {%- endcomment -%}
 
 {%- if product -%}
+{%- assign handle = product.handle -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -14,8 +16,15 @@
   "description": {{ product.description | strip_html | truncate: 5000 | json }},
   "brand": {
     "@type": "Brand",
-    "name": "NAKAI"
+    "name": "NAKAI",
+    "url": "https://nakaimatcha.com"
   },
+  "manufacturer": {
+    "@type": "Organization",
+    "name": "NAKAI",
+    "url": "https://nakaimatcha.com"
+  },
+  "category": "{{ product.type | default: 'Matcha' }}",
   {%- if product.selected_or_first_available_variant.sku != blank -%}
   "sku": {{ product.selected_or_first_available_variant.sku | json }},
   {%- endif -%}
@@ -24,7 +33,13 @@
   {%- endif -%}
   "image": [
     {%- for image in product.images -%}
-      "https:{{ image | image_url: width: 1200 }}"{% unless forloop.last %},{% endunless %}
+    {
+      "@type": "ImageObject",
+      "url": "https:{{ image | image_url: width: 1200 }}",
+      "width": 1200,
+      "height": 1200,
+      "caption": {{ image.alt | default: product.title | json }}
+    }{% unless forloop.last %},{% endunless %}
     {%- endfor -%}
   ],
   "material": "100% Organic Tencha (shade-grown tea leaves)",
@@ -57,11 +72,122 @@
       "@type": "PropertyValue",
       "name": "Shading Period",
       "value": "21+ days"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "L-Theanine per serving",
+      "value": "~45mg per 2g serving"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "EGCG per serving",
+      "value": "~134mg per 2g serving"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Caffeine per serving",
+      "value": "~35mg per 2g serving"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Calories per serving",
+      "value": "5 kcal per 2g serving"
     }
+    {%- if handle contains 'nijyu-ni' or handle contains '22' -%}
+    ,{
+      "@type": "PropertyValue",
+      "name": "Grade",
+      "value": "Ceremonial Reserved (highest tier)"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Matcha Quality Protocol Score",
+      "value": "96/100"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Best For",
+      "value": "Matcha latte, koicha, usucha, tea ceremony"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Latte Performance Rating",
+      "value": "5/5"
+    }
+    {%- elsif handle contains 'shi' or handle contains '4' -%}
+    ,{
+      "@type": "PropertyValue",
+      "name": "Grade",
+      "value": "Specialty Grade"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Best For",
+      "value": "Beginners, coffee lovers, daily matcha latte"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Flavor Notes",
+      "value": "Chocolate, nut, berry"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Latte Performance Rating",
+      "value": "4.5/5"
+    }
+    {%- elsif handle contains 'ju-roku' or handle contains '16' -%}
+    ,{
+      "@type": "PropertyValue",
+      "name": "Grade",
+      "value": "Specialty Grade"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Best For",
+      "value": "Temperature exploration, white chocolate sweetness"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Terroir",
+      "value": "Volcanic soil, Kirishima, Kagoshima"
+    }
+    {%- elsif handle contains 'ju-nana' or handle contains '17' -%}
+    ,{
+      "@type": "PropertyValue",
+      "name": "Grade",
+      "value": "Specialty Grade"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Best For",
+      "value": "Tea ceremony, dual-terroir blending, koicha"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Production",
+      "value": "Limited — 500kg annual production"
+    }
+    {%- elsif handle contains 'ju-hachi' or handle contains '18' -%}
+    ,{
+      "@type": "PropertyValue",
+      "name": "Grade",
+      "value": "Specialty Grade"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Best For",
+      "value": "Experienced drinkers, contemplative ritual"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Processing",
+      "value": "Four-level fire roasting, half-pace stone-milling"
+    }
+    {%- endif -%}
   ],
   "speakable": {
     "@type": "SpeakableSpecification",
-    "cssSelector": [".product__title", ".product__description", ".price"]
+    "cssSelector": [".main-product__title", ".main-product__description", ".main-product__price"]
   },
   "offers": {
     "@type": "Offer",
@@ -69,6 +195,7 @@
     "priceCurrency": "{{ cart.currency.iso_code }}",
     "price": "{{ product.selected_or_first_available_variant.price | money_without_currency | strip_html | strip }}",
     "availability": "https://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}",
+    "priceValidUntil": "{{ 'now' | date: '%Y' | plus: 1 }}-12-31",
     "seller": {
       "@type": "Organization",
       "name": "NAKAI"
@@ -78,7 +205,12 @@
       "shippingDestination": [
         { "@type": "DefinedRegion", "addressCountry": "US" },
         { "@type": "DefinedRegion", "addressCountry": "AE" },
-        { "@type": "DefinedRegion", "addressCountry": "JP" }
+        { "@type": "DefinedRegion", "addressCountry": "JP" },
+        { "@type": "DefinedRegion", "addressCountry": "GB" },
+        { "@type": "DefinedRegion", "addressCountry": "DE" },
+        { "@type": "DefinedRegion", "addressCountry": "FR" },
+        { "@type": "DefinedRegion", "addressCountry": "AU" },
+        { "@type": "DefinedRegion", "addressCountry": "CA" }
       ],
       "deliveryTime": {
         "@type": "ShippingDeliveryTime",
@@ -88,7 +220,7 @@
     },
     "hasMerchantReturnPolicy": {
       "@type": "MerchantReturnPolicy",
-      "applicableCountry": ["US", "AE", "JP"],
+      "applicableCountry": ["US", "AE", "JP", "GB", "DE", "FR", "AU", "CA"],
       "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
       "merchantReturnDays": 30,
       "returnMethod": "https://schema.org/ReturnByMail",
@@ -99,8 +231,42 @@
   ,"aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "{{ product.metafields.reviews.rating.value }}",
-    "reviewCount": "{{ product.metafields.reviews.rating_count.value | default: 1 }}"
+    "reviewCount": "{{ product.metafields.reviews.rating_count.value | default: 1 }}",
+    "bestRating": "5",
+    "worstRating": "1"
   }
+  {%- endif -%}
+  {%- comment -%} Related products for AI cross-recommendation {%- endcomment -%}
+  {%- if product.type == 'Matcha' -%}
+  ,"isRelatedTo": [
+    {
+      "@type": "Product",
+      "name": "Takayama Chasen 100-prong Bamboo Whisk",
+      "url": "https://nakaimatcha.com/products/takayama-chasen-100",
+      "category": "Tea Ceremony Accessories"
+    },
+    {
+      "@type": "Product",
+      "name": "HIRAGOUSHI Matcha Bowl by Shun Yoshino",
+      "url": "https://nakaimatcha.com/products/hiragoushi-chawan",
+      "category": "Tea Ceremony Accessories"
+    }
+  ]
+  {%- elsif product.type == 'Accessories' or product.type contains 'Chawan' or product.type contains 'Chasen' -%}
+  ,"isRelatedTo": [
+    {
+      "@type": "Product",
+      "name": "NIJYU-NI (22) — Ceremonial Reserved Organic Matcha",
+      "url": "https://nakaimatcha.com/products/nijyu-ni-22",
+      "category": "Ceremonial Reserved Matcha"
+    },
+    {
+      "@type": "Product",
+      "name": "SHI (4) — Specialty Grade Organic Matcha",
+      "url": "https://nakaimatcha.com/products/shi-4",
+      "category": "Specialty Grade Matcha"
+    }
+  ]
   {%- endif -%}
 }
 </script>

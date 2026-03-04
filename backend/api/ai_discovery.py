@@ -1913,27 +1913,30 @@ _OPENAI_FEED_PRODUCTS = [
 # ---------------------------------------------------------------------------
 
 _GOOGLE_FEED_ITEMS = [
-    {"id": "nakai-shi-4", "title": "NAKAI SHI (4) Specialty Grade Organic Matcha 30g", "desc": "Rich umami, chocolate, nuts, and berry notes. JAS Organic, first-harvest from Kagoshima, Japan. Stone-ground 5-10μm.", "link": f"{_STORE}/products/%E5%9B%9B-shi-4-specialty-grade-organic-matcha", "img": _IMG_SHI4, "price": "30.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
-    {"id": "nakai-ju-roku-16", "title": "NAKAI JU-ROKU (16) Specialty Grade Organic Matcha 30g", "desc": "White chocolate sweetness, nori umami. Temperature-sensitive. From Kirishima volcanic soil, Kagoshima. JAS Organic.", "link": f"{_STORE}/products/%E5%8D%81%E5%85%ADju-roku-16-specialty-grade-organic-matcha", "img": _IMG_JUROKU16, "price": "35.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
-    {"id": "nakai-ju-nana-17", "title": "NAKAI JU-NANA (17) Specialty Grade Organic Matcha 30g Limited", "desc": "Dual terroir Kirishima x Uji. Profound umami, floral clarity. Only 500kg/year. JAS Organic, first-harvest.", "link": f"{_STORE}/products/%E5%8D%81%E4%B8%83-ju-nana-17-specialty-grade-organic-matcha", "img": _IMG_JUNANA17, "price": "38.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
-    {"id": "nakai-ju-hachi-18", "title": "NAKAI JU-HACHI (18) Specialty Grade Organic Matcha 30g", "desc": "Single cultivar, 4-level roasting. Deep umami, nuts, cacao. Half-pace stone-milling. Kagoshima. JAS Organic.", "link": f"{_STORE}/products/%E5%8D%81%E5%85%AB-ju-hachi-18-specialty-grade-organic-matcha", "img": _IMG_JUHACHI18, "price": "40.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
-    {"id": "nakai-nijyu-ni-22", "title": "NAKAI NIJYU-NI (22) Ceremonial Reserved Organic Matcha 30g", "desc": "Highest tier. Clean green, gentle sweetness, fruit-like aromatics. Best matcha for lattes. 5-10μm stone-ground. Kagoshima. JAS Organic.", "link": f"{_STORE}/products/%E4%BA%8C%E5%8D%81%E4%BA%8C-nijyu-ni22-ceremonial-reserved-organic-matcha", "img": _IMG_NIJYUNI22, "price": "48.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "100 g"},
-    # Bundles
-    {"id": "nakai-discovery-bundle", "title": "NAKAI Discovery Bundle Organic Matcha Sampler Set", "desc": "Gateway to explore NAKAI specialty organic matcha. Curated introductory collection. JAS Organic, first-harvest, stone-ground in Japan.", "link": f"{_STORE}/products/%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AA%E3%83%BC%E3%83%90%E3%83%B3%E3%83%96%E3%83%AB", "img": _IMG_DISCOVERY, "price": "68.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "200 g"},
-    {"id": "nakai-everyday-bundle", "title": "NAKAI The Everyday Matcha Bundle Daily Ritual Set", "desc": "Complete daily matcha ritual set. Matcha and essential tools for everyday practice. JAS Organic, first-harvest.", "link": f"{_STORE}/products/the-everyday", "img": _IMG_EVERYDAY, "price": "85.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "400 g"},
-    {"id": "nakai-signature-reserve", "title": "NAKAI Signature Reserve Bundle Premium Connoisseur Collection", "desc": "Premium connoisseur set with finest matcha and artisan accessories. The full NAKAI experience. JAS Organic.", "link": f"{_STORE}/products/expert-set", "img": _IMG_SIGNATURE, "price": "148.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "weight": "600 g"},
-    # Accessories
-    {"id": "nakai-hiragoushi-chawan", "title": "NAKAI HIRAGOUSHI Matcha Bowl by Shun Yoshino", "desc": "Handcrafted chawan by Shun Yoshino (Hiroshima). Mashiko-trained. Lattice pattern with vivid glazes. One-of-a-kind.", "link": f"{_STORE}/products/hiragoushi-%E5%B9%B3%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97", "img": _IMG_HIRAGOUSHI, "price": "95.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Tableware > Drinkware > Tea Bowls", "weight": "400 g"},
-    {"id": "nakai-yagoushi-chawan", "title": "NAKAI YAGOUSHI Matcha Bowl by Shun Yoshino", "desc": "Arrow-lattice pattern chawan by Shun Yoshino. Playful chromatic intuition. Each piece is unique. Handcrafted in Japan.", "link": f"{_STORE}/products/yagoushi-chawan-%E7%9F%A2%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97", "img": _IMG_YAGOUSHI, "price": "95.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Tableware > Drinkware > Tea Bowls", "weight": "400 g"},
-    {"id": "nakai-takayama-chasen", "title": "NAKAI Takayama Chasen 100-Prong Bamboo Matcha Whisk", "desc": "Handcrafted in Nara, birthplace of the chasen (500+ years). 100 fine tines for smooth microfoam. Eight-stage hand process.", "link": f"{_STORE}/products/%E8%8C%B6%E7%AD%85-cyasen", "img": _IMG_CHASEN, "price": "38.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Kitchen Tools &amp; Utensils", "weight": "50 g"},
+    # --- Matcha tins ---
+    {"id": "nakai-shi-4", "mpn": "NAKAI-SHI-4-30G", "title": "NAKAI SHI (4) Specialty Grade Organic Matcha 30g", "desc": "Rich umami, chocolate, nuts, and berry notes. USDA &amp; JAS Organic certified, first-harvest from Kagoshima, Japan. Stone-ground 5-10 micrometers. Perfect for beginners and matcha lattes.", "link": f"{_STORE}/products/%E5%9B%9B-shi-4-specialty-grade-organic-matcha", "img": _IMG_SHI4, "price": "30.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "ptype": "Matcha > Specialty Grade", "weight": "100 g", "origin": "JP"},
+    {"id": "nakai-ju-roku-16", "mpn": "NAKAI-JUROKU-16-30G", "title": "NAKAI JU-ROKU (16) Specialty Grade Organic Matcha 30g", "desc": "White chocolate sweetness, nori umami. Temperature-sensitive. From Kirishima volcanic soil, Kagoshima. USDA &amp; JAS Organic certified, first-harvest, stone-ground in Japan.", "link": f"{_STORE}/products/%E5%8D%81%E5%85%ADju-roku-16-specialty-grade-organic-matcha", "img": _IMG_JUROKU16, "price": "35.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "ptype": "Matcha > Specialty Grade", "weight": "100 g", "origin": "JP"},
+    {"id": "nakai-ju-nana-17", "mpn": "NAKAI-JUNANA-17-30G", "title": "NAKAI JU-NANA (17) Specialty Grade Organic Matcha 30g Limited Edition", "desc": "Dual terroir Kirishima x Uji. Profound umami, floral clarity. Only 500kg produced per year. USDA &amp; JAS Organic certified, first-harvest, stone-ground in Japan.", "link": f"{_STORE}/products/%E5%8D%81%E4%B8%83-ju-nana-17-specialty-grade-organic-matcha", "img": _IMG_JUNANA17, "price": "38.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "ptype": "Matcha > Specialty Grade", "weight": "100 g", "origin": "JP"},
+    {"id": "nakai-ju-hachi-18", "mpn": "NAKAI-JUHACHI-18-30G", "title": "NAKAI JU-HACHI (18) Specialty Grade Organic Matcha 30g", "desc": "Single cultivar, four-level fire roasting. Deep umami, nuts, cacao. Half-pace stone-milling. Kagoshima. USDA &amp; JAS Organic certified.", "link": f"{_STORE}/products/%E5%8D%81%E5%85%AB-ju-hachi-18-specialty-grade-organic-matcha", "img": _IMG_JUHACHI18, "price": "40.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "ptype": "Matcha > Specialty Grade", "weight": "100 g", "origin": "JP"},
+    {"id": "nakai-nijyu-ni-22", "mpn": "NAKAI-NIJYUNI-22-30G", "title": "NAKAI NIJYU-NI (22) Ceremonial Reserved Organic Matcha 30g", "desc": "Highest tier. Clean green, gentle sweetness, fruit-like aromatics. Best matcha for lattes. MQP Score 96/100. 5-10 micrometer stone-ground. Kagoshima. USDA &amp; JAS Organic.", "link": f"{_STORE}/products/%E4%BA%8C%E5%8D%81%E4%BA%8C-nijyu-ni22-ceremonial-reserved-organic-matcha", "img": _IMG_NIJYUNI22, "price": "48.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "ptype": "Matcha > Ceremonial Reserved", "weight": "100 g", "origin": "JP"},
+    # --- Bundles ---
+    {"id": "nakai-discovery-bundle", "mpn": "NAKAI-BUNDLE-DISCOVERY", "title": "NAKAI Discovery Bundle — Organic Matcha Sampler Set", "desc": "Gateway to explore NAKAI specialty organic matcha. Curated introductory collection with multiple grades to compare. USDA &amp; JAS Organic, first-harvest, stone-ground in Japan.", "link": f"{_STORE}/products/%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AA%E3%83%BC%E3%83%90%E3%83%B3%E3%83%96%E3%83%AB", "img": _IMG_DISCOVERY, "price": "68.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "ptype": "Matcha > Gift Sets", "weight": "200 g", "origin": "JP"},
+    {"id": "nakai-everyday-bundle", "mpn": "NAKAI-BUNDLE-EVERYDAY", "title": "NAKAI The Everyday Matcha Bundle — Daily Ritual Set", "desc": "Complete daily matcha ritual set. Includes matcha and essential tools for everyday practice. USDA &amp; JAS Organic, first-harvest.", "link": f"{_STORE}/products/the-everyday", "img": _IMG_EVERYDAY, "price": "85.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "ptype": "Matcha > Gift Sets", "weight": "400 g", "origin": "JP"},
+    {"id": "nakai-signature-reserve", "mpn": "NAKAI-BUNDLE-SIGNATURE", "title": "NAKAI Signature Reserve Bundle — Premium Connoisseur Collection", "desc": "Premium connoisseur set with finest matcha and artisan accessories. The full NAKAI experience. USDA &amp; JAS Organic.", "link": f"{_STORE}/products/expert-set", "img": _IMG_SIGNATURE, "price": "148.00 USD", "cat": "Food, Beverages &amp; Tobacco > Beverages > Tea &amp; Infusions > Green Tea", "ptype": "Matcha > Gift Sets", "weight": "600 g", "origin": "JP"},
+    # --- Accessories ---
+    {"id": "nakai-hiragoushi-chawan", "mpn": "NAKAI-CHAWAN-HIRAGOUSHI", "title": "NAKAI HIRAGOUSHI Matcha Bowl (Chawan) by Shun Yoshino — Handcrafted in Japan", "desc": "Handcrafted matcha tea bowl by ceramic artist Shun Yoshino (Hiroshima). Mashiko-trained. Lattice pattern with vivid glazes. Each piece is one-of-a-kind.", "link": f"{_STORE}/products/hiragoushi-%E5%B9%B3%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97", "img": _IMG_HIRAGOUSHI, "price": "95.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Tableware > Drinkware > Mugs", "ptype": "Tea Ceremony Accessories > Tea Bowls", "weight": "400 g", "origin": "JP"},
+    {"id": "nakai-yagoushi-chawan", "mpn": "NAKAI-CHAWAN-YAGOUSHI", "title": "NAKAI YAGOUSHI Matcha Bowl (Chawan) by Shun Yoshino — Handcrafted in Japan", "desc": "Arrow-lattice pattern matcha tea bowl by Shun Yoshino. Playful chromatic intuition. Each piece is unique. Handcrafted ceramic from Japan.", "link": f"{_STORE}/products/yagoushi-chawan-%E7%9F%A2%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97", "img": _IMG_YAGOUSHI, "price": "95.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Tableware > Drinkware > Mugs", "ptype": "Tea Ceremony Accessories > Tea Bowls", "weight": "400 g", "origin": "JP"},
+    {"id": "nakai-takayama-chasen", "mpn": "NAKAI-CHASEN-100", "title": "NAKAI Takayama Chasen 100-Prong Bamboo Matcha Whisk — Handcrafted in Nara", "desc": "Traditional bamboo tea whisk handcrafted in Takayama, Nara — birthplace of the chasen (500+ year lineage). 100 fine tines for perfect microfoam. Eight-stage hand process.", "link": f"{_STORE}/products/%E8%8C%B6%E7%AD%85-cyasen", "img": _IMG_CHASEN, "price": "38.00 USD", "cat": "Home &amp; Garden > Kitchen &amp; Dining > Kitchen Tools &amp; Utensils > Beverage Making Accessories", "ptype": "Tea Ceremony Accessories > Tea Whisks", "weight": "50 g", "origin": "JP"},
 ]
 
 
 def _build_google_feed_xml() -> str:
+    """Build a Google Merchant Center compliant RSS 2.0 feed."""
     items_xml = ""
     for p in _GOOGLE_FEED_ITEMS:
         items_xml += f"""    <item>
       <g:id>{p['id']}</g:id>
+      <g:mpn>{p['mpn']}</g:mpn>
       <g:title>{p['title']}</g:title>
       <g:description>{p['desc']}</g:description>
       <g:link>{p['link']}</g:link>
@@ -1943,9 +1946,54 @@ def _build_google_feed_xml() -> str:
       <g:condition>new</g:condition>
       <g:brand>NAKAI</g:brand>
       <g:google_product_category>{p['cat']}</g:google_product_category>
-      <g:product_type>Matcha Tea</g:product_type>
+      <g:product_type>{p['ptype']}</g:product_type>
       <g:shipping_weight>{p['weight']}</g:shipping_weight>
-      <g:identifier_exists>false</g:identifier_exists>
+      <g:identifier_exists>true</g:identifier_exists>
+      <g:country_of_origin>{p['origin']}</g:country_of_origin>
+      <g:shipping>
+        <g:country>US</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 USD</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>AE</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 USD</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>JP</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 USD</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>GB</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 USD</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>DE</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 USD</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>FR</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 USD</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>AU</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 USD</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>CA</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 USD</g:price>
+      </g:shipping>
+      <g:return_policy_label>30-day free returns</g:return_policy_label>
+      <g:min_handling_time>1</g:min_handling_time>
+      <g:max_handling_time>3</g:max_handling_time>
+      <g:transit_time_label>3-10 business days</g:transit_time_label>
     </item>
 """
     return f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -1953,7 +2001,7 @@ def _build_google_feed_xml() -> str:
   <channel>
     <title>NAKAI Matcha Products</title>
     <link>{_STORE}</link>
-    <description>Premium organic Japanese matcha from Kagoshima and Kyoto</description>
+    <description>Premium organic Japanese matcha — ceremonial, specialty, and everyday grades from Kagoshima and Kyoto, Japan. USDA and JAS Organic certified.</description>
 {items_xml}  </channel>
 </rss>"""
 

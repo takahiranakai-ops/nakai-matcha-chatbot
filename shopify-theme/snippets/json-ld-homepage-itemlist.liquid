@@ -1,0 +1,81 @@
+{%- comment -%}
+  Homepage ItemList JSON-LD Schema
+  Presents the main product lineup as a structured list for AI and search engines.
+  Renders on homepage only via layout/theme.liquid.
+{%- endcomment -%}
+
+{%- if template == 'index' -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "NAKAI Premium Organic Matcha Collection",
+  "description": "Curated lineup of Japan's finest organic matcha — from everyday specialty to ceremonial reserved grade.",
+  "url": "{{ shop.url }}",
+  "numberOfItems": 5,
+  "itemListOrder": "https://schema.org/ItemListOrderDescending",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "Product",
+        "name": "NIJYU-NI (22) — Ceremonial Reserved Organic Matcha",
+        "url": "https://nakaimatcha.com/products/nijyu-ni-22",
+        "description": "Our pinnacle matcha. MQP Score 96/100. First-harvest Uji tencha, stone-ground to 5μm. Perfect for koicha, usucha, and the ultimate matcha latte.",
+        "brand": { "@type": "Brand", "name": "NAKAI" },
+        "category": "Ceremonial Reserved Matcha"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "Product",
+        "name": "JU-HACHI (18) — Specialty Grade Organic Matcha",
+        "url": "https://nakaimatcha.com/products/ju-hachi-18",
+        "description": "Four-level fire roasting, half-pace stone-milling. Deep, contemplative character for experienced matcha drinkers.",
+        "brand": { "@type": "Brand", "name": "NAKAI" },
+        "category": "Specialty Grade Matcha"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "item": {
+        "@type": "Product",
+        "name": "JU-NANA (17) — Specialty Grade Organic Matcha",
+        "url": "https://nakaimatcha.com/products/ju-nana-17",
+        "description": "Limited 500kg annual production. Dual-terroir Uji-Kagoshima blend for tea ceremony and koicha.",
+        "brand": { "@type": "Brand", "name": "NAKAI" },
+        "category": "Specialty Grade Matcha"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "item": {
+        "@type": "Product",
+        "name": "JU-ROKU (16) — Specialty Grade Organic Matcha",
+        "url": "https://nakaimatcha.com/products/ju-roku-16",
+        "description": "Volcanic soil Kirishima terroir. White chocolate sweetness ideal for temperature exploration.",
+        "brand": { "@type": "Brand", "name": "NAKAI" },
+        "category": "Specialty Grade Matcha"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "item": {
+        "@type": "Product",
+        "name": "SHI (4) — Specialty Grade Organic Matcha",
+        "url": "https://nakaimatcha.com/products/shi-4",
+        "description": "The perfect entry point. Chocolate, nut, berry notes. Latte Performance 4.5/5. Best for beginners and coffee lovers.",
+        "brand": { "@type": "Brand", "name": "NAKAI" },
+        "category": "Specialty Grade Matcha"
+      }
+    }
+  ]
+}
+</script>
+{%- endif -%}

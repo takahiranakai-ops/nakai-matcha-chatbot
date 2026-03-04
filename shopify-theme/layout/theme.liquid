@@ -45,8 +45,13 @@
 
   {{ content_for_header }}
 
-  {%- comment -%} JSON-LD Structured Data — WS10, WS14, WS15 {%- endcomment -%}
+  {%- comment -%} JSON-LD Structured Data — Global Schemas {%- endcomment -%}
   {% render 'json-ld-organization' %}
+  {% render 'json-ld-website' %}
+  {% render 'json-ld-breadcrumb' %}
+  {% render 'json-ld-site-navigation' %}
+
+  {%- comment -%} JSON-LD — Product Pages {%- endcomment -%}
   {%- if template.name == 'product' -%}
     {% render 'json-ld-product-enhanced' %}
     {% render 'json-ld-product-faq' %}
@@ -54,11 +59,21 @@
     {% render 'json-ld-video' %}
     {% render 'aria-product' %}
   {%- endif -%}
+
+  {%- comment -%} JSON-LD — Collection Pages {%- endcomment -%}
+  {%- if template.name == 'collection' -%}
+    {% render 'json-ld-collection' %}
+  {%- endif -%}
+
+  {%- comment -%} JSON-LD — Article Pages {%- endcomment -%}
   {%- if template.name == 'article' -%}
     {% render 'json-ld-article' %}
   {%- endif -%}
+
+  {%- comment -%} JSON-LD — Homepage {%- endcomment -%}
   {%- if template == 'index' -%}
     {% render 'json-ld-defined-term' %}
+    {% render 'json-ld-homepage-itemlist' %}
     {% render 'json-ld-video' %}
   {%- endif -%}
 

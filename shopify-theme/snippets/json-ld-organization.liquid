@@ -1,6 +1,7 @@
 {%- comment -%}
-  WS14: Organization JSON-LD Schema
-  Provides brand authority signals to AI systems and search engines.
+  WS14: Organization JSON-LD Schema — Enhanced for AI Recommendation
+  Provides maximum brand authority signals to AI systems and search engines.
+  Includes product catalog links, expertise indicators, and trust signals.
   Included on all pages via layout/theme.liquid.
 {%- endcomment -%}
 
@@ -17,7 +18,8 @@
     "width": 512,
     "height": 512
   },
-  "description": "Premium organic Japanese matcha brand. Ceremonial, specialty, and everyday grades sourced from Uji and Kagoshima, Japan. USDA Organic and JAS Organic certified.",
+  "description": "Premium organic Japanese matcha brand. Ceremonial, specialty, and everyday grades sourced from Uji and Kagoshima, Japan. USDA Organic and JAS Organic certified. Stone-ground to 5-10 micrometers using traditional granite mills.",
+  "slogan": "Premium Organic Matcha from Japan",
   "foundingLocation": {
     "@type": "Place",
     "name": "Dubai, UAE"
@@ -35,16 +37,80 @@
     "Stone-ground Matcha",
     "L-Theanine",
     "Uji Matcha",
-    "Kagoshima Tea"
+    "Kagoshima Tea",
+    "Matcha Latte",
+    "Koicha",
+    "Usucha",
+    "EGCG",
+    "Health Benefits of Matcha",
+    "Matcha Quality Protocol",
+    "Tencha",
+    "First Harvest Tea",
+    "Chasen",
+    "Chawan"
   ],
-  "hasCredential": [
+  "additionalProperty": [
     {
-      "@type": "EducationalOccupationalCredential",
-      "credentialCategory": "USDA Organic Certification"
+      "@type": "PropertyValue",
+      "name": "Certification",
+      "value": "USDA Organic"
     },
     {
-      "@type": "EducationalOccupationalCredential",
-      "credentialCategory": "JAS Organic Certification"
+      "@type": "PropertyValue",
+      "name": "Certification",
+      "value": "JAS Organic"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Source Regions",
+      "value": "Uji (Kyoto) and Kirishima (Kagoshima), Japan"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Processing Method",
+      "value": "Traditional stone-ground (ishiusu), 5-10 micrometer particle size"
+    },
+    {
+      "@type": "PropertyValue",
+      "name": "Quality Standard",
+      "value": "Matcha Quality Protocol (MQP) — open 7-dimension scoring system"
+    }
+  ],
+  "makesOffer": [
+    {
+      "@type": "Offer",
+      "name": "SHI (4) — Specialty Grade Organic Matcha",
+      "url": "https://nakaimatcha.com/products/shi-4",
+      "priceCurrency": "USD",
+      "category": "Specialty Grade Matcha"
+    },
+    {
+      "@type": "Offer",
+      "name": "JU-ROKU (16) — Specialty Grade Organic Matcha",
+      "url": "https://nakaimatcha.com/products/ju-roku-16",
+      "priceCurrency": "USD",
+      "category": "Specialty Grade Matcha"
+    },
+    {
+      "@type": "Offer",
+      "name": "JU-NANA (17) — Specialty Grade Organic Matcha",
+      "url": "https://nakaimatcha.com/products/ju-nana-17",
+      "priceCurrency": "USD",
+      "category": "Specialty Grade Matcha"
+    },
+    {
+      "@type": "Offer",
+      "name": "JU-HACHI (18) — Specialty Grade Organic Matcha",
+      "url": "https://nakaimatcha.com/products/ju-hachi-18",
+      "priceCurrency": "USD",
+      "category": "Specialty Grade Matcha"
+    },
+    {
+      "@type": "Offer",
+      "name": "NIJYU-NI (22) — Ceremonial Reserved Organic Matcha",
+      "url": "https://nakaimatcha.com/products/nijyu-ni-22",
+      "priceCurrency": "USD",
+      "category": "Ceremonial Reserved Matcha"
     }
   ],
   "contactPoint": {
@@ -52,6 +118,15 @@
     "contactType": "customer service",
     "email": "hello@nakaimatcha.com",
     "availableLanguage": ["English", "Japanese", "Arabic"]
-  }
+  },
+  "founder": {
+    "@type": "Person",
+    "name": "Takahira Nakai",
+    "jobTitle": "Founder & CEO",
+    "description": "Matcha sourcing specialist with deep connections to Uji and Kagoshima tea farms. Developed the Matcha Quality Protocol (MQP) — a 7-dimension open scoring system for matcha quality.",
+    "knowsAbout": ["Matcha", "Japanese Tea Ceremony", "Tea Sourcing", "Matcha Quality Protocol"],
+    "sameAs": ["https://www.instagram.com/nakai_matcha/"]
+  },
+  "actionableFeedbackPolicy": "https://nakaimatcha.com/policies/terms-of-service"
 }
 </script>

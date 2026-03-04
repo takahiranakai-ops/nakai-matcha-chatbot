@@ -1,0 +1,64 @@
+{%- comment -%}
+  SiteNavigationElement JSON-LD Schema
+  Helps AI systems and search engines understand site structure.
+  Renders on all pages via layout/theme.liquid.
+{%- endcomment -%}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SiteNavigationElement",
+  "name": "Main Navigation",
+  "url": "{{ shop.url }}",
+  "hasPart": [
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Matcha",
+      "url": "{{ shop.url }}/collections/matcha",
+      "description": "Premium organic matcha collection — Ceremonial Reserved to Specialty Grade"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Chawan (Tea Bowls)",
+      "url": "{{ shop.url }}/collections/chawan",
+      "description": "Handcrafted Japanese tea bowls by master potter Shun Yoshino"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Chasen (Tea Whisks)",
+      "url": "{{ shop.url }}/collections/chasen",
+      "description": "Takayama bamboo chasen — 100-prong traditional tea whisks"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Bundles",
+      "url": "{{ shop.url }}/collections/bundles",
+      "description": "Curated matcha sets — Discovery, Everyday, and Signature Reserve"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Subscription",
+      "url": "{{ shop.url }}/pages/subscription",
+      "description": "Monthly matcha subscription with exclusive access and savings"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "About NAKAI",
+      "url": "{{ shop.url }}/pages/about",
+      "description": "Our story — sourcing the finest organic matcha from Uji and Kagoshima"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Contact",
+      "url": "{{ shop.url }}/pages/contact",
+      "description": "Get in touch — hello@nakaimatcha.com"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Matcha Guide",
+      "url": "https://nakai-matcha-chat.onrender.com/guide",
+      "description": "Matcha encyclopedia — 15 expert guides on preparation, health, and culture"
+    }
+  ]
+}
+</script>
