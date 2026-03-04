@@ -479,7 +479,7 @@ _MQP_PROFILES = {
 )
 async def mqp_spec():
     return JSONResponse(
-        content=_MQP_SPEC,
+        content={**_MQP_SPEC, "products": _MQP_PROFILES},
         headers={"Cache-Control": "public, max-age=86400"},
     )
 

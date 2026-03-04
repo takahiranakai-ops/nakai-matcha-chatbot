@@ -81,7 +81,7 @@ app = FastAPI(
         "- `POST /api/matcha/taste-profile` — Matcha DNA taste fingerprinting\n"
         "- `POST /api/matcha/discover` — Contextual matcha discovery\n"
         "- `GET /api/products/{handle}/live` — Living product intelligence\n"
-        "- `GET /guide` — Matcha Encyclopedia (10 SEO-optimized HTML guides)\n"
+        "- `GET /guide` — Matcha Encyclopedia (15 SEO-optimized HTML guides)\n"
         "- `GET /guide/sitemap.xml` — Encyclopedia sitemap\n"
     ),
     contact={"name": "NAKAI", "email": "info@s-natural.xyz", "url": "https://nakaimatcha.com"},

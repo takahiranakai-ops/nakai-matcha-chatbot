@@ -1533,9 +1533,51 @@ async def robots_txt():
             "User-agent: Bingbot\nAllow: /\n\n"
             "User-agent: Applebot\nAllow: /\n\n"
             f"Sitemap: {_STORE}/sitemap.xml\n"
+            f"Sitemap: {_BASE}/sitemap.xml\n"
             f"Sitemap: {_BASE}/guide/sitemap.xml\n"
         ),
         media_type="text/plain",
+    )
+
+
+@ai_router.get(
+    "/sitemap.xml",
+    summary="Root sitemap index for all NAKAI content",
+    tags=["AI Discovery"],
+)
+async def root_sitemap():
+    """Sitemap index combining guide pages, API endpoints, and app pages."""
+    from fastapi.responses import Response
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    urls = ""
+    # Core pages
+    for path, prio in [
+        ("/", "1.0"), ("/guide", "1.0"), ("/app", "0.8"),
+        ("/llms.txt", "0.9"), ("/llms-full.txt", "0.9"),
+        ("/.well-known/ai-plugin.json", "0.8"),
+    ]:
+        urls += f'  <url><loc>{_BASE}{path}</loc><lastmod>{now}</lastmod><priority>{prio}</priority></url>\n'
+    # Guide pages
+    from api.matcha_guide import _PAGES
+    for slug in _PAGES:
+        urls += f'  <url><loc>{_BASE}/guide/{slug}</loc><lastmod>{now}</lastmod><priority>0.9</priority></url>\n'
+    # API endpoints
+    for path in [
+        "/api/matcha", "/api/matcha/knowledge", "/api/matcha/mqp",
+        "/api/matcha/taste-profile", "/api/matcha/discover",
+        "/api/products/catalog", "/api/products/feed",
+        "/api/products/google-feed.xml",
+        "/api/faq", "/api/oracle/ask",
+        "/api/mcp/tools", "/api/mcp/resources",
+        "/openapi.json",
+    ]:
+        urls += f'  <url><loc>{_BASE}{path}</loc><lastmod>{now}</lastmod><priority>0.7</priority></url>\n'
+    return Response(
+        content=f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{urls}</urlset>""",
+        media_type="application/xml",
+        headers={"Cache-Control": "public, max-age=86400"},
     )
 
 
