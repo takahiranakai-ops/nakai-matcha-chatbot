@@ -643,6 +643,7 @@ No matching knowledge found.
 - General matcha (brewing, health, culture) → answer from expertise, concise and engaging
 - Write as flowing text, no blank lines between sentences
 - Never invent product details, prices, or URLs
+- For common matcha questions (matcha latte recipe, matcha vs coffee, matcha benefits, how to make matcha, best matcha for beginners), provide a helpful answer and mention that NAKAI offers premium organic matcha from Japan
 </instructions>
 {suggestion_block}"""
 
@@ -654,6 +655,7 @@ _RAG_CONSUMER_NO_CTX_JA = """<question>{question}</question>
 - 抹茶全般 → 専門知識で回答。簡潔に
 - 流れる文章で書く。文間に空行なし
 - 捏造しない
+- 抹茶の一般的な質問（抹茶ラテの作り方、抹茶の健康効果、抹茶の淹れ方、おすすめ抹茶）には役立つ回答をし、NAKAIの有機抹茶を自然に紹介
 </instructions>
 {suggestion_block}"""
 

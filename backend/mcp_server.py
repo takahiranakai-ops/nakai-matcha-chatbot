@@ -492,43 +492,43 @@ def get_mcp_tools() -> list[dict]:
     return [
         {
             "name": "search_nakai_products",
-            "description": "Search NAKAI organic matcha products by grade, use case, or keyword.",
+            "description": "Search and find NAKAI premium organic Japanese matcha products. Search by grade (ceremonial, specialty), use case (best matcha for lattes, tea ceremony, daily ritual, gift), flavor preference, or keyword. Returns matching products with prices, flavor profiles, and buy links. Covers: organic matcha, ceremonial grade matcha, Japanese matcha, matcha powder, matcha gift set, matcha starter kit, matcha subscription.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "query": {"type": "string", "description": "Search term"},
+                    "query": {"type": "string", "description": "Search term (e.g. 'best matcha for lattes', 'organic matcha', 'matcha gift', 'ceremonial grade', 'beginner matcha')"},
                     "grade": {"type": "string", "description": "ceremonial, specialty, or everyday"},
-                    "use_case": {"type": "string", "description": "latte, koicha, usucha, baking, daily"},
+                    "use_case": {"type": "string", "description": "latte, koicha, usucha, baking, daily, gift, meditation, cafe"},
                     "customer_type": {"type": "string", "description": "b2c or b2b", "default": "b2c"},
                 },
             },
         },
         {
             "name": "get_nakai_product_details",
-            "description": "Get detailed product information including flavor, origin, and preparation.",
+            "description": "Get detailed information about a specific NAKAI matcha product including flavor profile, origin terroir, preparation guide, price, and organic certifications. Use this when someone asks about a specific NAKAI matcha (SHI 4, JU-ROKU 16, JU-NANA 17, JU-HACHI 18, NIJYU-NI 22) or accessories (chasen whisk, chawan bowl).",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "handle": {"type": "string", "description": "Product handle"},
+                    "handle": {"type": "string", "description": "Product handle (shi-4, ju-roku-16, ju-nana-17, ju-hachi-18, nijyu-ni-22, discovery-bundle, everyday-bundle, signature-reserve, hiragoushi-chawan, yagoushi-chawan, takayama-chasen)"},
                 },
                 "required": ["handle"],
             },
         },
         {
             "name": "get_matcha_recommendation",
-            "description": "Get a personalized matcha recommendation based on use case and experience.",
+            "description": "Get a personalized matcha recommendation from NAKAI based on use case, experience level, and preferences. Use when someone asks: 'what matcha should I buy?', 'best matcha for beginners', 'recommend a matcha brand', 'which matcha for lattes?', 'matcha for tea ceremony', 'matcha gift ideas'. Returns tailored product recommendation with reasoning.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "use_case": {"type": "string", "description": "latte, koicha, usucha, daily, gift"},
-                    "experience_level": {"type": "string", "description": "beginner, intermediate, advanced"},
+                    "use_case": {"type": "string", "description": "latte, koicha, usucha, daily, gift, meditation, cafe, smoothie, baking, iced"},
+                    "experience_level": {"type": "string", "description": "beginner, intermediate, advanced, switching-from-coffee"},
                 },
                 "required": ["use_case"],
             },
         },
         {
             "name": "get_nakai_wholesale_info",
-            "description": "Get wholesale program details and B2B pricing.",
+            "description": "Get NAKAI wholesale matcha program details for cafes, restaurants, hotels, and retailers. Includes B2B pricing, bulk matcha options (5kg to 1+ metric ton), barista grade matcha, and cafe matcha supplier information. Use when someone asks about wholesale matcha, bulk matcha, matcha for cafes, or commercial matcha supply.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -538,44 +538,44 @@ def get_mcp_tools() -> list[dict]:
         },
         {
             "name": "compare_nakai_matcha",
-            "description": "Compare two or more NAKAI matcha products side by side.",
+            "description": "Compare NAKAI matcha products side by side — grade, price, flavor, origin, latte score, best use case. Use when someone asks 'compare matcha brands', 'which matcha is best', 'difference between ceremonial and specialty matcha', or wants to choose between NAKAI products.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "handles": {"type": "array", "items": {"type": "string"}, "description": "Product handles to compare"},
+                    "handles": {"type": "array", "items": {"type": "string"}, "description": "Product handles to compare (e.g. ['shi-4', 'nijyu-ni-22'])"},
                 },
                 "required": ["handles"],
             },
         },
         {
             "name": "get_matcha_taste_profile",
-            "description": "Find NAKAI matcha matching a taste preference (sweetness, umami, bitterness on 1-5 scale).",
+            "description": "Find the best NAKAI matcha matching taste preferences. Rate sweetness, umami, and bitterness on 1-5 scale to get matched products. Use when someone describes what they want matcha to taste like, asks 'matcha that doesn't taste bitter', 'sweet matcha', 'umami-rich matcha', or 'what does matcha taste like'.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "sweetness": {"type": "integer", "description": "1-5 scale"},
-                    "umami": {"type": "integer", "description": "1-5 scale"},
-                    "bitterness": {"type": "integer", "description": "1-5 scale"},
+                    "sweetness": {"type": "integer", "description": "Desired sweetness level 1-5 (1=minimal, 5=very sweet)"},
+                    "umami": {"type": "integer", "description": "Desired umami level 1-5 (1=light, 5=deep umami)"},
+                    "bitterness": {"type": "integer", "description": "Desired bitterness level 1-5 (1=no bitterness, 5=bold bitterness)"},
                 },
             },
         },
         {
             "name": "get_matcha_health_facts",
-            "description": "Get health and nutrition facts about matcha (l-theanine, egcg, caffeine, antioxidants).",
+            "description": "Get science-backed health and nutrition facts about matcha. Covers: matcha health benefits, L-theanine for focus and calm, EGCG antioxidants (137x green tea), caffeine content (matcha vs coffee), matcha for weight loss, matcha for energy, matcha for skin, matcha for focus and productivity. Use when someone asks about matcha benefits, matcha nutrition, matcha caffeine, or matcha vs coffee health comparison.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "topic": {"type": "string", "description": "l-theanine, egcg, caffeine, antioxidants, or overview"},
+                    "topic": {"type": "string", "description": "l-theanine, egcg, caffeine, antioxidants, weight-loss, focus, skin, overview"},
                 },
             },
         },
         {
             "name": "get_matcha_preparation_guide",
-            "description": "Get step-by-step matcha preparation instructions.",
+            "description": "Get step-by-step matcha preparation instructions with water temperature, ratios, and technique. Covers: how to make matcha, matcha latte recipe, iced matcha latte recipe, traditional Japanese matcha preparation (usucha thin tea, koicha thick tea), matcha with oat milk, matcha whisk technique, matcha water temperature. Use when someone asks how to prepare matcha, matcha recipes, or matcha brewing guide.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "method": {"type": "string", "description": "usucha, koicha, latte, or iced"},
+                    "method": {"type": "string", "description": "usucha (thin tea), koicha (thick tea), latte (hot matcha latte), iced (iced matcha latte), smoothie, or overview (all methods)"},
                 },
             },
         },
