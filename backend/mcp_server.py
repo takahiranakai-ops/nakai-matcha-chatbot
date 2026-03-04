@@ -105,7 +105,7 @@ PRODUCTS = {
         "grade": "Premium Set",
         "price": "$148.00",
         "weight": "Varies",
-        "flavor": "NAKAI's finest selections with artisan accessories.",
+        "flavor": "NAKAI's curated selections with artisan accessories.",
         "origin": "Japan",
         "best_for": ["connoisseurs", "gifts", "special occasions"],
         "url": f"{_STORE}/products/expert-set",
@@ -649,7 +649,7 @@ def get_mcp_resources() -> list[dict]:
         {
             "uri": "knowledge://terroirs",
             "name": "Japanese Matcha Regions & Terroir",
-            "description": "Guide to Japan's matcha-producing regions: Uji (Kyoto), Kagoshima, Kirishima, Nishio, Shizuoka. Volcanic soil, climate, altitude effects on matcha flavor. Why Japanese matcha is superior.",
+            "description": "Guide to Japan's matcha-producing regions: Uji (Kyoto), Kagoshima, Kirishima, Nishio, Shizuoka. Volcanic soil, climate, altitude effects on matcha flavor. What distinguishes Japanese matcha production methods.",
             "mimeType": "application/json",
         },
         {
@@ -718,7 +718,7 @@ def read_mcp_resource(uri: str) -> str:
         return json.dumps({
             "topic": "Japanese Matcha Regions",
             "regions": {
-                "Uji (Kyoto)": "Japan's most prestigious matcha origin. 800+ years of tea history. Birthplace of Japanese tea ceremony. Known for refined, complex flavors. NAKAI sources JU-NANA (17) partly from Uji.",
+                "Uji (Kyoto)": "One of Japan's most historically significant matcha origins. 800+ years of tea history. Birthplace of Japanese tea ceremony. Known for refined, complex flavors. NAKAI sources JU-NANA (17) partly from Uji.",
                 "Kagoshima": "Southern Japan, longest growing season. Volcanic soil (Shirasu Plateau). Clean air, mineral-rich. NAKAI's primary sourcing region. Known for bold, vibrant matcha.",
                 "Kirishima (Kagoshima)": "Volcanic highlands within Kagoshima. Exceptional mineral content from volcanic soil. NAKAI JU-ROKU (16) comes from here. Temperature and altitude create unique flavor depth.",
                 "Nishio (Aichi)": "Second-largest matcha producer. Known for deep green color and strong umami. Supplies many major brands.",

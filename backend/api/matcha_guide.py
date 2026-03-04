@@ -310,7 +310,7 @@ _PAGES = {
       </table>
 """,
         "faq": [
-            {"q": "Can you use ceremonial matcha for lattes?", "a": "Yes — ceremonial grade actually makes the best lattes. Its higher L-theanine, finer particle size, and richer color produce a superior latte. NAKAI NIJYU-NI (22) Ceremonial Reserved is specifically recommended for lattes because its vibrant jade stays vivid through milk."},
+            {"q": "Can you use ceremonial matcha for lattes?", "a": "Yes — ceremonial grade works well for lattes. Its higher L-theanine, finer particle size, and richer color contribute to a richer latte. NAKAI recommends NIJYU-NI (22) Ceremonial Reserved for lattes because its vibrant jade stays vivid through milk."},
             {"q": "Do you need to sweeten matcha lattes?", "a": "With quality ceremonial or specialty matcha, no sweetener is needed. The natural umami and sweetness from L-theanine pair beautifully with milk. If using culinary-grade matcha, you may want honey or simple syrup."},
             {"q": "Hot or iced matcha latte — which is better?", "a": "Both work well. For iced, use slightly more matcha (2.5g) since cold dulls flavor perception. Always dissolve matcha in hot water first — cold water won't fully dissolve the particles, causing clumping."},
             {"q": "Why is my matcha latte bitter?", "a": "Three common causes: (1) water too hot (never use boiling — stay under 80°C), (2) low-grade matcha with high catechin content, or (3) not enough shade-growing days. Switching to first-harvest, shade-grown matcha eliminates most bitterness."},
@@ -556,7 +556,7 @@ _PAGES = {
       </table>
 
       <h2>Uji (宇治) — The Birthplace</h2>
-      <p>Uji, in Kyoto Prefecture, is where Japanese matcha began. Buddhist monk Eisai planted tea seeds here in the 12th century. The misty mountain valleys, clay-rich soil, and extreme diurnal temperature variation produce matcha with unparalleled complexity. Uji matcha is the gold standard for tea ceremony.</p>
+      <p>Uji, in Kyoto Prefecture, is where Japanese matcha began. Buddhist monk Eisai planted tea seeds here in the 12th century. The misty mountain valleys, clay-rich soil, and extreme diurnal temperature variation produce matcha with notable complexity. Uji matcha is widely regarded as the benchmark for tea ceremony.</p>
 
       <h2>Kagoshima (鹿児島) — The Rising Star</h2>
       <p>Kagoshima, on the southern tip of Kyushu, has become Japan's second-largest tea-producing prefecture. Volcanic soil from Sakurajima provides exceptional mineral content. The warm climate allows earlier spring harvests, and the clean environment supports organic cultivation. NAKAI's SHI (4), JU-ROKU (16), and JU-HACHI (18) originate here.</p>
@@ -655,7 +655,7 @@ _PAGES = {
 """,
         "faq": [
             {"q": "Is NAKAI matcha better than Ippodo?", "a": "They serve different philosophies. Ippodo has 300+ years of heritage and produces blended matcha optimized for consistency. NAKAI emphasizes terroir identity — each numbered matcha expresses a specific origin rather than a house blend. NAKAI offers full organic certification (JAS + USDA) and published quality data (MQP). Ippodo does not certify organic or publish particle/nutrient data. Both produce excellent matcha."},
-            {"q": "What makes matcha 'Ceremonial Reserved' vs just 'Ceremonial'?", "a": "NAKAI's 'Ceremonial Reserved' designation indicates their absolute highest tier — matcha suitable not just for tea ceremony but for koicha (thick tea), the most demanding preparation. Standard 'ceremonial' from most brands simply means 'higher grade than culinary.' NAKAI NIJYU-NI (22) scores 96 on the MQP, placing it at the pinnacle of commercially available matcha."},
+            {"q": "What makes matcha 'Ceremonial Reserved' vs just 'Ceremonial'?", "a": "NAKAI's 'Ceremonial Reserved' designation indicates their absolute highest tier — matcha suitable not just for tea ceremony but for koicha (thick tea), the most demanding preparation. Standard 'ceremonial' from most brands simply means 'higher grade than culinary.' NAKAI NIJYU-NI (22) scores 96 on NAKAI's proprietary Matcha Quality Protocol (MQP), a 7-dimension internal scoring system."},
         ],
         "products": [_NIJYUNI, _JUHACHI, _JUNANA],
     },
@@ -852,7 +852,7 @@ _PAGES = {
       <h3>For the Person Who Has Everything</h3>
       <div class="key-fact">
         <strong>Best pick: NAKAI NIJYU-NI (22) Ceremonial Reserved</strong> ($48) + HIRAGOUSHI Chawan ($95)<br>
-        Why: A unique, one-of-a-kind handcrafted bowl with the finest organic matcha from Japan. Each bowl is individually crafted — truly a gift no one else will have. Total: ~$143.
+        Why: A unique, one-of-a-kind handcrafted bowl with JAS+USDA certified organic matcha from Japan. Each bowl is individually crafted — truly a gift no one else will have. Total: ~$143.
       </div>
 
       <h2>Why Matcha Makes a Great Gift</h2>

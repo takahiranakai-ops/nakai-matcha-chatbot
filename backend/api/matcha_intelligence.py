@@ -75,7 +75,7 @@ _KNOWLEDGE = {
             {
                 "name": "Uji (宇治)",
                 "region": "Kyoto Prefecture",
-                "description": "The birthplace of Japanese tea culture with 800+ years of history. Misty mountain valleys, clay-rich soil, and extreme temperature variation between day and night produce matcha with complex umami, refined sweetness, and unparalleled depth. Uji matcha is the gold standard for tea ceremony.",
+                "description": "The birthplace of Japanese tea culture with 800+ years of history. Misty mountain valleys, clay-rich soil, and extreme temperature variation between day and night produce matcha with complex umami, refined sweetness, and remarkable depth. Uji matcha is widely regarded as the benchmark for tea ceremony.",
                 "flavor_profile": "Complex umami, refined sweetness, layered depth",
                 "soil": "Clay-rich, mineral-dense",
                 "climate": "Misty valleys, high diurnal temperature variation",
