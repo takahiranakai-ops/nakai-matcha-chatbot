@@ -1,22 +1,67 @@
 {%- comment -%}
   WS15: VideoObject JSON-LD Schema
   Enables rich video snippets in Google/AI search results.
-  Covers: homepage brand video + product preparation guides.
+
+  IMPORTANT: Only enable a VideoObject when the actual video file exists.
+  Google requires contentUrl or embedUrl — without them the schema is invalid
+  and may trigger Search Console warnings.
 
   Usage: {% render 'json-ld-video' %} in theme.liquid
+  To activate: set a video metafield on the product, or uncomment with real URLs.
 {%- endcomment -%}
 
-{%- comment -%} Homepage — Brand / Hero Video {%- endcomment -%}
-{%- if template == 'index' -%}
+{%- comment -%}
+  Homepage — Brand / Hero Video
+  Uncomment the block below when you have a real brand video uploaded.
+  Replace BOTH contentUrl AND embedUrl with actual video URLs.
+
+  {%- if template == 'index' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": "NAKAI — Premium Organic Matcha from Japan",
+    "description": "Discover NAKAI's premium organic matcha, sourced from Uji and Kagoshima, Japan. Stone-ground to 5-10 micrometers for the smoothest ceremonial experience. USDA Organic and JAS certified.",
+    "thumbnailUrl": "https://nakaimatcha.com/cdn/shop/files/nakai-matcha-hero.jpg",
+    "contentUrl": "https://nakaimatcha.com/cdn/shop/videos/nakai-hero.mp4",
+    "uploadDate": "2025-01-01",
+    "duration": "PT1M30S",
+    "publisher": {
+      "@type": "Organization",
+      "name": "NAKAI",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://nakaimatcha.com/cdn/shop/files/nakai-logo.png",
+        "width": 200,
+        "height": 60
+      }
+    },
+    "potentialAction": {
+      "@type": "WatchAction",
+      "target": "https://nakaimatcha.com/"
+    }
+  }
+  </script>
+  {%- endif -%}
+{%- endcomment -%}
+
+{%- comment -%}
+  Product Pages — Preparation Guide Videos
+  Activate per-product when video metafield (product.metafields.custom.video_url) is set,
+  or uncomment the block below with hardcoded URLs when videos are produced.
+{%- endcomment -%}
+
+{%- if template.name == 'product' and product and product.metafields.custom.video_url != blank -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "VideoObject",
-  "name": "NAKAI — Premium Organic Matcha from Japan",
-  "description": "Discover NAKAI's premium organic matcha, sourced from Uji and Kagoshima, Japan. Stone-ground to 5-10 micrometers for the smoothest ceremonial experience. USDA Organic and JAS certified.",
-  "thumbnailUrl": "https://nakaimatcha.com/cdn/shop/files/nakai-matcha-hero.jpg",
-  "uploadDate": "2025-01-01",
-  "duration": "PT1M30S",
+  "name": "How to Prepare {{ product.title | escape }}",
+  "description": "Step-by-step guide to preparing {{ product.title | escape }}. Brewing tips for usucha, koicha, and matcha latte.",
+  "thumbnailUrl": "{{ product.featured_image | image_url: width: 1200 }}",
+  "contentUrl": "{{ product.metafields.custom.video_url }}",
+  "uploadDate": "{{ product.published_at | date: '%Y-%m-%d' }}",
+  "duration": "{{ product.metafields.custom.video_duration | default: 'PT2M' }}",
   "publisher": {
     "@type": "Organization",
     "name": "NAKAI",
@@ -27,66 +72,11 @@
       "height": 60
     }
   },
-  "potentialAction": {
-    "@type": "WatchAction",
-    "target": "https://nakaimatcha.com/"
+  "about": {
+    "@type": "Product",
+    "name": "{{ product.title | escape }}",
+    "brand": { "@type": "Brand", "name": "NAKAI" }
   }
 }
-</script>
-{%- endif -%}
-
-{%- comment -%} Product Pages — Preparation Guide Videos {%- endcomment -%}
-{%- if template.name == 'product' and product -%}
-<script type="application/ld+json">
-[
-  {
-    "@context": "https://schema.org",
-    "@type": "VideoObject",
-    "name": "How to Prepare {{ product.title | escape }} — Usucha (Thin Tea)",
-    "description": "Step-by-step guide to preparing {{ product.title | escape }} as usucha (thin tea). Sift 2g of matcha, add 70ml of 80°C water, and whisk in a W-motion for 15-20 seconds until a fine crema forms. Perfect for daily drinking.",
-    "thumbnailUrl": "{{ product.featured_image | image_url: width: 1200 }}",
-    "uploadDate": "{{ product.published_at | date: '%Y-%m-%d' }}",
-    "duration": "PT2M",
-    "publisher": {
-      "@type": "Organization",
-      "name": "NAKAI",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://nakaimatcha.com/cdn/shop/files/nakai-logo.png",
-        "width": 200,
-        "height": 60
-      }
-    },
-    "about": {
-      "@type": "Product",
-      "name": "{{ product.title | escape }}",
-      "brand": { "@type": "Brand", "name": "NAKAI" }
-    }
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "VideoObject",
-    "name": "How to Make a Matcha Latte with {{ product.title | escape }}",
-    "description": "Prepare a creamy matcha latte using {{ product.title | escape }}. Whisk 2g of matcha with 30ml hot water to create a concentrated shot, then pour over 200ml steamed milk. Works with oat, almond, or dairy milk.",
-    "thumbnailUrl": "{{ product.featured_image | image_url: width: 1200 }}",
-    "uploadDate": "{{ product.published_at | date: '%Y-%m-%d' }}",
-    "duration": "PT3M",
-    "publisher": {
-      "@type": "Organization",
-      "name": "NAKAI",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://nakaimatcha.com/cdn/shop/files/nakai-logo.png",
-        "width": 200,
-        "height": 60
-      }
-    },
-    "about": {
-      "@type": "Product",
-      "name": "{{ product.title | escape }}",
-      "brand": { "@type": "Brand", "name": "NAKAI" }
-    }
-  }
-]
 </script>
 {%- endif -%}

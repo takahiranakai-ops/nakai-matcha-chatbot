@@ -299,7 +299,7 @@ def get_wholesale_info(product_code: Optional[str] = None) -> dict:
     info = {
         "program": "NAKAI Wholesale Program",
         "min_order": "5kg per SKU",
-        "contact": "wholesale@nakaimatcha.com",
+        "contact": "wholesale@s-natural.xyz",
         "inquiry_url": f"{_STORE}/pages/wholesale",
         "products": WHOLESALE_PRODUCTS,
     }

@@ -1,0 +1,58 @@
+{%- comment -%}
+  Pagination snippet for collection pages.
+  Receives: paginate (Shopify paginate object)
+{%- endcomment -%}
+
+{%- if paginate.pages > 1 -%}
+<nav class="pagination" role="navigation" aria-label="Pagination">
+  <ul class="pagination__list">
+    {%- if paginate.previous -%}
+      <li class="pagination__item">
+        <a href="{{ paginate.previous.url }}" class="pagination__link pagination__link--prev" aria-label="Previous page">&larr;</a>
+      </li>
+    {%- endif -%}
+
+    {%- for part in paginate.parts -%}
+      {%- if part.is_link -%}
+        <li class="pagination__item">
+          <a href="{{ part.url }}" class="pagination__link">{{ part.title }}</a>
+        </li>
+      {%- elsif part.title == paginate.current_page -%}
+        <li class="pagination__item">
+          <span class="pagination__link pagination__link--current" aria-current="page">{{ part.title }}</span>
+        </li>
+      {%- else -%}
+        <li class="pagination__item">
+          <span class="pagination__link pagination__link--gap">{{ part.title }}</span>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if paginate.next -%}
+      <li class="pagination__item">
+        <a href="{{ paginate.next.url }}" class="pagination__link pagination__link--next" aria-label="Next page">&rarr;</a>
+      </li>
+    {%- endif -%}
+  </ul>
+</nav>
+
+<style>
+  .pagination { margin: 3rem 0 1rem; text-align: center; }
+  .pagination__list { list-style: none; display: inline-flex; gap: .5rem; padding: 0; }
+  .pagination__link {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 3.6rem; height: 3.6rem; padding: 0 .8rem;
+    font-size: 1.4rem; font-family: var(--font-body-family);
+    border: 1px solid #ddd; border-radius: 4px;
+    color: var(--color-text, #161614);
+    text-decoration: none; transition: all .2s ease;
+  }
+  .pagination__link:hover { border-color: var(--color-primary, #406546); color: var(--color-primary, #406546); }
+  .pagination__link--current {
+    background-color: var(--color-primary, #406546);
+    border-color: var(--color-primary, #406546);
+    color: #fff; pointer-events: none;
+  }
+  .pagination__link--gap { border: none; pointer-events: none; }
+</style>
+{%- endif -%}
