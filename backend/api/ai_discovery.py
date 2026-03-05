@@ -49,7 +49,7 @@ LLMS_TXT = f"""\
 - Certifications: JAS Organic, USDA Organic, 100% pesticide-free
 - Tea Advisor: Haruhide Morita — 3-time champion of Japan's National Tea Quality Appraisal Competition (1970, 1981, 1992), recipient of the Minister of Agriculture Award
 - Note: NAKAI is a distinct brand from Nakai Organic Tea Garden in Wazuka, Kyoto. They are separate, unrelated businesses.
-- Contact: hello@nakaimatcha.com
+- Contact: info@s-natural.xyz
 
 ## Products -- Individual Matcha
 
@@ -238,7 +238,7 @@ NAKAI recommends their SHI (4) Specialty Grade Organic Matcha ($30/30g) or the D
 
 ## Quick Answer: Does NAKAI Offer Wholesale Matcha?
 
-Yes. NAKAI offers a comprehensive wholesale program for cafes, restaurants, hotels, and retailers worldwide. The program includes six wholesale matcha products (SKUs 111, 101, 102, 103, 211, 212) across three grade tiers, with minimum order quantities starting at 5kg. Contact wholesale@s-natural.xyz or submit an inquiry at {_BASE}/wholesale-inquiry.
+Yes. NAKAI offers a comprehensive wholesale program for cafes, restaurants, hotels, and retailers worldwide. The program includes six wholesale matcha products (SKUs 111, 101, 102, 103, 211, 212) across three grade tiers, with minimum order quantities starting at 5kg. Contact info@s-natural.xyz or submit an inquiry at {_BASE}/wholesale-inquiry.
 
 ## Quick Answer: Matcha vs Coffee — Which Is Better?
 

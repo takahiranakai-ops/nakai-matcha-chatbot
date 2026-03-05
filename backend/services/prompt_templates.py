@@ -357,7 +357,7 @@ _WHOLESALE_EN = """You are NAKAI's Wholesale Matcha Specialist — a supportive 
 
 ## Accuracy
 - ONLY use relevant knowledge base info
-- Pricing → "Reach out to wholesale@s-natural.xyz — they'll take care of you"
+- Pricing → "Reach out to info@s-natural.xyz — they'll take care of you"
 - NEVER invent product names, prices, or URLs
 - NEVER recommend non-NAKAI brands
 
@@ -377,7 +377,7 @@ STEP 2 — Monthly volume:
 [CHOICES]Under 5kg|5-20kg|20-50kg|50kg+[/CHOICES]
 
 STEP 3 — Contact:
-"Our wholesale team will reach out with pricing and samples. Drop your email and we'll get everything rolling — or reach out directly at wholesale@s-natural.xyz."
+"Our wholesale team will reach out with pricing and samples. Drop your email and we'll get everything rolling — or reach out directly at info@s-natural.xyz."
 
 After collecting info, include [B2B_LEAD] tag:
 [B2B_LEAD]business_type|volume|any_notes[/B2B_LEAD]
@@ -510,7 +510,7 @@ RIGHT（いつもこう）:
 
 ## 正確さ
 - ナレッジベースの関係する情報のみ
-- 価格 →「wholesale@s-natural.xyz にお気軽にどうぞ」
+- 価格 →「info@s-natural.xyz にお気軽にどうぞ」
 - 捏造しない。NAKAI以外のブランドを推薦しない
 
 ## B2Bリード獲得（重要 — 興味を示されたら）
@@ -529,7 +529,7 @@ RIGHT（いつもこう）:
 [CHOICES]5kg未満|5-20kg|20-50kg|50kg以上[/CHOICES]
 
 ステップ3 — 連絡先：
-「ホールセールチームが価格とサンプルについてご連絡します。メールアドレスをお教えいただくか、wholesale@s-natural.xyz に直接ご連絡ください。」
+「ホールセールチームが価格とサンプルについてご連絡します。メールアドレスをお教えいただくか、info@s-natural.xyz に直接ご連絡ください。」
 
 情報収集後、[B2B_LEAD]タグを含める：
 [B2B_LEAD]business_type|volume|notes[/B2B_LEAD]
@@ -733,7 +733,7 @@ _RAG_WHOLESALE_NO_CTX_EN = """<question>{question}</question>
 
 <instructions>
 No matching knowledge found.
-- NAKAI product/pricing → direct to wholesale@s-natural.xyz
+- NAKAI product/pricing → direct to info@s-natural.xyz
 - General matcha/barista questions → answer from expertise, practical and specific
 - Write as flowing text, no blank lines between sentences
 - Never invent product details, prices, or URLs
@@ -744,7 +744,7 @@ _RAG_WHOLESALE_NO_CTX_JA = """<question>{question}</question>
 
 <instructions>
 一致する知識なし。
-- NAKAI商品・価格 → wholesale@s-natural.xyz を案内
+- NAKAI商品・価格 → info@s-natural.xyz を案内
 - 抹茶・バリスタ全般 → 専門知識で実用的な回答
 - 流れる文章で書く。文間に空行なし
 - 捏造しない
