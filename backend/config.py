@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     # MCP SSE transport (OpenFang / external agents)
     mcp_api_key: str = ""  # Bearer token for authenticated MCP access
+    # OpenFang Agent OS
+    openfang_base_url: str = "http://localhost:50051"
     # WS34-41: Automation
     shopify_webhook_secret: str = ""
     serp_api_key: str = ""
