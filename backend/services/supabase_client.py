@@ -617,7 +617,8 @@ async def get_automation_stats() -> dict:
             )
             count = int(resp.headers.get("content-range", "0/0").split("/")[-1])
             stats[key] = count
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Failed to fetch {key} count: {e}")
             stats[key] = 0
 
     # Share of Model: % of citations where nakai_cited=true
@@ -631,7 +632,8 @@ async def get_automation_stats() -> dict:
         total = stats.get("citations", 0)
         stats["share_of_model"] = round(cited / total * 100, 1) if total else 0
         stats["nakai_cited"] = cited
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to fetch share_of_model: {e}")
         stats["share_of_model"] = 0
         stats["nakai_cited"] = 0
 
@@ -643,7 +645,8 @@ async def get_automation_stats() -> dict:
             params={"order": "timestamp.desc", "limit": "5"},
         )
         stats["recent_mentions"] = resp.json()
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to fetch recent_mentions: {e}")
         stats["recent_mentions"] = []
 
     # Citation trend: daily counts for last 30 days
@@ -679,7 +682,8 @@ async def get_automation_stats() -> dict:
                 "pct": round(c / t * 100, 1) if t else 0,
             })
         stats["citation_trend"] = trend
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to fetch citation_trend: {e}")
         stats["citation_trend"] = []
 
     # Top cited queries
@@ -701,7 +705,8 @@ async def get_automation_stats() -> dict:
             query_counts[q] = query_counts.get(q, 0) + 1
         top_queries = sorted(query_counts.items(), key=lambda x: x[1], reverse=True)[:10]
         stats["top_cited_queries"] = [{"query": q, "count": c} for q, c in top_queries]
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to fetch top_cited_queries: {e}")
         stats["top_cited_queries"] = []
 
     return stats

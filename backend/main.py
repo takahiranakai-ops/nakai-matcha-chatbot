@@ -25,6 +25,14 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Validate critical settings on startup
+    if not settings.ngc_api_key:
+        logger.error("CRITICAL: NVIDIA NGC API key not set — chat will fail")
+    if settings.admin_password == "change-me-admin":
+        logger.warning("Admin password is still at default — change in production")
+    if not settings.supabase_url:
+        logger.warning("Supabase not configured — analytics disabled")
+
     # Auto-ingest data on startup if vector store is empty
     if vector_store.count() == 0:
         logger.info("Vector store empty — starting auto-ingestion...")

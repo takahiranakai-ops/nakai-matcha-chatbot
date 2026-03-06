@@ -235,7 +235,7 @@ WIDGET_JS = r"""
       +     '</div>'
       +     '<button id="nakai-chat-close" class="nakai-chat__header-close" aria-label="Close chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>'
       +   '</div>'
-      +   '<div id="nakai-chat-messages" class="nakai-chat__messages">'
+      +   '<div id="nakai-chat-messages" class="nakai-chat__messages" role="log" aria-live="polite">'
       +     '<div class="nakai-chat__ai-intro">' + STAR_SVG + '<span>' + t('aiBanner') + '</span></div>'
       +     '<div class="nakai-chat__message nakai-chat__message--bot">'
       +       '<div class="nakai-chat__message-row"><div class="nakai-chat__avatar">' + STAR_SVG + '</div><div class="nakai-chat__message-content">' + t('greeting') + '</div></div>'

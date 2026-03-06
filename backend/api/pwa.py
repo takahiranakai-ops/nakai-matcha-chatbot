@@ -681,7 +681,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           </div>
         </div>
       </header>
-      <div class="nc-messages" id="nc-messages">
+      <div class="nc-messages" id="nc-messages" role="log" aria-live="polite">
         <div class="nc-banner" id="nc-banner-text">AI-powered answers based on our matcha expertise</div>
         <div class="nc-msg nc-msg--bot" id="nc-welcome">
           <div class="nc-msg__bubble" id="nc-greeting"></div>
@@ -1256,7 +1256,12 @@ async def serve_test():
 async def serve_app():
     return HTMLResponse(
         content=APP_HTML,
-        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"},
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+        },
     )
 
 

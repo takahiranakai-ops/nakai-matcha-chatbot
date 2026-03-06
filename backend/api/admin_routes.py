@@ -155,7 +155,8 @@ async def upload_article(
     if not hmac.compare_digest(x_admin_password, settings.admin_password):
         raise HTTPException(status_code=401, detail="Invalid admin password")
 
-    filename = file.filename or ""
+    import os
+    filename = os.path.basename(file.filename or "")
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
     if ext not in ("txt", "pdf"):
         raise HTTPException(status_code=400, detail="Only .txt and .pdf files are supported")

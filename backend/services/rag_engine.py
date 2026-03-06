@@ -413,7 +413,13 @@ class RAGEngine:
                 logger.info("  chunk %d (%d chars): %.80s...", i, len(ct), ct.replace("\n", " "))
 
         # 5. Inject topic-specific context (e.g. latte → 二十二 recommendation)
-        if _LATTE_RE.search(msg_stripped):
+        # Skip if a product was already recommended in this conversation
+        _has_prior_product = any(
+            "[PRODUCT:" in msg.get("content", "")
+            for msg in (conversation_history or [])
+            if msg.get("role") == "assistant"
+        )
+        if _LATTE_RE.search(msg_stripped) and not _has_prior_product:
             lang_key = "ja" if language == "ja" else "en"
             context_texts.insert(0, _TOPIC_CONTEXT["latte"][lang_key])
 
@@ -560,7 +566,13 @@ class RAGEngine:
         )
 
         # Inject topic-specific context (e.g. latte → 二十二 recommendation)
-        if _LATTE_RE.search(msg_stripped):
+        # Skip if a product was already recommended in this conversation
+        _has_prior_product = any(
+            "[PRODUCT:" in msg.get("content", "")
+            for msg in (conversation_history or [])
+            if msg.get("role") == "assistant"
+        )
+        if _LATTE_RE.search(msg_stripped) and not _has_prior_product:
             lang_key = "ja" if language == "ja" else "en"
             context_texts.insert(0, _TOPIC_CONTEXT["latte"][lang_key])
 

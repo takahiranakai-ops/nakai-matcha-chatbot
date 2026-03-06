@@ -187,9 +187,10 @@ async def health():
 
 
 @router.get("/health/nvidia")
-async def health_nvidia():
+@limiter.limit("10/minute")
+async def health_nvidia(request: Request):
     """Diagnose NVIDIA NIM API connectivity — tests embedding + chat."""
-    diag = {"api_key_set": bool(settings.ngc_api_key), "api_key_prefix": settings.ngc_api_key[:12] + "..." if settings.ngc_api_key else ""}
+    diag: dict = {"api_key_set": bool(settings.ngc_api_key)}
     headers = {"Authorization": f"Bearer {settings.ngc_api_key}", "Content-Type": "application/json"}
 
     # Test embedding
@@ -202,7 +203,8 @@ async def health_nvidia():
             )
             diag["embedding_status"] = r.status_code
             if r.status_code != 200:
-                diag["embedding_error"] = r.text[:500]
+                logger.error(f"NVIDIA embedding error: {r.text[:500]}")
+                diag["embedding_error"] = f"HTTP {r.status_code}"
             else:
                 diag["embedding_ok"] = True
     except Exception as e:
@@ -218,7 +220,8 @@ async def health_nvidia():
             )
             diag["chat_status"] = r.status_code
             if r.status_code != 200:
-                diag["chat_error"] = r.text[:500]
+                logger.error(f"NVIDIA chat error: {r.text[:500]}")
+                diag["chat_error"] = f"HTTP {r.status_code}"
             else:
                 diag["chat_ok"] = True
                 diag["chat_response"] = r.json().get("choices", [{}])[0].get("message", {}).get("content", "")[:100]
