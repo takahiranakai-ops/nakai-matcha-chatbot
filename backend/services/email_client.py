@@ -10,7 +10,7 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
-RECIPIENT = "contact@nakaiinfo.com"
+RECIPIENT = "wholesale@nakaiinfo.com"
 
 
 def _is_configured() -> bool:
