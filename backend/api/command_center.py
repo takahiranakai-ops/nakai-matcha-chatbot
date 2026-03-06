@@ -498,7 +498,7 @@ _HTML = f"""<!DOCTYPE html>
 <!-- Login Gate -->
 <div id="cc-login" class="cc-login">
   <div class="cc-login-box">
-    <h1>NAKAI &times; OpenFang</h1>
+    <h1>NAKAI &times; Happy Monster</h1>
     <p>指令センター &mdash; Command Center</p>
     <input id="cc-pw" type="password" placeholder="Admin password" autocomplete="off">
     <button id="cc-login-btn">ACCESS</button>
@@ -512,7 +512,7 @@ _HTML = f"""<!DOCTYPE html>
 <!-- Header -->
 <header class="cc-header">
   <div class="cc-hdr-left">
-    <div class="cc-hdr-logo">NAKAI <span>&times; OpenFang</span></div>
+    <div class="cc-hdr-logo">NAKAI <span>&times; Happy Monster</span></div>
     <div class="cc-hdr-sub">指令センター</div>
   </div>
   <div class="cc-hdr-badges">
@@ -550,7 +550,7 @@ _HTML = f"""<!DOCTYPE html>
 
 <!-- Offline banner -->
 <div id="cc-offline-bar" class="cc-offline">
-  OpenFang connection lost &mdash; retrying every 8 seconds...
+  Happy Monster connection lost &mdash; retrying every 8 seconds...
 </div>
 
 <!-- Agent Grid -->
