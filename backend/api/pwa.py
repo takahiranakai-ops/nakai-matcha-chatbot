@@ -671,7 +671,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
         <div class="nc-header__left">
           <button class="nc-back" id="nc-back" aria-label="Back"><svg width="10" height="18" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1L1 9l8 8"/></svg></button>
           <img class="nc-header__logo" src="data:image/png;base64,{_LOGO_WM_BLACK_B64}" alt="NAKAI" />
-          <span class="nc-header__title" id="nc-title">Concierge</span>
+          <span class="nc-header__title" id="nc-title">Concierge</span><span style="font-size:9px;font-weight:600;letter-spacing:.5px;background:rgba(0,0,0,0.08);border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:middle;color:#666;">Beta</span>
           <span class="nc-header__dot"></span>
         </div>
         <div class="nc-header__right">

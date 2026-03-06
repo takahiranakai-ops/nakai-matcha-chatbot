@@ -7,6 +7,23 @@ from config import settings
 _CJK_RE = re.compile(r"[\u3000-\u9fff\uf900-\ufaff]")
 
 
+def _audience_for_knowledge_file(filename: str) -> str:
+    """Determine audience from knowledge filename."""
+    name = filename.lower()
+    if name.startswith("wholesale_"):
+        return "wholesale"
+    if name.startswith("nakai_products"):
+        return "consumer"
+    return "all"
+
+
+def _audience_for_product(handle: str) -> str:
+    """Determine audience from product handle."""
+    if "wholesale" in handle.lower():
+        return "wholesale"
+    return "consumer"
+
+
 def _strip_html(raw) -> str:
     """Remove HTML tags and decode HTML entities."""
     if not raw:
@@ -119,6 +136,7 @@ def process_product(product: dict) -> list:
         "handle": handle,
         "title": product["title"],
         "url": f"/products/{handle}",
+        "audience": _audience_for_product(handle),
     }
 
     return [
@@ -140,6 +158,7 @@ def process_collection(collection: dict) -> list:
         "handle": handle,
         "title": collection["title"],
         "url": f"/collections/{handle}",
+        "audience": "all",
     }
 
     return [
@@ -162,6 +181,7 @@ def process_page(page: dict) -> list:
         "handle": handle,
         "title": title,
         "url": f"/pages/{handle}",
+        "audience": "all",
     }
 
     return [
@@ -189,6 +209,7 @@ def process_article(article: dict) -> list:
         "handle": handle,
         "title": title,
         "url": f"/blogs/journal/{handle}",
+        "audience": "all",
     }
 
     return [
@@ -209,6 +230,7 @@ def process_policy(policy: dict) -> list:
         "type": "policy",
         "title": title,
         "url": policy.get("url", ""),
+        "audience": "all",
     }
 
     return [
@@ -236,14 +258,17 @@ def process_knowledge_file(filepath: str) -> list:
 
     title = path.stem.replace("_", " ").title()
 
+    audience = _audience_for_knowledge_file(path.name)
+
     # Section-aware chunking for files with === separators
     if "\n===\n" in text or "\n===\n" in text.replace("\r\n", "\n"):
-        return _process_sectioned_knowledge(text, title)
+        return _process_sectioned_knowledge(text, title, audience)
 
     metadata = {
         "type": "knowledge",
         "title": title,
         "url": "",
+        "audience": audience,
     }
 
     return [
@@ -252,7 +277,7 @@ def process_knowledge_file(filepath: str) -> list:
     ]
 
 
-def _process_sectioned_knowledge(text: str, base_title: str) -> list:
+def _process_sectioned_knowledge(text: str, base_title: str, audience: str = "all") -> list:
     """Process knowledge files with ``===`` section separators.
 
     Each section is chunked independently with a generous window so that
@@ -270,7 +295,7 @@ def _process_sectioned_knowledge(text: str, base_title: str) -> list:
         section_title = (
             f"{base_title} — {first_line}" if first_line else base_title
         )
-        metadata = {"type": "knowledge", "title": section_title, "url": ""}
+        metadata = {"type": "knowledge", "title": section_title, "url": "", "audience": audience}
 
         # Larger chunk window to keep each product/section intact
         if _is_cjk_heavy(section):
@@ -311,6 +336,7 @@ def process_knowledge_article(article: dict) -> list:
         "source": "supabase",
         "category": article.get("category", "general"),
         "language": article.get("language", "en"),
+        "audience": "all",
     }
 
     chunks = chunk_text(content)

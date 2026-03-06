@@ -303,7 +303,7 @@ body{{
     </div>
     <h2 class="success__title" id="s-title">Received.</h2>
     <p class="success__sub" id="s-sub">We'll get back to you within 1&ndash;2 business days.</p>
-    <a class="success__link" href="/wholesale" id="s-link">&larr; Back to Wholesale Portal</a>
+    <a class="success__link" href="https://nakaimatcha.com/collections/matcha-wholesale" id="s-link">&larr; Back to Wholesale Collection</a>
   </div>
 
   <p class="note" id="note">
@@ -324,7 +324,7 @@ body{{
     btn:'\\u9001\\u4fe1\\u3059\\u308b',sending:'\\u9001\\u4fe1\\u4e2d\\u2026',
     sTitle:'\\u53d7\\u3051\\u4ed8\\u3051\\u307e\\u3057\\u305f\\u3002',
     sSub:'1\\u301c2\\u55b6\\u696d\\u65e5\\u4ee5\\u5185\\u306b\\u3054\\u9023\\u7d61\\u3044\\u305f\\u3057\\u307e\\u3059\\u3002',
-    sLink:'\\u2190 \\u5378\\u58f2\\u30dd\\u30fc\\u30bf\\u30eb\\u306b\\u623b\\u308b',
+    sLink:'\\u2190 \\u5378\\u58f2\\u30b3\\u30ec\\u30af\\u30b7\\u30e7\\u30f3\\u306b\\u623b\\u308b',
     back:'\\u623b\\u308b',note:'\\u30e1\\u30fc\\u30eb\\u3067\\u306e\\u304a\\u554f\\u3044\\u5408\\u308f\\u305b\\u306f <a href="mailto:wholesale@nakaiinfo.com">wholesale@nakaiinfo.com</a>',
     phCompany:'\\u4f1a\\u793e\\u540d',phName:'\\u304a\\u540d\\u524d',phEmail:'\\u30e1\\u30fc\\u30eb',phPhone:'\\u96fb\\u8a71\\u756a\\u53f7\\uff08\\u4efb\\u610f\\uff09',
     phQty:'\\u6ce8\\u6587\\u4e88\\u5b9a\\u91cf',phUse:'\\u696d\\u7a2e\\uff08\\u4efb\\u610f\\uff09',phCountry:'\\u56fd\\uff08\\u4efb\\u610f\\uff09',
@@ -337,8 +337,7 @@ body{{
     btn:'Submit Inquiry',sending:'Sending\\u2026',
     sTitle:'Received.',
     sSub:'We\\u2019ll get back to you within 1\\u20132 business days.',
-    sLink:'\\u2190 Back to Wholesale Portal',
-    back:'Back',note:'Prefer email? <a href="mailto:wholesale@nakaiinfo.com">wholesale@nakaiinfo.com</a>',
+    sLink:'\\u2190 Back to Wholesale Collection',back:'Back',note:'Prefer email? <a href="mailto:wholesale@nakaiinfo.com">wholesale@nakaiinfo.com</a>',
     phCompany:'Company',phName:'Your name',phEmail:'Email',phPhone:'Phone (optional)',
     phQty:'Estimated quantity',phUse:'Business type (optional)',phCountry:'Country (optional)',
     phMsg:'Tell us about your needs, preferred products, timeline\\u2026'

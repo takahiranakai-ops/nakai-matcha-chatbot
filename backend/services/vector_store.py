@@ -32,18 +32,27 @@ class VectorStore:
         )
 
     def query(
-        self, query_embedding: list[float], n_results: int = 5
+        self, query_embedding: list[float], n_results: int = 5,
+        where=None,
     ) -> list[dict]:
-        """Query similar documents by embedding."""
+        """Query similar documents by embedding with optional metadata filter."""
         count = self.collection.count()
         if count == 0:
             return []
         n = min(n_results, count)
-        results = self.collection.query(
-            query_embeddings=[query_embedding],
-            n_results=n,
-            include=["documents", "metadatas", "distances"],
-        )
+        if where:
+            results = self.collection.query(
+                query_embeddings=[query_embedding],
+                n_results=n,
+                where=where,
+                include=["documents", "metadatas", "distances"],
+            )
+        else:
+            results = self.collection.query(
+                query_embeddings=[query_embedding],
+                n_results=n,
+                include=["documents", "metadatas", "distances"],
+            )
         return [
             {"text": doc, "metadata": meta, "distance": dist}
             for doc, meta, dist in zip(

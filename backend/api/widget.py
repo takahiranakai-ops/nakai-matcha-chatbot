@@ -229,7 +229,7 @@ WIDGET_JS = r"""
       +   '<div class="nakai-chat__header">'
       +     '<div class="nakai-chat__header-left">'
       +       '<div class="nakai-chat__header-info">'
-      +         '<span class="nakai-chat__header-title">NAKAI Concierge <span class="nakai-chat__ai-badge">' + STAR_SVG + ' AI</span></span>'
+      +         '<span class="nakai-chat__header-title">NAKAI Concierge <span class="nakai-chat__ai-badge">' + STAR_SVG + ' AI</span> <span style="font-size:9px;font-weight:600;letter-spacing:.5px;background:rgba(0,0,0,0.08);border-radius:4px;padding:2px 6px;vertical-align:middle;color:#666;">Beta</span></span>'
       +         '<div class="nakai-chat__header-status"><span class="nakai-chat__header-dot"></span><span class="nakai-chat__header-subtitle">' + t('online') + '</span></div>'
       +       '</div>'
       +     '</div>'

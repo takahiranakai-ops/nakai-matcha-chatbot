@@ -375,10 +375,16 @@ class RAGEngine:
             _max_chunks * _RETRIEVAL_MULTIPLIER,
             max(self.vector_store.count(), 1),
         )
+        # Audience filter: wholesale sees wholesale+all, consumer sees consumer+all
+        if "wholesale" in source:
+            _audience_filter = {"audience": {"$in": ["wholesale", "all"]}}
+        else:
+            _audience_filter = {"audience": {"$in": ["consumer", "all"]}}
         try:
             results = self.vector_store.query(
                 query_embedding=query_embedding,
                 n_results=max(n_retrieve, 1),
+                where=_audience_filter,
             )
         except Exception as e:
             logger.error(f"Vector store query failed: {e}")
@@ -521,10 +527,16 @@ class RAGEngine:
             _max_chunks * _RETRIEVAL_MULTIPLIER,
             max(self.vector_store.count(), 1),
         )
+        # Audience filter: wholesale sees wholesale+all, consumer sees consumer+all
+        if "wholesale" in source:
+            _audience_filter = {"audience": {"$in": ["wholesale", "all"]}}
+        else:
+            _audience_filter = {"audience": {"$in": ["consumer", "all"]}}
         try:
             results = self.vector_store.query(
                 query_embedding=query_embedding,
                 n_results=max(n_retrieve, 1),
+                where=_audience_filter,
             )
         except Exception as e:
             logger.error(f"Streaming vector query failed: {e}")
