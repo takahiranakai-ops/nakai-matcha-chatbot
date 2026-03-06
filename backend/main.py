@@ -84,7 +84,7 @@ app = FastAPI(
         "- `GET /guide` — Matcha Encyclopedia (15 SEO-optimized HTML guides)\n"
         "- `GET /guide/sitemap.xml` — Encyclopedia sitemap\n"
     ),
-    contact={"name": "NAKAI", "email": "info@s-natural.xyz", "url": "https://nakaimatcha.com"},
+    contact={"name": "NAKAI", "email": "contact@nakaiinfo.com", "url": "https://nakaimatcha.com"},
     license_info={"name": "Proprietary"},
     lifespan=lifespan,
 )

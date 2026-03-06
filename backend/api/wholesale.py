@@ -380,7 +380,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
       <div class="ws-inquiry__tier-label" id="ws-inq-label2">BULK ORDER</div>
       <div class="ws-inquiry__tier-range" id="ws-inq-range2">10 kg &ndash; 100 t</div>
       <div class="ws-inquiry__tier-desc" id="ws-inq-desc2">Contact our team for custom pricing and logistics.</div>
-      <a href="mailto:info@s-natural.xyz" class="ws-inquiry__tier-btn ws-inquiry__tier-btn--email" id="ws-inq-btn2">Email Us</a>
+      <a href="mailto:wholesale@nakaiinfo.com" class="ws-inquiry__tier-btn ws-inquiry__tier-btn--email" id="ws-inq-btn2">Email Us</a>
     </div>
   </div>
 </div>

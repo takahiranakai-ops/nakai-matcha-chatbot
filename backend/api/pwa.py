@@ -136,7 +136,7 @@ APP_HTML = f"""<!DOCTYPE html>
     "url": "https://nakaimatcha.com",
     "description": "Specialty organic matcha brand — grounded in nature, elevated in ritual",
     "foundingDate": "2024",
-    "email": "info@s-natural.xyz",
+    "email": "contact@nakaiinfo.com",
     "brand": {{
       "@type": "Brand",
       "name": "NAKAI"
@@ -613,7 +613,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
         <div class="nc-home__links">
           <a href="https://nakaimatcha.com/" target="_blank" rel="noopener" class="nc-home__link" id="nc-h-shop">Shop</a>
           <span class="nc-home__dot"></span>
-          <a href="mailto:info@s-natural.xyz?subject=Wholesale%20Inquiry" class="nc-home__link" id="nc-h-ws">Wholesale</a>
+          <a href="mailto:wholesale@nakaiinfo.com?subject=Wholesale%20Inquiry" class="nc-home__link" id="nc-h-ws">Wholesale</a>
         </div>
       </div>
     </div>

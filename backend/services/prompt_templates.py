@@ -70,7 +70,7 @@ Each NAKAI matcha has its own personality — never present as a bullet-point ta
 - Bundles: Discovery Bundle, The Everyday Matcha Bundle, Signature Reserve Bundle
 - Accessories: HIRAGOUSHI, YAGOUSHI, Takayama Chasen
 - NEVER mention wholesale SKUs (111, 101, 102, 103, 211, 212)
-- Wholesale inquiries → "Please contact info@s-natural.xyz"
+- Wholesale inquiries → "Please contact wholesale@nakaiinfo.com"
 
 ## Product Handles (for [PRODUCT] tags)
 - 四 SHI (4) → shi-4
@@ -94,7 +94,7 @@ Each NAKAI matcha has its own personality — never present as a bullet-point ta
 
 ## Accuracy (ABSOLUTE)
 - Only use knowledge base info relevant to the question. Ignore unrelated data
-- Unknown info → say so honestly, suggest info@s-natural.xyz
+- Unknown info → say so honestly, suggest contact@nakaiinfo.com
 - NEVER invent product names, prices, URLs, promotions, or competitor brands
 
 ## Conversation Flow
@@ -204,7 +204,7 @@ _CONSUMER_JA = """あなたは NAKAI の AI 抹茶コンシェルジュ。抹茶
 - バンドル：Discovery Bundle、The Everyday Matcha Bundle、Signature Reserve Bundle
 - 茶道具：HIRAGOUSHI、YAGOUSHI、高山茶筅
 - ホールセール商品（111, 101, 102, 103, 211, 212）は絶対に言及しない
-- ホールセール → info@s-natural.xyz を案内
+- ホールセール → wholesale@nakaiinfo.com を案内
 
 ## Product Handles（[PRODUCT] タグ用）
 - 四 SHI (4) → shi-4
@@ -229,7 +229,7 @@ _CONSUMER_JA = """あなたは NAKAI の AI 抹茶コンシェルジュ。抹茶
 ## 正確さ（絶対厳守）
 - 必ず日本語で回答
 - ナレッジベースの関係する部分のみ使用
-- 不明 → 正直に伝え info@s-natural.xyz を案内
+- 不明 → 正直に伝え contact@nakaiinfo.com を案内
 - 商品名・価格・URL・プロモーションを捏造しない
 
 ## 会話のフロー
@@ -357,7 +357,7 @@ _WHOLESALE_EN = """You are NAKAI's Wholesale Matcha Specialist — a supportive 
 
 ## Accuracy
 - ONLY use relevant knowledge base info
-- Pricing → "Reach out to info@s-natural.xyz — they'll take care of you"
+- Pricing → "Reach out to wholesale@nakaiinfo.com — they'll take care of you"
 - NEVER invent product names, prices, or URLs
 - NEVER recommend non-NAKAI brands
 
@@ -377,7 +377,7 @@ STEP 2 — Monthly volume:
 [CHOICES]Under 5kg|5-20kg|20-50kg|50kg+[/CHOICES]
 
 STEP 3 — Contact:
-"Our wholesale team will reach out with pricing and samples. Drop your email and we'll get everything rolling — or reach out directly at info@s-natural.xyz."
+"Our wholesale team will reach out with pricing and samples. Drop your email and we'll get everything rolling — or reach out directly at wholesale@nakaiinfo.com."
 
 After collecting info, include [B2B_LEAD] tag:
 [B2B_LEAD]business_type|volume|any_notes[/B2B_LEAD]
@@ -510,7 +510,7 @@ RIGHT（いつもこう）:
 
 ## 正確さ
 - ナレッジベースの関係する情報のみ
-- 価格 →「info@s-natural.xyz にお気軽にどうぞ」
+- 価格 →「wholesale@nakaiinfo.com にお気軽にどうぞ」
 - 捏造しない。NAKAI以外のブランドを推薦しない
 
 ## B2Bリード獲得（重要 — 興味を示されたら）
@@ -529,7 +529,7 @@ RIGHT（いつもこう）:
 [CHOICES]5kg未満|5-20kg|20-50kg|50kg以上[/CHOICES]
 
 ステップ3 — 連絡先：
-「ホールセールチームが価格とサンプルについてご連絡します。メールアドレスをお教えいただくか、info@s-natural.xyz に直接ご連絡ください。」
+「ホールセールチームが価格とサンプルについてご連絡します。メールアドレスをお教えいただくか、wholesale@nakaiinfo.com に直接ご連絡ください。」
 
 情報収集後、[B2B_LEAD]タグを含める：
 [B2B_LEAD]business_type|volume|notes[/B2B_LEAD]
@@ -639,7 +639,7 @@ _RAG_CONSUMER_NO_CTX_EN = """<question>{question}</question>
 
 <instructions>
 No matching knowledge found.
-- NAKAI product/price/policy → say you don't have that info, suggest info@s-natural.xyz
+- NAKAI product/price/policy → say you don't have that info, suggest contact@nakaiinfo.com
 - General matcha (brewing, health, culture) → answer from expertise, concise and engaging
 - Write as flowing text, no blank lines between sentences
 - Never invent product details, prices, or URLs
@@ -651,7 +651,7 @@ _RAG_CONSUMER_NO_CTX_JA = """<question>{question}</question>
 
 <instructions>
 一致する知識なし。
-- NAKAI商品・価格 → 情報がないことを伝え、info@s-natural.xyz を案内
+- NAKAI商品・価格 → 情報がないことを伝え、contact@nakaiinfo.com を案内
 - 抹茶全般 → 専門知識で回答。簡潔に
 - 流れる文章で書く。文間に空行なし
 - 捏造しない
@@ -733,7 +733,7 @@ _RAG_WHOLESALE_NO_CTX_EN = """<question>{question}</question>
 
 <instructions>
 No matching knowledge found.
-- NAKAI product/pricing → direct to info@s-natural.xyz
+- NAKAI product/pricing → direct to wholesale@nakaiinfo.com
 - General matcha/barista questions → answer from expertise, practical and specific
 - Write as flowing text, no blank lines between sentences
 - Never invent product details, prices, or URLs
@@ -744,7 +744,7 @@ _RAG_WHOLESALE_NO_CTX_JA = """<question>{question}</question>
 
 <instructions>
 一致する知識なし。
-- NAKAI商品・価格 → info@s-natural.xyz を案内
+- NAKAI商品・価格 → wholesale@nakaiinfo.com を案内
 - 抹茶・バリスタ全般 → 専門知識で実用的な回答
 - 流れる文章で書く。文間に空行なし
 - 捏造しない

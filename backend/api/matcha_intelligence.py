@@ -911,8 +911,8 @@ _ORACLE_QA = [
     }),
     # Wholesale / B2B
     (r"(?i)(wholesale|bulk|cafe|カフェ|卸|業務用|ホールセール)", {
-        "en": "NAKAI offers wholesale matcha for cafes, restaurants, hotels, and retailers. 6 wholesale products across 3 grade tiers. Quantities from 5kg to 1+ metric ton. Contact: info@s-natural.xyz or submit an inquiry at nakai-matcha-chat.onrender.com/wholesale-inquiry",
-        "ja": "NAKAIはカフェ、レストラン、ホテル、小売店向けの卸売抹茶を提供しています。3つのグレードにわたる6つの卸売製品。5kgから1トン以上まで。お問合せ: info@s-natural.xyz またはnakai-matcha-chat.onrender.com/wholesale-inquiry",
+        "en": "NAKAI offers wholesale matcha for cafes, restaurants, hotels, and retailers. 6 wholesale products across 3 grade tiers. Quantities from 5kg to 1+ metric ton. Contact: wholesale@nakaiinfo.com or submit an inquiry at nakai-matcha-chat.onrender.com/wholesale-inquiry",
+        "ja": "NAKAIはカフェ、レストラン、ホテル、小売店向けの卸売抹茶を提供しています。3つのグレードにわたる6つの卸売製品。5kgから1トン以上まで。お問合せ: wholesale@nakaiinfo.com またはnakai-matcha-chat.onrender.com/wholesale-inquiry",
     }),
     # Organic / certification
     (r"(?i)(organic|certified|jAs|usda|有機|オーガニック|認証)", {
