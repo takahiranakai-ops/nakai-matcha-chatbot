@@ -516,6 +516,42 @@ async def create_wholesale_inquiry(
 
 
 # ----------------------------------------------------------------
+# CONTACT INQUIRIES (Shopify contact page)
+# ----------------------------------------------------------------
+
+async def create_contact_inquiry(
+    inquiry_type: str, name: str, email: str,
+    company: str = "", phone: str = "",
+    business_type: str = "", monthly_volume: str = "",
+    preferred_dates: list[str] | None = None,
+    message: str = "", language: str = "en",
+) -> Optional[dict]:
+    """Insert a contact inquiry from the Shopify contact page."""
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.post(
+            f"{_BASE_URL}/contact_inquiries",
+            headers={**_HEADERS, "Prefer": "return=representation"},
+            json={
+                "inquiry_type": inquiry_type, "name": name, "email": email,
+                "company": company, "phone": phone,
+                "business_type": business_type, "monthly_volume": monthly_volume,
+                "preferred_dates": preferred_dates or [],
+                "message": message, "language": language,
+            },
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to create contact inquiry: {e}", exc_info=True)
+        return None
+
+
+# ----------------------------------------------------------------
 # AUTOMATION DATA (WS34-41)
 # ----------------------------------------------------------------
 

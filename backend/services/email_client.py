@@ -82,3 +82,76 @@ async def send_inquiry_notification(inquiry) -> bool:
     except Exception as e:
         logger.error(f"Failed to send email: {e}")
         return False
+
+
+async def send_contact_inquiry_notification(inquiry) -> bool:
+    """Send an email notification for a new contact page inquiry."""
+    if not _is_configured():
+        logger.info("SMTP not configured — skipping contact email notification")
+        return False
+
+    try:
+        import aiosmtplib
+    except ImportError:
+        logger.warning("aiosmtplib not installed — skipping contact email notification")
+        return False
+
+    type_label = getattr(inquiry, 'inquiry_type', 'General')
+    subject = f"New {type_label} Inquiry from {getattr(inquiry, 'name', 'Website')}"
+
+    # Build details rows
+    rows = []
+    if getattr(inquiry, 'name', ''):
+        rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px;width:120px">Name</td><td style="padding:8px 16px;font-size:14px">{inquiry.name}</td></tr>')
+    if getattr(inquiry, 'email', ''):
+        rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Email</td><td style="padding:8px 16px;font-size:14px"><a href="mailto:{inquiry.email}">{inquiry.email}</a></td></tr>')
+    if getattr(inquiry, 'company', ''):
+        rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Company</td><td style="padding:8px 16px;font-size:14px">{inquiry.company}</td></tr>')
+    if getattr(inquiry, 'phone', ''):
+        rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Phone</td><td style="padding:8px 16px;font-size:14px">{inquiry.phone}</td></tr>')
+    if getattr(inquiry, 'business_type', ''):
+        rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Business Type</td><td style="padding:8px 16px;font-size:14px">{inquiry.business_type}</td></tr>')
+    if getattr(inquiry, 'monthly_volume', ''):
+        rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Monthly Volume</td><td style="padding:8px 16px;font-size:14px">{inquiry.monthly_volume}</td></tr>')
+    dates = getattr(inquiry, 'preferred_dates', None)
+    if dates:
+        rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Preferred Dates</td><td style="padding:8px 16px;font-size:14px">{", ".join(dates)}</td></tr>')
+    if getattr(inquiry, 'message', ''):
+        rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px;vertical-align:top">Message</td><td style="padding:8px 16px;font-size:14px;white-space:pre-wrap">{inquiry.message}</td></tr>')
+
+    rows_html = ''.join(rows)
+    html_body = (
+        '<div style="font-family:\'Work Sans\',Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">'
+        '<div style="background:#406546;padding:24px 32px;border-radius:16px 16px 0 0;text-align:center">'
+        f'<h2 style="color:#fff;margin:0;font-size:18px;font-weight:600">New {type_label} Inquiry</h2>'
+        '</div>'
+        '<div style="background:#fff;padding:32px;border:1px solid #e8e8e8;border-top:none;border-radius:0 0 16px 16px">'
+        f'<table style="width:100%;border-collapse:collapse;font-size:14px">{rows_html}</table>'
+        '</div>'
+        '</div>'
+    )
+
+    # Determine recipient based on inquiry type
+    to_email = "wholesale@nakaiinfo.com" if type_label == "Wholesale" else "contact@nakaiinfo.com"
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = settings.smtp_user
+    msg["To"] = to_email
+    msg.attach(MIMEText(html_body, "html"))
+
+    try:
+        await aiosmtplib.send(
+            msg,
+            hostname=settings.smtp_host,
+            port=settings.smtp_port,
+            username=settings.smtp_user,
+            password=settings.smtp_password,
+            use_tls=settings.smtp_port == 465,
+            start_tls=settings.smtp_port == 587,
+        )
+        logger.info(f"Contact inquiry notification sent to {to_email}")
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to send contact inquiry email: {e}")
+        return False

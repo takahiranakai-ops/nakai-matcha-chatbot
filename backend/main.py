@@ -12,6 +12,7 @@ from api.admin_routes import admin_api_router
 from api.admin_page import admin_page_router
 from api.wholesale import wholesale_router
 from api.wholesale_inquiry import inquiry_router
+from api.contact_inquiry import contact_inquiry_router
 from api.ai_discovery import ai_router
 from api.matcha_intelligence import intelligence_router
 from api.matcha_guide import guide_router
@@ -116,6 +117,7 @@ app.include_router(widget_router)
 app.include_router(pwa_router)
 app.include_router(wholesale_router)
 app.include_router(inquiry_router)
+app.include_router(contact_inquiry_router)
 app.include_router(ai_router)
 app.include_router(intelligence_router)
 app.include_router(guide_router)
