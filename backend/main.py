@@ -17,6 +17,7 @@ from api.ai_discovery import ai_router
 from api.matcha_intelligence import intelligence_router
 from api.matcha_guide import guide_router
 from api.webhooks import webhook_router
+from api.mcp_sse import mcp_sse_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -32,6 +33,10 @@ async def lifespan(app: FastAPI):
         logger.warning("Admin password is still at default — change in production")
     if not settings.supabase_url:
         logger.warning("Supabase not configured — analytics disabled")
+    if not settings.mcp_api_key:
+        logger.warning("MCP_API_KEY not set — MCP SSE endpoint disabled (OpenFang cannot connect)")
+    else:
+        logger.info("MCP SSE endpoint enabled — OpenFang/agents can connect via /mcp/sse")
 
     # Auto-ingest data on startup if vector store is empty
     if vector_store.count() == 0:
@@ -92,6 +97,7 @@ app = FastAPI(
         "- `GET /api/products/{handle}/live` — Living product intelligence\n"
         "- `GET /guide` — Matcha Encyclopedia (15 SEO-optimized HTML guides)\n"
         "- `GET /guide/sitemap.xml` — Encyclopedia sitemap\n"
+        "- `GET /mcp/sse` — MCP SSE transport (Bearer auth required)\n"
     ),
     contact={"name": "NAKAI", "email": "contact@nakaiinfo.com", "url": "https://nakaimatcha.com"},
     license_info={"name": "Proprietary"},
@@ -113,6 +119,7 @@ app.add_middleware(
         "X-Admin-Password",
         "X-Shopify-Hmac-Sha256",
         "X-Shopify-Topic",
+        "Authorization",
     ],
 )
 
@@ -130,6 +137,7 @@ app.include_router(ai_router)
 app.include_router(intelligence_router)
 app.include_router(guide_router)
 app.include_router(webhook_router)
+app.include_router(mcp_sse_router)
 
 
 @app.get("/health")

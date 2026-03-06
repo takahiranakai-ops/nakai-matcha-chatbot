@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
+    # MCP SSE transport (OpenFang / external agents)
+    mcp_api_key: str = ""  # Bearer token for authenticated MCP access
     # WS34-41: Automation
     shopify_webhook_secret: str = ""
     serp_api_key: str = ""
