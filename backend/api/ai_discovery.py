@@ -30,6 +30,23 @@ _IMG_HIRAGOUSHI = f"{_STORE}/cdn/shop/files/2169_1.jpg"
 _IMG_YAGOUSHI = f"{_STORE}/cdn/shop/files/2171.jpg"
 _IMG_CHASEN = f"{_STORE}/cdn/shop/files/1897.jpg"
 
+# Product MPN (Manufacturer Part Number) mapping for feed compliance
+_MPN_MAP = {
+    "nakai-shi-4": "NAKAI-SHI-4-30G",
+    "nakai-ju-roku-16": "NAKAI-JUROKU-16-30G",
+    "nakai-ju-nana-17": "NAKAI-JUNANA-17-30G",
+    "nakai-ju-hachi-18": "NAKAI-JUHACHI-18-30G",
+    "nakai-nijyu-ni-22": "NAKAI-NIJYUNI-22-30G",
+    "nakai-discovery-bundle": "NAKAI-BUNDLE-DISCOVERY",
+    "nakai-everyday-bundle": "NAKAI-BUNDLE-EVERYDAY",
+    "nakai-signature-reserve": "NAKAI-BUNDLE-SIGNATURE",
+    "nakai-hiragoushi-chawan": "NAKAI-CHAWAN-HIRAGOUSHI",
+    "nakai-yagoushi-chawan": "NAKAI-CHAWAN-YAGOUSHI",
+    "nakai-takayama-chasen": "NAKAI-CHASEN-100",
+}
+
+_TARGET_COUNTRIES = ["US", "AE", "JP", "GB", "DE", "FR", "AU", "CA"]
+
 # ---------------------------------------------------------------------------
 # /llms.txt -- AI-readable site information (summary)
 # ---------------------------------------------------------------------------
@@ -145,6 +162,8 @@ Contact: wholesale@nakaiinfo.com | Inquiry form: {_BASE}/wholesale-inquiry
 - Individual product: {_BASE}/api/products/{{handle}}
 - FAQ (JSON-LD): {_BASE}/api/faq
 - AI plugin manifest: {_BASE}/.well-known/ai-plugin.json
+- UCP (Universal Commerce Protocol): {_BASE}/.well-known/ucp
+- A2A Agent Card: {_BASE}/.well-known/agent-card.json
 - OpenAPI spec: {_BASE}/openapi.json
 
 ## Matcha Encyclopedia (10 SEO guides — Google-indexable HTML)
@@ -1359,7 +1378,9 @@ AI_PLUGIN = {
         "/api/matcha/taste-profile (personalized matching), "
         "/api/matcha/discover (contextual recommendation), "
         "/api/oracle/ask (Q&A), /guide (15 SEO articles), "
-        "/api/mcp/tools (8 tools), /api/mcp/resources (11 resources). "
+        "/api/mcp/tools (8 tools), /api/mcp/resources (11 resources), "
+        "/.well-known/ucp (Universal Commerce Protocol), "
+        "/.well-known/agent-card.json (A2A agent discovery). "
         "Supports: best matcha brand, matcha latte recipe, matcha vs coffee, "
         "matcha health benefits, ceremonial grade matcha, organic matcha, wholesale matcha."
     ),
@@ -1431,13 +1452,74 @@ async def product_catalog():
     tags=["AI Discovery"],
 )
 async def openai_product_feed():
-    """OpenAI Product Feed for ChatGPT Shopping."""
+    """OpenAI Product Feed for ChatGPT Shopping (spec-compliant)."""
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    products = []
+    for p in _OPENAI_FEED_PRODUCTS:
+        pid = p["product_id"]
+        # Collect all related product IDs across relationship types
+        related_ids = []
+        primary_rel = "often_bought_with"
+        for rel_type, ids in p.get("relationship_type", {}).items():
+            if isinstance(ids, list):
+                related_ids.extend(ids)
+            if ids and rel_type in (
+                "often_bought_with", "substitute", "accessory",
+                "accessory_for", "upgrade", "part_of_set",
+            ):
+                primary_rel = rel_type
+        product = {
+            # OpenAI flags
+            "is_eligible_search": True,
+            "is_eligible_checkout": False,
+            # Basic product data
+            "item_id": pid,
+            "title": p["title"],
+            "description": p["description"],
+            "url": p["canonical_url"],
+            "brand": p["brand"],
+            # Media
+            "image_url": p["main_image_link"],
+            "additional_image_urls": ",".join(p.get("additional_image_link", [])),
+            # Price & availability
+            "price": f"{p['price']['value']} {p['price']['currency']}",
+            "availability": p["availability"],
+            "condition": p.get("condition", "new"),
+            # Item information
+            "mpn": _MPN_MAP.get(pid, ""),
+            "product_category": p.get("product_type", ""),
+            "material": p.get("material", ""),
+            "weight": p.get("shipping_weight", {}).get("value", ""),
+            "item_weight_unit": p.get("shipping_weight", {}).get("unit", "g"),
+            # Merchant info
+            "seller_name": "NAKAI",
+            "seller_url": _STORE,
+            # Geo
+            "target_countries": _TARGET_COUNTRIES,
+            "store_country": "AE",
+            # Shipping & returns
+            "shipping": "US:::0.00 USD::3:10,AE:::0.00 USD::3:10,JP:::0.00 USD::3:10,GB:::0.00 USD::5:14",
+            "accepts_returns": True,
+            "return_deadline_in_days": 30,
+            "return_policy": f"{_STORE}/policies/refund-policy",
+            # Q&A (spec uses q/a keys)
+            "q_and_a": [
+                {"q": qa["question"], "a": qa["answer"]}
+                for qa in p.get("q_and_a", [])
+            ],
+            # Related products
+            "related_product_id": ",".join(related_ids) if related_ids else "",
+            "relationship_type": primary_rel if related_ids else "",
+            # Metadata
+            "updated_at": now,
+        }
+        products.append(product)
     return JSONResponse(
         content={
             "feed_version": "1.0",
             "brand": "NAKAI",
-            "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "products": _OPENAI_FEED_PRODUCTS,
+            "last_updated": now,
+            "products": products,
         },
         headers={
             "Cache-Control": "public, max-age=3600",
@@ -1506,6 +1588,195 @@ async def ai_plugin():
     )
 
 
+# ---------------------------------------------------------------------------
+# Universal Commerce Protocol (UCP) — /.well-known/ucp
+# ---------------------------------------------------------------------------
+
+_UCP_MANIFEST = {
+    "ucp": {
+        "version": "2026-01-11",
+        "services": {
+            "dev.ucp.shopping": {
+                "version": "2026-01-11",
+                "spec": "https://ucp.dev/specification/overview",
+                "rest": {
+                    "schema": f"{_BASE}/openapi.json",
+                    "endpoint": f"{_BASE}/api/products",
+                },
+                "mcp": {
+                    "schema": f"{_BASE}/api/mcp/tools",
+                    "endpoint": f"{_BASE}/api/mcp/call",
+                },
+                "a2a": {
+                    "endpoint": f"{_BASE}/.well-known/agent-card.json",
+                },
+            },
+        },
+        "capabilities": [
+            {
+                "name": "dev.ucp.shopping.catalog",
+                "version": "2026-01-11",
+                "spec": "https://ucp.dev/specification/overview",
+                "schema": f"{_BASE}/openapi.json",
+                "config": {
+                    "catalog_size": 11,
+                    "feeds": {
+                        "openai": f"{_BASE}/api/products/feed",
+                        "google": f"{_BASE}/api/products/google-feed.xml",
+                        "json_ld": f"{_BASE}/api/products/catalog",
+                    },
+                    "mcp_tools": 8,
+                    "mcp_resources": 11,
+                    "ai_concierge": f"{_BASE}/api/chat",
+                    "knowledge_graph": f"{_BASE}/api/matcha/knowledge",
+                },
+            },
+            {
+                "name": "dev.ucp.shopping.checkout",
+                "version": "2026-01-11",
+                "spec": "https://ucp.dev/specification/checkout",
+                "schema": "https://ucp.dev/schemas/shopping/checkout.json",
+                "config": {
+                    "provider": "shopify",
+                    "checkout_url": f"{_STORE}/cart",
+                    "note": "Checkout handled by Shopify storefront",
+                },
+            },
+            {
+                "name": "dev.ucp.shopping.fulfillment",
+                "version": "2026-01-11",
+                "spec": "https://ucp.dev/specification/fulfillment",
+                "schema": "https://ucp.dev/schemas/shopping/fulfillment.json",
+                "extends": "dev.ucp.shopping.checkout",
+                "config": {
+                    "shipping_countries": _TARGET_COUNTRIES,
+                    "free_shipping": True,
+                    "handling_days": "1-3",
+                    "transit_days": "3-10",
+                },
+            },
+        ],
+    },
+    "payment": {
+        "handlers": [
+            {
+                "id": "shopify_payments",
+                "name": "com.shopify.payments",
+                "version": "2026-01-11",
+                "config": {
+                    "type": "SHOPIFY_CHECKOUT",
+                    "checkout_url": f"{_STORE}/cart",
+                    "accepted_methods": ["card", "apple_pay", "google_pay", "shop_pay"],
+                },
+            },
+        ],
+    },
+}
+
+
+@ai_router.get(
+    "/.well-known/ucp",
+    summary="Universal Commerce Protocol manifest",
+    description="UCP discovery profile for AI agentic commerce (Google AI Mode, Gemini, Copilot).",
+    tags=["AI Discovery"],
+)
+async def ucp_manifest():
+    """UCP manifest for agentic commerce discovery."""
+    return JSONResponse(
+        content=_UCP_MANIFEST,
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Agent-to-Agent Protocol (A2A) — /.well-known/agent-card.json
+# ---------------------------------------------------------------------------
+
+_AGENT_CARD = {
+    "name": "NAKAI Matcha Concierge",
+    "description": (
+        "AI matcha expert by NAKAI. Recommends premium organic Japanese matcha "
+        "based on taste preferences, use case, and experience level. "
+        "Provides product details, preparation guides, and matcha knowledge."
+    ),
+    "url": _BASE,
+    "provider": {
+        "organization": "NAKAI",
+        "url": _STORE,
+    },
+    "version": "3.0.0",
+    "documentationUrl": f"{_BASE}/openapi.json",
+    "capabilities": {
+        "streaming": False,
+        "pushNotifications": False,
+    },
+    "authentication": {
+        "schemes": ["none"],
+        "note": "Public API — no authentication required for product data and chat",
+    },
+    "defaultInputModes": ["text"],
+    "defaultOutputModes": ["text"],
+    "skills": [
+        {
+            "id": "matcha-recommendation",
+            "name": "Matcha Recommendation",
+            "description": "Recommend the best NAKAI matcha based on taste, use case, budget, and experience level",
+            "tags": ["matcha", "recommendation", "tea"],
+            "examples": [
+                "What matcha is best for lattes?",
+                "I want a bold matcha under $35",
+                "Best matcha for tea ceremony?",
+            ],
+        },
+        {
+            "id": "product-search",
+            "name": "Product Search",
+            "description": "Search NAKAI product catalog by keyword, grade, or use case",
+            "tags": ["search", "products", "catalog"],
+            "examples": [
+                "Show me ceremonial grade matcha",
+                "What matcha bowls do you have?",
+            ],
+        },
+        {
+            "id": "matcha-knowledge",
+            "name": "Matcha Knowledge",
+            "description": "Answer questions about matcha preparation, health benefits, grading, and Japanese tea culture",
+            "tags": ["knowledge", "preparation", "health", "culture"],
+            "examples": [
+                "How do I make koicha?",
+                "What is the difference between ceremonial and culinary matcha?",
+                "Health benefits of L-theanine in matcha",
+            ],
+        },
+        {
+            "id": "taste-profiling",
+            "name": "Taste Profiling",
+            "description": "Generate matcha DNA taste fingerprints and match products to flavor preferences",
+            "tags": ["taste", "flavor", "profiling"],
+            "examples": [
+                "I like chocolate and nutty flavors",
+                "Compare the taste of SHI (4) vs NIJYU-NI (22)",
+            ],
+        },
+    ],
+}
+
+
+@ai_router.get(
+    "/.well-known/agent-card.json",
+    summary="A2A Agent Card",
+    description="Agent-to-Agent protocol discovery card for AI agent interoperability.",
+    tags=["AI Discovery"],
+)
+async def agent_card():
+    """A2A agent discovery card."""
+    return JSONResponse(
+        content=_AGENT_CARD,
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
 @ai_router.get(
     "/robots.txt",
     response_class=PlainTextResponse,
@@ -1561,6 +1832,8 @@ async def root_sitemap():
         ("/", "1.0"), ("/guide", "1.0"), ("/app", "0.8"),
         ("/llms.txt", "0.9"), ("/llms-full.txt", "0.9"),
         ("/.well-known/ai-plugin.json", "0.8"),
+        ("/.well-known/ucp", "0.9"),
+        ("/.well-known/agent-card.json", "0.8"),
     ]:
         urls += f'  <url><loc>{_BASE}{path}</loc><lastmod>{now}</lastmod><priority>{prio}</priority></url>\n'
     # Guide pages
