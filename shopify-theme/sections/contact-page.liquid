@@ -1,0 +1,305 @@
+<section class="contact-page page-width">
+  <div class="contact-page__header">
+    <h1 class="contact-page__heading">{{ section.settings.heading | default: 'Contact' }}</h1>
+    {%- if section.settings.subheading != blank -%}
+      <p class="contact-page__subheading">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="contact-page__body">
+    <div class="contact-page__form-wrap">
+      {%- form 'contact', id: 'contact-form' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="contact-page__success">
+            {{ section.settings.success_message | default: 'Thank you for reaching out. We will get back to you shortly.' }}
+          </p>
+        {%- endif -%}
+
+        {%- if form.errors -%}
+          <div class="contact-page__errors">
+            {{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="contact-page__field">
+          <label for="contact-name" class="contact-page__label">Name</label>
+          <input
+            type="text"
+            id="contact-name"
+            name="contact[name]"
+            value="{{ form.name }}"
+            required
+            class="contact-page__input"
+            autocomplete="name"
+          >
+        </div>
+
+        <div class="contact-page__field">
+          <label for="contact-email" class="contact-page__label">Email</label>
+          <input
+            type="email"
+            id="contact-email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            required
+            class="contact-page__input"
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="contact-page__field">
+          <label for="contact-message" class="contact-page__label">Message</label>
+          <textarea
+            id="contact-message"
+            name="contact[body]"
+            rows="5"
+            required
+            class="contact-page__input contact-page__textarea"
+          >{{ form.body }}</textarea>
+        </div>
+
+        <button type="submit" class="contact-page__submit">
+          Send Message
+        </button>
+      {%- endform -%}
+    </div>
+
+    <div class="contact-page__info">
+      <div class="contact-page__info-item">
+        <span class="contact-page__info-label">Email</span>
+        <a href="mailto:{{ section.settings.email | default: 'info@s-natural.xyz' }}" class="contact-page__info-value">
+          {{ section.settings.email | default: 'info@s-natural.xyz' }}
+        </a>
+      </div>
+
+      {%- if section.settings.response_time != blank -%}
+        <div class="contact-page__info-item">
+          <span class="contact-page__info-label">Response Time</span>
+          <span class="contact-page__info-value">{{ section.settings.response_time }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.location != blank -%}
+        <div class="contact-page__info-item">
+          <span class="contact-page__info-label">Location</span>
+          <span class="contact-page__info-value">{{ section.settings.location }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-page {
+    padding: 4rem 0 6rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .contact-page__header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+  }
+
+  .contact-page__heading {
+    font-family: var(--font-heading-family);
+    font-size: 2.8rem;
+    font-weight: 400;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--color-primary, #406546);
+    margin-bottom: .6rem;
+  }
+
+  .contact-page__subheading {
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--color-text-secondary, #7A766D);
+    letter-spacing: .04em;
+  }
+
+  .contact-page__body {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  /* -- Form -- */
+  .contact-page__form-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+
+  .contact-page__field {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+  }
+
+  .contact-page__label {
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--color-text, #161614);
+  }
+
+  .contact-page__input {
+    width: 100%;
+    padding: 1rem 1.4rem;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 12px;
+    font-family: var(--font-body-family);
+    font-size: 1.4rem;
+    color: var(--color-text, #161614);
+    background: #fff;
+    transition: border-color .3s ease;
+    -webkit-appearance: none;
+  }
+
+  .contact-page__input:focus {
+    outline: none;
+    border-color: var(--color-primary, #406546);
+  }
+
+  .contact-page__textarea {
+    resize: vertical;
+    min-height: 12rem;
+    line-height: 1.6;
+  }
+
+  .contact-page__submit {
+    width: 100%;
+    padding: 1.4rem;
+    background: var(--color-primary, #406546);
+    color: #fff;
+    border: none;
+    border-radius: 9999px;
+    font-family: var(--font-body-family);
+    font-size: 1.3rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .3s ease;
+    margin-top: .4rem;
+  }
+
+  .contact-page__submit:hover {
+    opacity: .9;
+    transform: translateY(-1px);
+  }
+
+  /* -- Status messages -- */
+  .contact-page__success {
+    padding: 1.2rem 1.6rem;
+    background: rgba(64, 101, 70, .08);
+    border-radius: 12px;
+    font-size: 1.4rem;
+    color: var(--color-primary, #406546);
+    text-align: center;
+  }
+
+  .contact-page__errors {
+    padding: 1.2rem 1.6rem;
+    background: rgba(180, 60, 60, .06);
+    border-radius: 12px;
+    font-size: 1.3rem;
+    color: #8B3A3A;
+  }
+
+  /* -- Info -- */
+  .contact-page__info {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 0, 0, .06);
+  }
+
+  .contact-page__info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .3rem;
+  }
+
+  .contact-page__info-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary, #7A766D);
+  }
+
+  .contact-page__info-value {
+    font-size: 1.4rem;
+    color: var(--color-text, #161614);
+  }
+
+  a.contact-page__info-value:hover {
+    color: var(--color-primary, #406546);
+  }
+
+  /* -- Mobile -- */
+  @media screen and (max-width: 749px) {
+    .contact-page {
+      padding: 3rem 1.5rem 4rem;
+    }
+    .contact-page__heading {
+      font-size: 2.2rem;
+    }
+    .contact-page__info {
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Contact Page",
+  "tag": "section",
+  "class": "section-contact-page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Contact"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "We'd love to hear from you."
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Contact email",
+      "default": "info@s-natural.xyz"
+    },
+    {
+      "type": "text",
+      "id": "response_time",
+      "label": "Response time",
+      "default": "Within 24 hours"
+    },
+    {
+      "type": "text",
+      "id": "location",
+      "label": "Location",
+      "default": "Dubai, UAE"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thank you for reaching out. We will get back to you shortly."
+    }
+  ]
+}
+{% endschema %}

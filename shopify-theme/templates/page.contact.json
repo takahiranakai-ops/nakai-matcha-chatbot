@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "contact-page",
+      "settings": {
+        "heading": "Contact",
+        "subheading": "We'd love to hear from you.",
+        "email": "info@s-natural.xyz",
+        "response_time": "Within 24 hours",
+        "location": "Dubai, UAE"
+      }
+    }
+  },
+  "order": ["main"]
+}
