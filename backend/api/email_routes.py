@@ -1,0 +1,503 @@
+"""Email marketing API endpoints."""
+
+import asyncio
+import csv
+import io
+import logging
+from datetime import datetime, timezone
+from typing import Optional
+
+from fastapi import APIRouter, HTTPException, Depends, Header, Request, UploadFile, File, Form
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel, Field
+
+from api.admin_routes import verify_admin
+from api.middleware import limiter
+from config import settings
+from services import supabase_client
+from services import resend_client
+from services.email_ai import generate_email_design, extract_editable_blocks, apply_editable_text
+
+logger = logging.getLogger(__name__)
+
+email_router = APIRouter(prefix="/api/email", tags=["Email Marketing"])
+
+BASE_URL = "https://nakai-matcha-chat.onrender.com"
+
+
+# ── Models ────────────────────────────────────────────────────
+
+class BrandAssetsUpdate(BaseModel):
+    logo_url: Optional[str] = None
+    colors: Optional[dict] = None
+    font_family: Optional[str] = None
+    footer_text: Optional[str] = None
+    photos: Optional[list] = None
+
+
+class SubscriberCreate(BaseModel):
+    email: str = Field(..., min_length=3, max_length=320)
+    name: str = Field(default="", max_length=200)
+    tags: list[str] = Field(default_factory=list)
+    language: str = Field(default="en", max_length=5)
+
+
+class SubscriberUpdate(BaseModel):
+    name: Optional[str] = None
+    tags: Optional[list[str]] = None
+    language: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+class CampaignCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(..., min_length=1, max_length=2000)
+    target_tags: list[str] = Field(default_factory=list)
+    target_language: str = Field(default="", max_length=5)
+
+
+class CampaignUpdate(BaseModel):
+    name: Optional[str] = None
+    subject: Optional[str] = None
+    html_content: Optional[str] = None
+    text_content: Optional[str] = None
+    target_tags: Optional[list[str]] = None
+    target_language: Optional[str] = None
+    edits: Optional[dict[str, str]] = None  # {block_name: new_text}
+
+
+class SendTestRequest(BaseModel):
+    email: str = Field(..., min_length=3, max_length=320)
+
+
+# ── Brand Assets ──────────────────────────────────────────────
+
+@email_router.get("/brand-assets")
+async def get_brand_assets(_auth: bool = Depends(verify_admin)):
+    assets = await supabase_client.get_email_brand_assets()
+    if not assets:
+        return {
+            "logo_url": "",
+            "colors": {"primary": "#406546", "secondary": "#F9F0E2", "accent": "#FFFFFF", "text": "#1a1a1a"},
+            "font_family": "Work Sans, Helvetica, Arial, sans-serif",
+            "footer_text": "NAKAI Matcha | Kagoshima, Japan",
+            "photos": [],
+        }
+    return assets
+
+
+@email_router.post("/brand-assets")
+async def update_brand_assets(body: BrandAssetsUpdate, _auth: bool = Depends(verify_admin)):
+    data = {k: v for k, v in body.model_dump().items() if v is not None}
+    data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    result = await supabase_client.upsert_email_brand_assets(data)
+    if not result:
+        raise HTTPException(500, "Failed to save brand assets")
+    return result
+
+
+@email_router.post("/brand-assets/photo")
+async def upload_brand_photo(
+    file: UploadFile = File(...),
+    label: str = Form(default=""),
+    _auth: bool = Depends(verify_admin),
+):
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(400, "Only image files allowed")
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(400, "File too large (max 5MB)")
+
+    # Upload to Supabase Storage
+    import uuid
+    ext = file.filename.rsplit(".", 1)[-1] if file.filename and "." in file.filename else "jpg"
+    filename = f"{uuid.uuid4().hex}.{ext}"
+
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                f"{settings.supabase_url}/storage/v1/object/email-assets/{filename}",
+                headers={
+                    "Authorization": f"Bearer {settings.supabase_service_key}",
+                    "Content-Type": file.content_type or "image/jpeg",
+                },
+                content=content,
+            )
+            resp.raise_for_status()
+    except Exception as e:
+        logger.error(f"Photo upload failed: {e}")
+        raise HTTPException(500, "Failed to upload photo")
+
+    photo_url = f"{settings.supabase_url}/storage/v1/object/public/email-assets/{filename}"
+
+    # Add to brand assets photos array
+    assets = await supabase_client.get_email_brand_assets()
+    photos = assets.get("photos", []) if assets else []
+    photos.append({"url": photo_url, "label": label or file.filename, "uploaded_at": datetime.now(timezone.utc).isoformat()})
+    await supabase_client.upsert_email_brand_assets({"photos": photos})
+
+    return {"url": photo_url, "label": label or file.filename}
+
+
+@email_router.delete("/brand-assets/photo/{idx}")
+async def delete_brand_photo(idx: int, _auth: bool = Depends(verify_admin)):
+    assets = await supabase_client.get_email_brand_assets()
+    if not assets:
+        raise HTTPException(404, "No brand assets found")
+    photos = assets.get("photos", [])
+    if idx < 0 or idx >= len(photos):
+        raise HTTPException(404, "Photo index out of range")
+    photos.pop(idx)
+    await supabase_client.upsert_email_brand_assets({"photos": photos})
+    return {"ok": True}
+
+
+# ── Subscribers ───────────────────────────────────────────────
+
+@email_router.get("/subscribers")
+async def list_subscribers(
+    tag: Optional[str] = None,
+    language: Optional[str] = None,
+    _auth: bool = Depends(verify_admin),
+):
+    return await supabase_client.list_email_subscribers(tag=tag, language=language)
+
+
+@email_router.post("/subscribers")
+async def create_subscriber(body: SubscriberCreate, _auth: bool = Depends(verify_admin)):
+    result = await supabase_client.create_email_subscriber(
+        email=body.email, name=body.name, tags=body.tags, language=body.language,
+    )
+    if not result:
+        raise HTTPException(500, "Failed to create subscriber (may already exist)")
+    return result
+
+
+@email_router.post("/subscribers/import")
+async def import_subscribers(
+    file: UploadFile = File(...),
+    _auth: bool = Depends(verify_admin),
+):
+    """Import subscribers from CSV (columns: email, name, tags, language)."""
+    content = await file.read()
+    text = content.decode("utf-8-sig")
+    reader = csv.DictReader(io.StringIO(text))
+
+    imported = 0
+    errors = []
+    for i, row in enumerate(reader):
+        email = row.get("email", "").strip()
+        if not email or "@" not in email:
+            errors.append(f"Row {i+2}: invalid email")
+            continue
+        name = row.get("name", "").strip()
+        tags_str = row.get("tags", "").strip()
+        tags = [t.strip() for t in tags_str.split(",") if t.strip()] if tags_str else []
+        language = row.get("language", "en").strip() or "en"
+
+        result = await supabase_client.create_email_subscriber(
+            email=email, name=name, tags=tags, language=language,
+        )
+        if result:
+            imported += 1
+
+    return {"imported": imported, "errors": errors}
+
+
+@email_router.patch("/subscribers/{sub_id}")
+async def update_subscriber(sub_id: str, body: SubscriberUpdate, _auth: bool = Depends(verify_admin)):
+    data = {k: v for k, v in body.model_dump().items() if v is not None}
+    result = await supabase_client.update_email_subscriber(sub_id, data)
+    if not result:
+        raise HTTPException(404, "Subscriber not found")
+    return result
+
+
+@email_router.delete("/subscribers/{sub_id}")
+async def delete_subscriber(sub_id: str, _auth: bool = Depends(verify_admin)):
+    ok = await supabase_client.delete_email_subscriber(sub_id)
+    if not ok:
+        raise HTTPException(404, "Subscriber not found")
+    return {"ok": True}
+
+
+# ── Campaigns ─────────────────────────────────────────────────
+
+@email_router.get("/campaigns")
+async def list_campaigns(_auth: bool = Depends(verify_admin)):
+    return await supabase_client.list_email_campaigns()
+
+
+@email_router.post("/campaigns")
+async def create_campaign(body: CampaignCreate, _auth: bool = Depends(verify_admin)):
+    """Create campaign and generate AI email design."""
+    # Save draft
+    campaign = await supabase_client.create_email_campaign({
+        "name": body.name,
+        "description": body.description,
+        "status": "generating",
+        "target_tags": body.target_tags,
+        "target_language": body.target_language,
+    })
+    if not campaign:
+        raise HTTPException(500, "Failed to create campaign")
+
+    # Generate design with AI
+    brand_assets = await supabase_client.get_email_brand_assets()
+    if not brand_assets:
+        brand_assets = {
+            "logo_url": "",
+            "colors": {"primary": "#406546", "secondary": "#F9F0E2", "accent": "#FFFFFF", "text": "#1a1a1a"},
+            "font_family": "Work Sans, Helvetica, Arial, sans-serif",
+            "photos": [],
+        }
+
+    html = await generate_email_design(
+        description=body.description,
+        brand_assets=brand_assets,
+        language=body.target_language or "en",
+    )
+
+    blocks = extract_editable_blocks(html)
+
+    await supabase_client.update_email_campaign(campaign["id"], {
+        "html_content": html,
+        "status": "ready",
+    })
+
+    campaign["html_content"] = html
+    campaign["status"] = "ready"
+    campaign["editable_blocks"] = blocks
+    return campaign
+
+
+@email_router.get("/campaigns/{campaign_id}")
+async def get_campaign(campaign_id: str, _auth: bool = Depends(verify_admin)):
+    campaign = await supabase_client.get_email_campaign(campaign_id)
+    if not campaign:
+        raise HTTPException(404, "Campaign not found")
+    campaign["editable_blocks"] = extract_editable_blocks(campaign.get("html_content", ""))
+    return campaign
+
+
+@email_router.patch("/campaigns/{campaign_id}")
+async def update_campaign(campaign_id: str, body: CampaignUpdate, _auth: bool = Depends(verify_admin)):
+    campaign = await supabase_client.get_email_campaign(campaign_id)
+    if not campaign:
+        raise HTTPException(404, "Campaign not found")
+
+    data = {k: v for k, v in body.model_dump().items() if v is not None and k != "edits"}
+    data["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+    # Apply text edits to HTML
+    if body.edits and campaign.get("html_content"):
+        data["html_content"] = apply_editable_text(campaign["html_content"], body.edits)
+
+    result = await supabase_client.update_email_campaign(campaign_id, data)
+    if not result:
+        raise HTTPException(500, "Failed to update campaign")
+    result["editable_blocks"] = extract_editable_blocks(result.get("html_content", ""))
+    return result
+
+
+@email_router.delete("/campaigns/{campaign_id}")
+async def delete_campaign(campaign_id: str, _auth: bool = Depends(verify_admin)):
+    ok = await supabase_client.delete_email_campaign(campaign_id)
+    if not ok:
+        raise HTTPException(404, "Campaign not found")
+    return {"ok": True}
+
+
+@email_router.post("/campaigns/{campaign_id}/regenerate")
+async def regenerate_campaign(campaign_id: str, _auth: bool = Depends(verify_admin)):
+    """Re-generate email design with AI."""
+    campaign = await supabase_client.get_email_campaign(campaign_id)
+    if not campaign:
+        raise HTTPException(404, "Campaign not found")
+
+    await supabase_client.update_email_campaign(campaign_id, {"status": "generating"})
+
+    brand_assets = await supabase_client.get_email_brand_assets() or {
+        "logo_url": "",
+        "colors": {"primary": "#406546", "secondary": "#F9F0E2", "accent": "#FFFFFF", "text": "#1a1a1a"},
+        "font_family": "Work Sans, Helvetica, Arial, sans-serif",
+        "photos": [],
+    }
+
+    html = await generate_email_design(
+        description=campaign["description"],
+        brand_assets=brand_assets,
+        language=campaign.get("target_language") or "en",
+    )
+
+    result = await supabase_client.update_email_campaign(campaign_id, {
+        "html_content": html,
+        "status": "ready",
+    })
+    if result:
+        result["editable_blocks"] = extract_editable_blocks(html)
+    return result
+
+
+@email_router.post("/campaigns/{campaign_id}/send-test")
+async def send_test_email(
+    campaign_id: str,
+    body: SendTestRequest,
+    _auth: bool = Depends(verify_admin),
+):
+    campaign = await supabase_client.get_email_campaign(campaign_id)
+    if not campaign:
+        raise HTTPException(404, "Campaign not found")
+    if not campaign.get("html_content"):
+        raise HTTPException(400, "Campaign has no email content")
+
+    subject = campaign.get("subject") or f"[TEST] {campaign['name']}"
+    html = campaign["html_content"].replace(
+        "{{unsubscribe_url}}", f"{BASE_URL}/api/email/unsubscribe?token=test"
+    )
+
+    result = await resend_client.send_email(
+        to=body.email,
+        subject=f"[TEST] {subject}",
+        html=html,
+    )
+    if not result:
+        raise HTTPException(500, "Failed to send test email")
+    return {"ok": True, "resend_id": result.get("id")}
+
+
+@email_router.post("/campaigns/{campaign_id}/send")
+@limiter.limit("5/minute")
+async def send_campaign(
+    request: Request,
+    campaign_id: str,
+    _auth: bool = Depends(verify_admin),
+):
+    """Execute bulk send to all matching subscribers."""
+    campaign = await supabase_client.get_email_campaign(campaign_id)
+    if not campaign:
+        raise HTTPException(404, "Campaign not found")
+    if not campaign.get("html_content") or not campaign.get("subject"):
+        raise HTTPException(400, "Campaign needs content and subject before sending")
+    if campaign.get("status") in ("sending", "sent"):
+        raise HTTPException(400, f"Campaign already {campaign['status']}")
+
+    # Start background send
+    asyncio.create_task(_execute_bulk_send(campaign_id))
+    return {"ok": True, "status": "sending"}
+
+
+async def _execute_bulk_send(campaign_id: str):
+    """Background task: send campaign to matching subscribers."""
+    try:
+        campaign = await supabase_client.get_email_campaign(campaign_id)
+        if not campaign:
+            return
+
+        subscribers = await supabase_client.list_email_subscribers(
+            tag=campaign["target_tags"][0] if campaign.get("target_tags") else None,
+            language=campaign.get("target_language") or None,
+        )
+
+        if not subscribers:
+            await supabase_client.update_email_campaign(campaign_id, {
+                "status": "sent",
+                "sent_at": datetime.now(timezone.utc).isoformat(),
+                "stats": {"total": 0, "sent": 0, "failed": 0},
+            })
+            return
+
+        await supabase_client.update_email_campaign(campaign_id, {"status": "sending"})
+
+        sent = 0
+        failed = 0
+        batch = []
+
+        for sub in subscribers:
+            html = campaign["html_content"].replace(
+                "{{unsubscribe_url}}",
+                f"{BASE_URL}/api/email/unsubscribe?token={sub.get('unsubscribe_token', '')}"
+            )
+
+            batch.append({
+                "from": "NAKAI Matcha <hello@nakaimatcha.com>",
+                "to": [sub["email"]],
+                "subject": campaign["subject"],
+                "html": html,
+                "reply_to": "contact@nakaiinfo.com",
+                "headers": {
+                    "List-Unsubscribe": f"<{BASE_URL}/api/email/unsubscribe?token={sub.get('unsubscribe_token', '')}>",
+                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+                },
+            })
+
+            if len(batch) >= 50:
+                results = await resend_client.send_batch(batch)
+                sent += len(results)
+                if len(results) < len(batch):
+                    failed += len(batch) - len(results)
+                batch = []
+                await asyncio.sleep(1)
+
+        if batch:
+            results = await resend_client.send_batch(batch)
+            sent += len(results)
+            if len(results) < len(batch):
+                failed += len(batch) - len(results)
+
+        await supabase_client.update_email_campaign(campaign_id, {
+            "status": "sent",
+            "sent_at": datetime.now(timezone.utc).isoformat(),
+            "stats": {"total": len(subscribers), "sent": sent, "failed": failed},
+        })
+
+    except Exception as e:
+        logger.error(f"Bulk send failed for campaign {campaign_id}: {e}")
+        await supabase_client.update_email_campaign(campaign_id, {"status": "failed"})
+
+
+# ── Unsubscribe (Public) ─────────────────────────────────────
+
+@email_router.get("/unsubscribe", response_class=HTMLResponse)
+async def unsubscribe_page(token: str = ""):
+    if not token:
+        return HTMLResponse("<h1>Invalid unsubscribe link</h1>", status_code=400)
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unsubscribe - NAKAI Matcha</title>
+<style>
+body{{font-family:Work Sans,Helvetica,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#F9F0E2;color:#1a1a1a}}
+.card{{background:#fff;padding:48px;border-radius:16px;text-align:center;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,.06)}}
+h1{{color:#406546;font-size:24px;margin:0 0 16px}}
+p{{font-size:16px;line-height:1.5;margin:0 0 24px;color:#666}}
+button{{background:#406546;color:#fff;border:none;padding:14px 32px;border-radius:8px;font-size:16px;cursor:pointer;font-family:inherit}}
+button:hover{{background:#345538}}
+.done{{color:#406546}}
+</style></head>
+<body><div class="card" id="card">
+<h1>Unsubscribe</h1>
+<p>Are you sure you want to unsubscribe from NAKAI Matcha emails?</p>
+<button onclick="doUnsub()">Unsubscribe</button>
+</div>
+<script>
+async function doUnsub(){{
+  try{{
+    const r=await fetch('/api/email/unsubscribe',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{token:'{token}'}})}});
+    const d=await r.json();
+    document.getElementById('card').innerHTML=d.ok
+      ?'<h1 class="done">Unsubscribed</h1><p>You have been successfully unsubscribed.</p>'
+      :'<h1>Error</h1><p>Could not process your request. The link may have expired.</p>';
+  }}catch(e){{document.getElementById('card').innerHTML='<h1>Error</h1><p>Something went wrong.</p>';}}
+}}
+</script></body></html>""")
+
+
+@email_router.post("/unsubscribe")
+async def process_unsubscribe(request: Request):
+    body = await request.json()
+    token = body.get("token", "")
+    if not token:
+        raise HTTPException(400, "Missing token")
+    ok = await supabase_client.unsubscribe_by_token(token)
+    return {"ok": ok}

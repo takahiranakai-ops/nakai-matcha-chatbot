@@ -710,3 +710,267 @@ async def get_automation_stats() -> dict:
         stats["top_cited_queries"] = []
 
     return stats
+
+
+# ----------------------------------------------------------------
+# EMAIL MARKETING: BRAND ASSETS
+# ----------------------------------------------------------------
+
+async def get_email_brand_assets() -> Optional[dict]:
+    """Get the single NAKAI brand assets row."""
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/email_brand_assets",
+            headers=_HEADERS,
+            params={"limit": "1"},
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to get brand assets: {e}")
+        return None
+
+
+async def upsert_email_brand_assets(data: dict) -> Optional[dict]:
+    """Create or update brand assets (single row)."""
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        existing = await get_email_brand_assets()
+        if existing:
+            resp = await client.patch(
+                f"{_BASE_URL}/email_brand_assets",
+                headers={**_HEADERS, "Prefer": "return=representation"},
+                params={"id": f"eq.{existing['id']}"},
+                json=data,
+            )
+        else:
+            resp = await client.post(
+                f"{_BASE_URL}/email_brand_assets",
+                headers=_HEADERS,
+                json=data,
+            )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to upsert brand assets: {e}")
+        return None
+
+
+# ----------------------------------------------------------------
+# EMAIL MARKETING: SUBSCRIBERS
+# ----------------------------------------------------------------
+
+async def list_email_subscribers(
+    tag: str | None = None,
+    language: str | None = None,
+    active_only: bool = True,
+) -> list[dict]:
+    if not _is_configured():
+        return []
+    _init()
+    params: dict = {"order": "created_at.desc", "limit": "5000"}
+    if active_only:
+        params["is_active"] = "eq.true"
+    if language:
+        params["language"] = f"eq.{language}"
+    if tag:
+        params["tags"] = f"cs.{{{tag}}}"
+    try:
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/email_subscribers",
+            headers=_HEADERS,
+            params=params,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logger.warning(f"Failed to list subscribers: {e}")
+        return []
+
+
+async def create_email_subscriber(
+    email: str, name: str = "", tags: list[str] | None = None, language: str = "en"
+) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.post(
+            f"{_BASE_URL}/email_subscribers",
+            headers={**_HEADERS, "Prefer": "return=representation,resolution=ignore-duplicates"},
+            json={"email": email, "name": name, "tags": tags or [], "language": language},
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to create subscriber: {e}")
+        return None
+
+
+async def update_email_subscriber(sub_id: str, updates: dict) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.patch(
+            f"{_BASE_URL}/email_subscribers",
+            headers={**_HEADERS, "Prefer": "return=representation"},
+            params={"id": f"eq.{sub_id}"},
+            json=updates,
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to update subscriber: {e}")
+        return None
+
+
+async def delete_email_subscriber(sub_id: str) -> bool:
+    if not _is_configured():
+        return False
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.delete(
+            f"{_BASE_URL}/email_subscribers",
+            headers=_HEADERS,
+            params={"id": f"eq.{sub_id}"},
+        )
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to delete subscriber: {e}")
+        return False
+
+
+async def unsubscribe_by_token(token: str) -> bool:
+    """Unsubscribe via token (public endpoint)."""
+    if not _is_configured():
+        return False
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.patch(
+            f"{_BASE_URL}/email_subscribers",
+            headers={**_HEADERS, "Prefer": "return=representation"},
+            params={"unsubscribe_token": f"eq.{token}", "is_active": "eq.true"},
+            json={"is_active": False, "unsubscribed_at": datetime.now(timezone.utc).isoformat()},
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return len(rows) > 0
+    except Exception as e:
+        logger.warning(f"Failed to unsubscribe: {e}")
+        return False
+
+
+# ----------------------------------------------------------------
+# EMAIL MARKETING: CAMPAIGNS
+# ----------------------------------------------------------------
+
+async def list_email_campaigns() -> list[dict]:
+    if not _is_configured():
+        return []
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/email_campaigns",
+            headers=_HEADERS,
+            params={"order": "created_at.desc", "limit": "100"},
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logger.warning(f"Failed to list campaigns: {e}")
+        return []
+
+
+async def get_email_campaign(campaign_id: str) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/email_campaigns",
+            headers=_HEADERS,
+            params={"id": f"eq.{campaign_id}", "limit": "1"},
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to get campaign: {e}")
+        return None
+
+
+async def create_email_campaign(data: dict) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.post(
+            f"{_BASE_URL}/email_campaigns",
+            headers=_HEADERS,
+            json=data,
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to create campaign: {e}")
+        return None
+
+
+async def update_email_campaign(campaign_id: str, updates: dict) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.patch(
+            f"{_BASE_URL}/email_campaigns",
+            headers={**_HEADERS, "Prefer": "return=representation"},
+            params={"id": f"eq.{campaign_id}"},
+            json=updates,
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to update campaign: {e}")
+        return None
+
+
+async def delete_email_campaign(campaign_id: str) -> bool:
+    if not _is_configured():
+        return False
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.delete(
+            f"{_BASE_URL}/email_campaigns",
+            headers=_HEADERS,
+            params={"id": f"eq.{campaign_id}"},
+        )
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to delete campaign: {e}")
+        return False

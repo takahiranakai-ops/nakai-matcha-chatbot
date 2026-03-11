@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     serp_api_key: str = ""
     indexnow_api_key: str = ""
     enable_scheduler: bool = True
+    # Email Marketing
+    resend_api_key: str = ""
+    anthropic_api_key: str = ""
 
     class Config:
         env_file = ".env"

@@ -10,3 +10,4 @@ slowapi==0.1.9
 pypdf==4.1.0
 python-multipart==0.0.12
 aiosmtplib>=3.0
+anthropic>=0.40.0

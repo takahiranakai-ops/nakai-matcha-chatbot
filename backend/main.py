@@ -19,6 +19,8 @@ from api.matcha_guide import guide_router
 from api.webhooks import webhook_router
 from api.mcp_sse import mcp_sse_router
 from api.command_center import command_center_router
+from api.email_routes import email_router
+from api.email_page import email_page_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -140,6 +142,8 @@ app.include_router(guide_router)
 app.include_router(webhook_router)
 app.include_router(mcp_sse_router)
 app.include_router(command_center_router)
+app.include_router(email_router)
+app.include_router(email_page_router)
 
 
 @app.get("/health")
