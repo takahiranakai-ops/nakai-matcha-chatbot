@@ -3,8 +3,6 @@
 import logging
 import re
 
-import anthropic
-
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -99,6 +97,7 @@ async def generate_email_design(
     user_prompt = f"Design an email for: {description}\nPlaceholder text language: {lang_hint}"
 
     try:
+        import anthropic
         client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
         response = await client.messages.create(
             model="claude-sonnet-4-20250514",
