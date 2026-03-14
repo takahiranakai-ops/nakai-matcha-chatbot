@@ -949,6 +949,23 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   }}
   function scroll(){{var m=$('nc-messages');if(m)m.scrollTop=m.scrollHeight}}
 
+  var HANDLE_MAP={{
+    'shi-4':'%E5%9B%9B-shi-4-specialty-grade-organic-matcha',
+    'ju-roku-16':'ju-roku-16-specialty-organic-matcha',
+    'ju-nana-17':'ju-nana-17-specialty-organic-matcha',
+    'ju-hachi-18':'expert-set',
+    'nijyu-ni-22':'nijyu-ni-22-ceremonial-reserve-organic-matcha',
+    'the-everyday':'the-everyday',
+    'bundle-16-4':'bundle-02-16-4',
+    'expert-set':'expert-set',
+    'hakemekuro':'hakemekuro-%E5%88%B7%E6%AF%9B%E7%9B%AE%E9%BB%92%E8%8C%B6%E7%A2%97',
+    'kurogoushi':'hiragoushi-%E5%B9%B3%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97',
+    'shimamon':'shimamon-shimamon-%E7%B8%9E%E7%B4%8B%E8%8C%B6%E7%A2%97',
+    'yagoushi':'yagoushi-chawan-%E7%9F%A2%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97',
+    'takayama-chasen':'takayama-chasen-100-bamboo-matcha-whisk'
+  }};
+  function resolveHandle(h){{return HANDLE_MAP[h]||h}}
+
   function extractProducts(text){{
     var re=/\[PRODUCT:([a-z0-9-]+)\]/gi;var handles=[];var m;
     while((m=re.exec(text))!==null)handles.push(m[1]);
@@ -960,11 +977,12 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
     if(!handles.length)return;
     var carousel=document.createElement('div');carousel.className='nc-product-carousel';
     handles.forEach(function(handle){{
+      var shopHandle=resolveHandle(handle);
       var card=document.createElement('a');card.className='nc-product-card nc-product-card--loading';
-      card.href=SHOP+'/products/'+handle;card.target='_blank';card.rel='noopener';
+      card.href=SHOP+'/products/'+shopHandle;card.target='_blank';card.rel='noopener';
       card.innerHTML='<div class="nc-product-card__img"></div><div class="nc-product-card__body"><div class="nc-product-card__name" style="height:2.6em;background:var(--g03);border-radius:4px"></div></div>';
       carousel.appendChild(card);
-      fetch('https://nakaimatcha.com/products/'+handle+'.json')
+      fetch('https://nakaimatcha.com/products/'+shopHandle+'.json')
         .then(function(r){{if(!r.ok)throw new Error('err');return r.json()}})
         .then(function(data){{
           var p=data.product;

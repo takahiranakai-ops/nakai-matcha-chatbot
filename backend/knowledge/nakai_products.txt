@@ -24,7 +24,8 @@ Grade: Specialty Grade Organic
 Origin: Kagoshima Prefecture, Japan
 Cultivation: First harvest, shade-grown, organic, JAS-certified
 Processing: Stone-milled, particle size 5-15 micrometers
-Product page: https://nakaimatcha.com/products/四-shi-4-specialty-grade-organic-matcha
+Price: $35/30g
+Product page: https://nakaimatcha.com/products/%E5%9B%9B-shi-4-specialty-grade-organic-matcha
 
 Flavor Profile:
 - Body: Thick and full with power and grace
@@ -53,7 +54,8 @@ Grade: Specialty Grade Organic
 Origin: Kirishima, Kagoshima Prefecture, Japan (volcanic soil)
 Cultivation: First harvest, shade-grown, organic, JAS-certified
 Processing: Stone-milled to perfection, 5-15 micrometers
-Product page: https://nakaimatcha.com/products/十六ju-roku-16-specialty-grade-organic-matcha
+Price: $35/30g
+Product page: https://nakaimatcha.com/products/ju-roku-16-specialty-organic-matcha
 
 Flavor Profile:
 - Body: Rich and smooth
@@ -84,7 +86,8 @@ Cultivars: Two carefully selected cultivars creating balance
 Cultivation: First harvest, shade-grown, organic, JAS-certified
 Processing: Stone-milled, 5-15 micrometers
 Annual production: Limited to 500 kg
-Product page: https://nakaimatcha.com/products/十七-ju-nana-17-specialty-grade-organic-matcha
+Price: $45/30g
+Product page: https://nakaimatcha.com/products/ju-nana-17-specialty-organic-matcha
 
 Flavor Profile:
 - Body: Serene balance of two terroirs
@@ -115,7 +118,8 @@ Origin: Kagoshima Prefecture, Japan
 Cultivar: Single cultivar, four-level roasting
 Cultivation: First harvest, shade-grown, organic, JAS-certified
 Processing: Stone-milled at half the usual pace, near-spherical particles, 5-15 micrometers
-Product page: https://nakaimatcha.com/products/十八-ju-hachi-18-specialty-grade-organic-matcha
+Note: Available as part of JU-HACHI & JU-NANA Bundle ($163)
+Product page: https://nakaimatcha.com/products/expert-set
 
 Flavor Profile:
 - Body: Weightless, smooth, drifting texture
@@ -142,11 +146,12 @@ Tagline: "Within the Flow, Everything Exists"
 
 Story: Equally beautiful hot or cold, especially when prepared with water alone, where its clarity comes into focus. Like the subtle sway of plants, a birdsong, or a child's growth — 二十二 invites you to notice the present moment. Every moment becomes the past. Every moment creates the future, within the gentle flow of everyday life.
 
-Grade: Ceremonial Reserved Organic (highest tier)
+Price: $25/30g
+Grade: Ceremonial Reserve Organic (highest tier)
 Origin: Kagoshima Prefecture, Japan
 Cultivation: First harvest, shade-grown, organic, JAS-certified
 Processing: Stone-milled, 5-15 micrometers
-Product page: https://nakaimatcha.com/products/二十二-nijyu-ni22-ceremonial-reserved-organic-matcha
+Product page: https://nakaimatcha.com/products/nijyu-ni-22-ceremonial-reserve-organic-matcha
 
 Flavor Profile:
 - Body: Light yet full, dissolves effortlessly
@@ -166,33 +171,45 @@ Ideal For:
 
 Bundles
 
-Discovery Bundle:
-An introductory bundle for those new to NAKAI. A gateway to explore the world of specialty organic matcha.
-Product page: https://nakaimatcha.com/products/エントリーバンブル
-
-The Everyday Matcha Bundle:
-Curated for daily ritual. Everything you need to make matcha part of your everyday life.
+十六 JU-ROKU (16) & 二十二 NIJYU-NI (22) Bundle — $57:
+The everyday ritual set. Specialty + Ceremonial Reserve for daily matcha practice.
 Product page: https://nakaimatcha.com/products/the-everyday
 
-Signature Reserve Bundle:
-The premium collection for connoisseurs. The full NAKAI experience in one set.
+十六 JU-ROKU (16) & 四 SHI (4) Bundle — $66:
+Two Specialty favorites for exploration and variety.
+Product page: https://nakaimatcha.com/products/bundle-02-16-4
+
+十八 JU-HACHI (18) & 十七 JU-NANA (17) Bundle — $163:
+The connoisseur set. Two unique Specialty expressions for the dedicated matcha enthusiast.
 Product page: https://nakaimatcha.com/products/expert-set
 
 ===
 
 Tea Ceremony Accessories
 
-HIRAGOUSHI 平格子茶碗 — Matcha Bowl by Shun Yoshino:
-Handcrafted by ceramic artist Shun Yoshino, based in Hiroshima. His style blends solid forming and glaze control honed through training in Mashiko, Tochigi, with his unique sense of color. The humble texture of the clay harmonizes with rhythmic lines and vivid hues, gently enhancing matcha. Perfect for everyday meals or hospitality scenes.
-Product page: https://nakaimatcha.com/products/hiragoushi-平格子茶碗
+All chawan (matcha bowls) are handcrafted by ceramic artist Shun Yoshino, based in Hiroshima. His style blends solid forming and glaze control honed through training in Mashiko, Tochigi, with his unique sense of color. The humble texture of the clay harmonizes with rhythmic lines and vivid hues, gently enhancing matcha.
+
+HAKEMEKURO 刷毛目黒茶碗 — Matcha Bowl by Shun Yoshino:
+Price: $300
+Product page: https://nakaimatcha.com/products/hakemekuro-%E5%88%B7%E6%AF%9B%E7%9B%AE%E9%BB%92%E8%8C%B6%E7%A2%97
+
+KUROGOUSHI 黒格子茶碗 — Matcha Bowl by Shun Yoshino:
+Price: $300
+Product page: https://nakaimatcha.com/products/hiragoushi-%E5%B9%B3%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97
+
+SHIMAMON 縞紋茶碗 — Matcha Bowl by Shun Yoshino:
+Price: $300
+Product page: https://nakaimatcha.com/products/shimamon-shimamon-%E7%B8%9E%E7%B4%8B%E8%8C%B6%E7%A2%97
 
 YAGOUSHI 矢格子茶碗 — Matcha Bowl by Shun Yoshino:
-Feel the color in every sip. Same artisan craftsmanship as HIRAGOUSHI, with a distinctive arrow-lattice pattern. Born from years of dedicated craftsmanship and playful chromatic intuition.
-Product page: https://nakaimatcha.com/products/yagoushi-chawan-矢格子茶碗
+A distinctive arrow-lattice pattern. Born from years of dedicated craftsmanship and playful chromatic intuition.
+Price: $300
+Product page: https://nakaimatcha.com/products/yagoushi-chawan-%E7%9F%A2%E6%A0%BC%E5%AD%90%E8%8C%B6%E7%A2%97
 
 高山茶筅 百本立 — Takayama Chasen 100-prong Whisk:
 Entrusted to NAKAI by a distinguished Japanese tea ceremony family. Handcrafted in Takayama-cho, Ikoma City, Nara — the birthplace of the chasen, where approximately 90% of Japan's tea whisks have been made for over 500 years. Approximately 100 fine tines draw air gently into the bowl, producing a smooth, creamy foam. The ideal whisk for usucha. Every step of the eight-stage process is completed entirely by hand.
-Product page: https://nakaimatcha.com/products/茶筅-cyasen
+Price: $80
+Product page: https://nakaimatcha.com/products/takayama-chasen-100-bamboo-matcha-whisk
 
 ===
 
@@ -232,10 +249,10 @@ For meditative stillness:
 十八 (18) — Single cultivar, four-level roasting. A cup that opens the gateway to silence.
 
 For exploring NAKAI:
-Start with the Discovery Bundle, or The Everyday Matcha Bundle for daily ritual.
+Start with The Everyday Bundle (十六 + 二十二, $57) for daily ritual, or Bundle 16+4 (十六 + 四, $66) for variety.
 
-For the complete experience:
-The Signature Reserve Bundle — the full NAKAI journey.
+For the connoisseur experience:
+The Expert Set (十八 + 十七, $163) — two rare specialty expressions for the dedicated matcha enthusiast.
 
 ===
 
