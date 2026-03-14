@@ -21,6 +21,7 @@ from api.mcp_sse import mcp_sse_router
 from api.command_center import command_center_router
 from api.email_routes import email_router
 from api.email_page import email_page_router
+from api.daily_tips_routes import tips_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -98,7 +99,7 @@ app = FastAPI(
         "- `POST /api/matcha/taste-profile` — Matcha DNA taste fingerprinting\n"
         "- `POST /api/matcha/discover` — Contextual matcha discovery\n"
         "- `GET /api/products/{handle}/live` — Living product intelligence\n"
-        "- `GET /guide` — Matcha Encyclopedia (15 SEO-optimized HTML guides)\n"
+        "- `GET /guide` — Matcha Encyclopedia (16 SEO-optimized HTML guides)\n"
         "- `GET /guide/sitemap.xml` — Encyclopedia sitemap\n"
         "- `GET /mcp/sse` — MCP SSE transport (Bearer auth required)\n"
     ),
@@ -144,6 +145,7 @@ app.include_router(mcp_sse_router)
 app.include_router(command_center_router)
 app.include_router(email_router)
 app.include_router(email_page_router)
+app.include_router(tips_router)
 
 
 @app.get("/health")

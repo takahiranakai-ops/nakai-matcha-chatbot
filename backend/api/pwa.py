@@ -135,7 +135,7 @@ APP_HTML = f"""<!DOCTYPE html>
     "name": "NAKAI",
     "url": "https://nakaimatcha.com",
     "description": "Specialty organic matcha brand — grounded in nature, elevated in ritual",
-    "foundingDate": "2024",
+    "foundingDate": "2023",
     "email": "contact@nakaiinfo.com",
     "brand": {{
       "@type": "Brand",

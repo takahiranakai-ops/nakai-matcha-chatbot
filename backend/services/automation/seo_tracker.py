@@ -43,14 +43,6 @@ SEO_KEYWORDS = {
         "濃茶 抹茶 おすすめ",
         "抹茶 卸売り",
     ],
-    "ae": [
-        "matcha Dubai",
-        "organic matcha UAE",
-        "Japanese matcha delivery Dubai",
-        "matcha wholesale Middle East",
-        "NAKAI matcha Dubai",
-        "ceremonial matcha UAE",
-    ],
 }
 
 MARKET_GL = {"us": "us", "jp": "jp", "ae": "ae"}
