@@ -379,6 +379,7 @@ function doLogin(){
   fetch(API+'/stats', {headers:{'X-Admin-Password':PWD}})
     .then(r=>{
       if(!r.ok) throw new Error();
+      sessionStorage.setItem('nakai_admin_pw', PWD);
       document.getElementById('login').style.display='none';
       document.getElementById('app').style.display='block';
       return r.json();
@@ -386,6 +387,23 @@ function doLogin(){
     .then(renderOverview)
     .catch(()=>{document.getElementById('login-err').style.display='block'});
 }
+
+// Auto-login from /admin session
+(function autoLogin(){
+  var stored = sessionStorage.getItem('nakai_admin_pw');
+  if(stored){
+    PWD = stored;
+    fetch(API+'/stats', {headers:{'X-Admin-Password':PWD}})
+      .then(r=>{
+        if(!r.ok) throw new Error();
+        document.getElementById('login').style.display='none';
+        document.getElementById('app').style.display='block';
+        return r.json();
+      })
+      .then(renderOverview)
+      .catch(()=>{});
+  }
+})();
 
 function headers(){return {'X-Admin-Password':PWD,'Content-Type':'application/json'}}
 function headersFile(){return {'X-Admin-Password':PWD}}

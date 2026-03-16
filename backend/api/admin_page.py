@@ -107,6 +107,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     <h1>NAKAI Admin</h1>
     <div style="display:flex;gap:8px">
       <button onclick="reingest()">Re-ingest Knowledge</button>
+      <button onclick="location.href='/b2b'" style="background:#406546;color:#fff;">B2B Sales</button>
       <button onclick="logout()">Logout</button>
     </div>
   </div>
