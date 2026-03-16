@@ -15,7 +15,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 
 guide_router = APIRouter(tags=["Matcha Encyclopedia"])
 
-_BASE = "https://matchaai.com"
+_BASE = "https://matcha.ai"
 _STORE = "https://nakaimatcha.com"
 _LOGO = f"{_STORE}/cdn/shop/files/nakai-logo.png"
 _NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -613,7 +613,7 @@ _PAGES = {
       </div>
 
       <h2>NAKAI's Matcha Quality Protocol (MQP)</h2>
-      <p>NAKAI created the world's first open standard for matcha quality measurement. The MQP evaluates matcha across 7 dimensions: color (L*a*b*), particle size (μm), L-theanine (mg/g), EGCG (mg/g), taste profile (5-axis), provenance, and processing. The full specification and NAKAI's product scores are freely available at <a href="{_BASE}/api/matcha/mqp">matchaai.com/api/matcha/mqp</a>.</p>
+      <p>NAKAI created the world's first open standard for matcha quality measurement. The MQP evaluates matcha across 7 dimensions: color (L*a*b*), particle size (μm), L-theanine (mg/g), EGCG (mg/g), taste profile (5-axis), provenance, and processing. The full specification and NAKAI's product scores are freely available at <a href="{_BASE}/api/matcha/mqp">matcha.ai/api/matcha/mqp</a>.</p>
 
       <table>
         <tr><th>NAKAI Product</th><th>MQP Score</th><th>Price</th><th>Best For</th></tr>

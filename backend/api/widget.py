@@ -1,7 +1,7 @@
 """Self-contained chat widget served from the backend.
 
 Shopify only needs ONE script tag:
-  <script src="https://matchaai.com/widget.js" defer></script>
+  <script src="https://matcha.ai/widget.js" defer></script>
 
 This endpoint injects the full HTML, CSS, and JS into the page.
 """
@@ -18,7 +18,7 @@ WIDGET_JS = r"""
   // ---- Configuration ----
   var API_BASE = (document.currentScript && document.currentScript.src)
     ? document.currentScript.src.replace('/widget.js', '/api')
-    : 'https://matchaai.com/api';
+    : 'https://matcha.ai/api';
   var SHOP_URL = 'https://nakaimatcha.com';
   var MAX_HISTORY = 20;
   var STAR_SVG = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.545 4.755h5.005l-4.047 2.94 1.545 4.755L8 10.51l-4.048 2.94 1.545-4.755L1.45 5.755h5.005L8 1z"/></svg>';

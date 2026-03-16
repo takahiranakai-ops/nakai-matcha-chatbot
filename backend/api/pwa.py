@@ -106,7 +106,7 @@ APP_HTML = f"""<!DOCTYPE html>
 <meta property="og:type" content="website">
 <meta property="og:title" content="NAKAI Matcha Concierge">
 <meta property="og:description" content="Your personal AI matcha expert. Discover NAKAI's numbered matcha collection — each with its own story, terroir, and character. From Kagoshima and Kyoto, Japan.">
-<meta property="og:url" content="https://matchaai.com/app">
+<meta property="og:url" content="https://matcha.ai/app">
 <meta property="og:site_name" content="NAKAI Matcha">
 <meta property="og:image" content="https://nakaimatcha.com/cdn/shop/files/nakai-logo.png">
 <meta property="og:locale" content="en_US">
@@ -115,14 +115,14 @@ APP_HTML = f"""<!DOCTYPE html>
 <meta name="twitter:title" content="NAKAI Matcha Concierge">
 <meta name="twitter:description" content="Premium organic matcha from Kagoshima, Japan. AI-powered concierge for personalized recommendations.">
 <meta name="twitter:image" content="https://nakaimatcha.com/cdn/shop/files/nakai-logo.png">
-<link rel="canonical" href="https://matchaai.com/app">
+<link rel="canonical" href="https://matcha.ai/app">
 <script type="application/ld+json">
 {{
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "NAKAI Matcha Concierge",
   "description": "AI-powered matcha concierge for premium organic matcha from Japan",
-  "url": "https://matchaai.com/app",
+  "url": "https://matcha.ai/app",
   "applicationCategory": "LifestyleApplication",
   "operatingSystem": "Any",
   "offers": {{

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 email_router = APIRouter(prefix="/api/email", tags=["Email Marketing"])
 
-BASE_URL = "https://matchaai.com"
+BASE_URL = "https://matcha.ai"
 
 
 # ── Models ────────────────────────────────────────────────────
