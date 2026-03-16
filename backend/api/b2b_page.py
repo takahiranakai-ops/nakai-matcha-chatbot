@@ -268,6 +268,63 @@ tr:hover{background:#fafaf8}
 
   <!-- 設定 -->
   <div class="panel" id="panel-settings">
+    <!-- メールテンプレート編集 -->
+    <div class="card" style="padding:32px;margin-bottom:20px;">
+      <h3 style="font-size:.95rem;font-weight:500;margin-bottom:8px;">メールテンプレート</h3>
+      <p style="font-size:.82rem;color:var(--gray);margin-bottom:20px;">3段階の営業メールを自分で編集できます。変数: <code>{{cafe_name}}</code> <code>{{city}}</code> <code>{{cafe_type}}</code> <code>{{location}}</code></p>
+      <div style="display:flex;gap:8px;margin-bottom:20px;">
+        <button class="btn btn-sm" id="tpl-btn-1" onclick="showTemplate(1)" style="background:var(--green);color:#fff;">Step 1: 初回</button>
+        <button class="btn btn-sm btn-secondary" id="tpl-btn-2" onclick="showTemplate(2)">Step 2: フォロー</button>
+        <button class="btn btn-sm btn-secondary" id="tpl-btn-3" onclick="showTemplate(3)">Step 3: 最終</button>
+      </div>
+      <div id="tpl-editor">
+        <label style="font-size:.75rem;font-weight:600;color:var(--gray);display:block;margin-bottom:6px;">件名</label>
+        <input type="text" id="tpl-subject" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:var(--font);font-size:.85rem;margin-bottom:16px;outline:none;" placeholder="Premium organic matcha for {{cafe_name}}">
+        <label style="font-size:.75rem;font-weight:600;color:var(--gray);display:block;margin-bottom:6px;">本文</label>
+        <textarea id="tpl-body" rows="12" style="width:100%;padding:14px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:var(--font);font-size:.85rem;line-height:1.6;resize:vertical;outline:none;" placeholder="Hi {{cafe_name}} team,&#10;&#10;I'm Takahiro from NAKAI..."></textarea>
+        <div style="display:flex;gap:10px;margin-top:14px;align-items:center;">
+          <button class="btn btn-primary" onclick="saveTemplate()">保存</button>
+          <span id="tpl-msg" style="font-size:.82rem;color:var(--green);"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- テスト送信 -->
+    <div class="card" style="padding:32px;margin-bottom:20px;">
+      <h3 style="font-size:.95rem;font-weight:500;margin-bottom:8px;">テスト送信</h3>
+      <p style="font-size:.82rem;color:var(--gray);margin-bottom:20px;">テンプレートの確認用にテストメールを送信します。</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:200px;">
+          <label style="font-size:.75rem;font-weight:600;color:var(--gray);display:block;margin-bottom:6px;">送信先メール</label>
+          <input type="email" id="test-email" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:var(--font);font-size:.85rem;outline:none;" placeholder="your@email.com">
+        </div>
+        <div>
+          <label style="font-size:.75rem;font-weight:600;color:var(--gray);display:block;margin-bottom:6px;">ステップ</label>
+          <select id="test-step" style="padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:var(--font);font-size:.85rem;">
+            <option value="1">Step 1: 初回</option>
+            <option value="2">Step 2: フォロー</option>
+            <option value="3">Step 3: 最終</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="sendTest()">テスト送信</button>
+      </div>
+      <div id="test-msg" style="font-size:.82rem;margin-top:12px;"></div>
+    </div>
+
+    <!-- PDF添付 -->
+    <div class="card" style="padding:32px;margin-bottom:20px;">
+      <h3 style="font-size:.95rem;font-weight:500;margin-bottom:8px;">PDF添付ファイル</h3>
+      <p style="font-size:.82rem;color:var(--gray);margin-bottom:20px;">営業メールに添付するPDF（カタログ、価格表など）をアップロードできます。最大5MB。</p>
+      <div id="pdf-status" style="margin-bottom:16px;"></div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-secondary" onclick="document.getElementById('pdf-input').click()">PDFをアップロード</button>
+        <button class="btn btn-sm btn-danger" id="pdf-remove-btn" onclick="removePdf()" style="display:none;">削除</button>
+        <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="uploadPdf(this.files[0])">
+        <span id="pdf-msg" style="font-size:.82rem;color:var(--gray);"></span>
+      </div>
+    </div>
+
+    <!-- API接続状態 -->
     <div class="card" style="padding:32px;">
       <h3 style="font-size:.95rem;font-weight:500;margin-bottom:20px;">パイプライン設定</h3>
       <div style="display:grid;gap:16px;max-width:500px;">
@@ -280,16 +337,8 @@ tr:hover{background:#fafaf8}
           <div style="font-size:.9rem;" id="cfg-from">-</div>
         </div>
         <div>
-          <label style="font-size:.75rem;font-weight:600;letter-spacing:.06em;color:var(--gray);display:block;margin-bottom:6px;">パイプラインの状態</label>
-          <div style="font-size:.9rem;" id="cfg-status">-</div>
-        </div>
-        <div>
           <label style="font-size:.75rem;font-weight:600;letter-spacing:.06em;color:var(--gray);display:block;margin-bottom:6px;">Google Places API</label>
           <div style="font-size:.9rem;" id="cfg-gp">-</div>
-        </div>
-        <div>
-          <label style="font-size:.75rem;font-weight:600;letter-spacing:.06em;color:var(--gray);display:block;margin-bottom:6px;">Hunter.io API</label>
-          <div style="font-size:.9rem;" id="cfg-hunter">-</div>
         </div>
         <div>
           <label style="font-size:.75rem;font-weight:600;letter-spacing:.06em;color:var(--gray);display:block;margin-bottom:6px;">Resend API</label>
@@ -341,6 +390,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
     if(name==='overview') loadStats();
     if(name==='leads') loadLeads();
     if(name==='outreach') loadOutreach();
+    if(name==='settings') loadSettings();
   });
 });
 
@@ -529,15 +579,107 @@ function runPipeline(){
 }
 
 // ── 設定 ──
+let currentStep = 1;
+let templates = {};
+
 function loadSettings(){
   fetch(API+'/stats',{headers:headers()}).then(r=>r.json()).then(s=>{
     document.getElementById('cfg-limit').textContent = '50 通/日';
     document.getElementById('cfg-from').textContent = 'wholesale@nakaimatcha.com';
-    document.getElementById('cfg-status').innerHTML = '<span class="badge badge-new">設定済</span>';
     document.getElementById('cfg-gp').textContent = s.total_leads > 0 ? '接続済' : '未設定';
-    document.getElementById('cfg-hunter').textContent = s.total_contacts > 0 ? '接続済' : '環境変数を確認';
     document.getElementById('cfg-resend').textContent = s.total_sent > 0 ? '接続済' : '環境変数を確認';
   });
+  loadTemplates();
+  loadPdfStatus();
+}
+
+function loadTemplates(){
+  fetch(API+'/sequences',{headers:headers()}).then(r=>r.json()).then(data=>{
+    templates = {};
+    (data||[]).forEach(s=>{ templates[s.step_number] = s; });
+    showTemplate(currentStep);
+  });
+}
+
+function showTemplate(step){
+  currentStep = step;
+  [1,2,3].forEach(s=>{
+    const btn = document.getElementById('tpl-btn-'+s);
+    if(s===step){btn.style.background='var(--green)';btn.style.color='#fff';btn.className='btn btn-sm';}
+    else{btn.style.background='';btn.style.color='';btn.className='btn btn-sm btn-secondary';}
+  });
+  const tpl = templates[step] || {};
+  document.getElementById('tpl-subject').value = tpl.subject_template || '';
+  document.getElementById('tpl-body').value = tpl.body_template || '';
+  document.getElementById('tpl-msg').textContent = '';
+}
+
+function saveTemplate(){
+  const subject = document.getElementById('tpl-subject').value;
+  const body = document.getElementById('tpl-body').value;
+  fetch(API+'/sequences/'+currentStep,{
+    method:'PUT',
+    headers:headers(),
+    body:JSON.stringify({subject_template:subject, body_template:body})
+  }).then(r=>r.json()).then(()=>{
+    document.getElementById('tpl-msg').textContent = '保存しました';
+    if(templates[currentStep]) {
+      templates[currentStep].subject_template = subject;
+      templates[currentStep].body_template = body;
+    }
+    setTimeout(()=>{document.getElementById('tpl-msg').textContent='';},3000);
+  }).catch(()=>{document.getElementById('tpl-msg').textContent='保存に失敗しました';document.getElementById('tpl-msg').style.color='var(--red)';});
+}
+
+function sendTest(){
+  const email = document.getElementById('test-email').value;
+  const step = parseInt(document.getElementById('test-step').value);
+  const msg = document.getElementById('test-msg');
+  if(!email){msg.textContent='メールアドレスを入力してください';msg.style.color='var(--red)';return;}
+  msg.textContent='送信中...';msg.style.color='var(--gray)';
+  fetch(API+'/test-send',{
+    method:'POST',
+    headers:headers(),
+    body:JSON.stringify({to_email:email, step:step, cafe_name:'Sample Cafe', city:'Portland', cafe_type:'specialty'})
+  }).then(r=>r.json()).then(data=>{
+    if(data.ok){msg.textContent='テスト送信しました: '+data.subject;msg.style.color='var(--green)';}
+    else{msg.textContent='送信に失敗しました';msg.style.color='var(--red)';}
+  }).catch(()=>{msg.textContent='送信に失敗しました';msg.style.color='var(--red)';});
+}
+
+function loadPdfStatus(){
+  fetch(API+'/attachment',{headers:headers()}).then(r=>r.json()).then(data=>{
+    const el = document.getElementById('pdf-status');
+    const rmBtn = document.getElementById('pdf-remove-btn');
+    if(data.filename){
+      el.innerHTML='<span style="font-size:.85rem;">現在の添付: <strong>'+esc(data.filename)+'</strong></span>';
+      rmBtn.style.display='inline-block';
+    } else {
+      el.innerHTML='<span style="font-size:.85rem;color:var(--gray);">添付ファイルなし</span>';
+      rmBtn.style.display='none';
+    }
+  });
+}
+
+function uploadPdf(file){
+  if(!file) return;
+  const msg = document.getElementById('pdf-msg');
+  msg.textContent='アップロード中...';
+  const formData = new FormData();
+  formData.append('file', file);
+  fetch(API+'/attachment/upload',{method:'POST',headers:headersFile(),body:formData})
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.ok){msg.textContent=data.filename+' ('+data.size_kb+'KB)';loadPdfStatus();}
+      else{msg.textContent='アップロード失敗';msg.style.color='var(--red)';}
+    })
+    .catch(()=>{msg.textContent='アップロード失敗';msg.style.color='var(--red)';});
+}
+
+function removePdf(){
+  if(!confirm('添付ファイルを削除しますか？')) return;
+  fetch(API+'/attachment',{method:'DELETE',headers:headers()}).then(()=>loadPdfStatus());
+  document.getElementById('pdf-msg').textContent='';
 }
 
 // ── ヘルパー ──

@@ -47,6 +47,10 @@ async def send_outreach(
     unsub_url = f"{BASE_URL}/api/b2b/unsubscribe?email={email}"
     html_with_unsub = html.replace("{{unsubscribe_link}}", unsub_url)
 
+    # Get PDF attachment if available
+    from api.b2b_routes import _get_active_attachment
+    attachments = await _get_active_attachment()
+
     # Send via Resend
     from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
     result = await resend_client.send_email(
@@ -55,6 +59,7 @@ async def send_outreach(
         html=html_with_unsub,
         from_email=from_email,
         reply_to=settings.b2b_reply_to,
+        attachments=attachments,
     )
 
     if not result:

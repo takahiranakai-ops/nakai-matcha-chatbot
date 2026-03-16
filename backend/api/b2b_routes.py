@@ -1,5 +1,6 @@
 """B2B Sales Automation API endpoints."""
 
+import base64
 import logging
 from datetime import datetime, timezone
 
@@ -22,6 +23,19 @@ class LeadUpdate(BaseModel):
     lead_score: int | None = None
     notes: str | None = None
     cafe_type: str | None = None
+
+
+class SequenceUpdate(BaseModel):
+    subject_template: str = ""
+    body_template: str = ""
+
+
+class TestSendRequest(BaseModel):
+    to_email: str
+    step: int = 1
+    cafe_name: str = "Sample Cafe"
+    city: str = "Portland"
+    cafe_type: str = "specialty"
 
 
 # ── Stats ─────────────────────────────────────────────────────
@@ -165,6 +179,201 @@ async def list_outreach(
         raise HTTPException(500, str(e))
 
 
+# ── Sequences (Template CRUD) ────────────────────────────────
+
+@b2b_router.get("/sequences")
+async def list_sequences(_auth: bool = Depends(verify_admin)):
+    """Get all email sequence templates."""
+    if not supabase_client._is_configured():
+        raise HTTPException(503, "Supabase not configured")
+    supabase_client._init()
+    try:
+        client = supabase_client._get_client()
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_sequences",
+            headers=supabase_client._HEADERS,
+            params={"order": "step_number.asc"},
+        )
+        return resp.json()
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@b2b_router.put("/sequences/{step_number}")
+async def update_sequence(
+    step_number: int,
+    body: SequenceUpdate,
+    _auth: bool = Depends(verify_admin),
+):
+    """Update email template for a specific step."""
+    if not supabase_client._is_configured():
+        raise HTTPException(503, "Supabase not configured")
+    supabase_client._init()
+    try:
+        client = supabase_client._get_client()
+        resp = await client.patch(
+            f"{supabase_client._BASE_URL}/b2b_sequences",
+            headers={**supabase_client._HEADERS, "Prefer": "return=representation"},
+            params={"step_number": f"eq.{step_number}", "name": "eq.Default"},
+            json={
+                "subject_template": body.subject_template,
+                "body_template": body.body_template,
+            },
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else {}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+# ── Test Send ─────────────────────────────────────────────────
+
+@b2b_router.post("/test-send")
+async def test_send(
+    body: TestSendRequest,
+    _auth: bool = Depends(verify_admin),
+):
+    """Send a test email to a specified address."""
+    from services.b2b.outreach_writer import generate_outreach_email
+    from services import resend_client
+
+    lead = {
+        "name": body.cafe_name,
+        "city": body.city,
+        "cafe_type": body.cafe_type,
+    }
+    email = await generate_outreach_email(lead, step=body.step)
+
+    # Get PDF attachment if exists
+    attachments = await _get_active_attachment()
+
+    from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
+    result = await resend_client.send_email(
+        to=body.to_email,
+        subject=f"[TEST] {email['subject']}",
+        html=email["html"],
+        from_email=from_email,
+        reply_to=settings.b2b_reply_to,
+        attachments=attachments,
+    )
+
+    if result:
+        return {"ok": True, "subject": email["subject"], "resend_id": result.get("id")}
+    raise HTTPException(500, "Failed to send test email")
+
+
+# ── PDF Attachment ────────────────────────────────────────────
+
+@b2b_router.post("/attachment/upload")
+async def upload_attachment(
+    file: UploadFile = File(...),
+    _auth: bool = Depends(verify_admin),
+):
+    """Upload a PDF to attach to outreach emails."""
+    filename = file.filename or "attachment.pdf"
+    if not filename.lower().endswith(".pdf"):
+        raise HTTPException(400, "PDF files only")
+
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(400, "File too large (max 5MB)")
+
+    content_b64 = base64.b64encode(content).decode("utf-8")
+
+    if not supabase_client._is_configured():
+        raise HTTPException(503, "Supabase not configured")
+    supabase_client._init()
+
+    try:
+        client = supabase_client._get_client()
+        # Deactivate existing attachments
+        await client.patch(
+            f"{supabase_client._BASE_URL}/b2b_attachments",
+            headers={**supabase_client._HEADERS, "Prefer": "return=minimal"},
+            params={"is_active": "eq.true"},
+            json={"is_active": False},
+        )
+        # Insert new
+        resp = await client.post(
+            f"{supabase_client._BASE_URL}/b2b_attachments",
+            headers={**supabase_client._HEADERS, "Prefer": "return=minimal"},
+            json={
+                "filename": filename,
+                "content_base64": content_b64,
+                "content_type": "application/pdf",
+                "is_active": True,
+            },
+        )
+        resp.raise_for_status()
+        return {"ok": True, "filename": filename, "size_kb": len(content) // 1024}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@b2b_router.get("/attachment")
+async def get_attachment(_auth: bool = Depends(verify_admin)):
+    """Get current active attachment info."""
+    if not supabase_client._is_configured():
+        return {"filename": None}
+    supabase_client._init()
+    try:
+        client = supabase_client._get_client()
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_attachments",
+            headers=supabase_client._HEADERS,
+            params={"is_active": "eq.true", "select": "filename,created_at", "limit": "1"},
+        )
+        rows = resp.json()
+        if rows:
+            return {"filename": rows[0]["filename"], "uploaded_at": rows[0]["created_at"]}
+        return {"filename": None}
+    except Exception:
+        return {"filename": None}
+
+
+@b2b_router.delete("/attachment")
+async def delete_attachment(_auth: bool = Depends(verify_admin)):
+    """Remove the active PDF attachment."""
+    if not supabase_client._is_configured():
+        raise HTTPException(503)
+    supabase_client._init()
+    try:
+        client = supabase_client._get_client()
+        await client.patch(
+            f"{supabase_client._BASE_URL}/b2b_attachments",
+            headers={**supabase_client._HEADERS, "Prefer": "return=minimal"},
+            params={"is_active": "eq.true"},
+            json={"is_active": False},
+        )
+        return {"ok": True}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+async def _get_active_attachment() -> list[dict] | None:
+    """Get active PDF attachment for email sending."""
+    if not supabase_client._is_configured():
+        return None
+    supabase_client._init()
+    try:
+        client = supabase_client._get_client()
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_attachments",
+            headers=supabase_client._HEADERS,
+            params={"is_active": "eq.true", "limit": "1"},
+        )
+        rows = resp.json()
+        if rows:
+            return [{
+                "filename": rows[0]["filename"],
+                "content": rows[0]["content_base64"],
+            }]
+    except Exception:
+        pass
+    return None
+
+
 # ── Import ────────────────────────────────────────────────────
 
 @b2b_router.post("/import")
@@ -216,9 +425,8 @@ async def discover_cafes(
     city: str = "",
     _auth: bool = Depends(verify_admin),
 ):
-    """Manually trigger café discovery for a region or city."""
+    """Manually trigger cafe discovery for a region or city."""
     from services.b2b.lead_researcher import search_region, search_cafes_in_city, SEARCH_KEYWORDS
-    import asyncio
 
     if city:
         results = await search_cafes_in_city(city, SEARCH_KEYWORDS[0], region or "us_west")
@@ -255,6 +463,8 @@ async def resend_webhook(request: Request):
 @b2b_router.get("/unsubscribe")
 async def unsubscribe(email: str = ""):
     """CAN-SPAM unsubscribe endpoint."""
+    from fastapi.responses import HTMLResponse
+
     if not email or "@" not in email:
         raise HTTPException(400, "Invalid email")
 

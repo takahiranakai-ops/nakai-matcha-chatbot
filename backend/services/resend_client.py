@@ -28,24 +28,31 @@ async def send_email(
     from_email: str = FROM_EMAIL,
     reply_to: str = REPLY_TO,
     extra_headers: Optional[dict] = None,
+    attachments: Optional[list[dict]] = None,
 ) -> Optional[dict]:
-    """Send a single email via Resend API."""
+    """Send a single email via Resend API.
+
+    attachments: list of {"filename": str, "content": str (base64)}
+    """
     if not settings.resend_api_key:
         logger.warning("Resend API key not configured")
         return None
     try:
+        payload = {
+            "from": from_email,
+            "to": [to],
+            "subject": subject,
+            "html": html,
+            "reply_to": reply_to,
+            "headers": extra_headers or {},
+        }
+        if attachments:
+            payload["attachments"] = attachments
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(
                 f"{RESEND_API}/emails",
                 headers=_headers(),
-                json={
-                    "from": from_email,
-                    "to": [to],
-                    "subject": subject,
-                    "html": html,
-                    "reply_to": reply_to,
-                    "headers": extra_headers or {},
-                },
+                json=payload,
             )
             resp.raise_for_status()
             return resp.json()
