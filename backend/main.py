@@ -23,6 +23,8 @@ from api.command_center import command_center_router
 from api.email_routes import email_router
 from api.email_page import email_page_router
 from api.daily_tips_routes import tips_router
+from api.b2b_routes import b2b_router
+from api.b2b_page import b2b_page_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -160,6 +162,8 @@ app.include_router(command_center_router)
 app.include_router(email_router)
 app.include_router(email_page_router)
 app.include_router(tips_router)
+app.include_router(b2b_router)
+app.include_router(b2b_page_router)
 
 
 @app.get("/health")

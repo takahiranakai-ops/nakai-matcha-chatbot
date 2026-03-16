@@ -6,6 +6,7 @@ Schedule:
 - Daily 01:00 UTC: Review aggregator (WS37)
 - Daily 02:00 UTC: SEO ranking tracker (WS40)
 - Daily 23:00 UTC (08:00 JST): AI Tips auto-post (Twitter/Threads/LINE)
+- Daily 14:00 UTC (06:00 PST): B2B Sales Pipeline
 - Weekly Wed 03:00 UTC: Content freshness refresh (WS38)
 - Weekly Mon 06:00 UTC: Competitor monitor (WS36)
 
@@ -92,6 +93,12 @@ async def run_daily_tips():
     await _safe_run("daily_tips", _generate_and_post())
 
 
+async def run_b2b_pipeline():
+    """Daily B2B sales pipeline — discover, hunt emails, send outreach."""
+    from services.b2b.pipeline import run_daily_pipeline
+    await _safe_run("b2b_pipeline", run_daily_pipeline())
+
+
 # ---------------------------------------------------------------------------
 # Simple asyncio-based scheduler (no external dependency needed)
 # ---------------------------------------------------------------------------
@@ -109,6 +116,7 @@ async def _scheduler_loop():
         "reviews": 0,      # daily
         "seo": 0,          # daily
         "daily_tips": 0,   # daily 23:00 UTC
+        "b2b": 0,          # daily 14:00 UTC
         "freshness": 0,    # weekly
         "competitor": 0,   # weekly
     }
@@ -148,6 +156,11 @@ async def _scheduler_loop():
             if weekday == 0 and hour == 6 and (now.timestamp() - last_run["competitor"]) >= 6 * 24 * 3600:
                 last_run["competitor"] = now.timestamp()
                 asyncio.create_task(run_competitor_monitor())
+
+            # Daily at 14:xx UTC (06:00 PST): B2B Sales Pipeline
+            if hour == 14 and (now.timestamp() - last_run["b2b"]) >= 23 * 3600:
+                last_run["b2b"] = now.timestamp()
+                asyncio.create_task(run_b2b_pipeline())
 
             # Daily at 23:xx UTC (08:00 JST): AI Tips auto-post
             if hour == 23 and (now.timestamp() - last_run["daily_tips"]) >= 23 * 3600:

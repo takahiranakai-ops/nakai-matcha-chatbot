@@ -44,6 +44,13 @@ class Settings(BaseSettings):
     threads_user_id: str = ""
     line_channel_access_token: str = ""
     daily_tips_hour_utc: int = 23  # 23:00 UTC = 08:00 JST
+    # B2B Sales Automation
+    google_places_api_key: str = ""
+    hunter_io_api_key: str = ""
+    b2b_daily_send_limit: int = 50
+    b2b_from_email: str = "wholesale@nakaimatcha.com"
+    b2b_reply_to: str = "wholesale@nakaimatcha.com"
+    b2b_enabled: bool = False
 
     class Config:
         env_file = ".env"
