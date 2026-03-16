@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 
 from config import settings
 from services import resend_client, supabase_client
+from services.b2b import cache
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ async def send_outreach(
     if not email:
         return None
 
-    # Check daily send limit
+    # Check daily send limit (cached 30s)
     today_count = await _get_today_send_count()
     if today_count >= settings.b2b_daily_send_limit:
         logger.warning(f"[B2B] Daily send limit ({settings.b2b_daily_send_limit}) reached")
@@ -47,9 +48,8 @@ async def send_outreach(
     unsub_url = f"{BASE_URL}/api/b2b/unsubscribe?email={email}"
     html_with_unsub = html.replace("{{unsubscribe_link}}", unsub_url)
 
-    # Get PDF attachment if available
-    from api.b2b_routes import _get_active_attachment
-    attachments = await _get_active_attachment()
+    # Get PDF attachment if available (cached 5min)
+    attachments = await _get_cached_attachment()
 
     # Send via Resend
     from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
@@ -109,6 +109,75 @@ async def send_batch(
         # Random delay between sends (30-90 seconds)
         delay = random.uniform(30, 90)
         await asyncio.sleep(delay)
+
+    return sent
+
+
+async def send_batch_optimized(items: list[dict]) -> int:
+    """Send outreach emails using Resend batch API.
+
+    Sends in chunks of 50 (under the 100 limit).
+    5-10 second delay between chunks instead of 30-90s per email.
+    333 emails: ~8 hours -> ~40 seconds.
+    """
+    # Pre-fetch attachment once for entire batch
+    attachments = await _get_cached_attachment()
+
+    # Pre-fetch unsubscribe list once
+    unsub_set = await _get_unsubscribe_set()
+
+    sent = 0
+    chunk_size = 50
+    for i in range(0, len(items), chunk_size):
+        chunk = items[i:i + chunk_size]
+        batch_payloads = []
+        batch_meta = []
+
+        for item in chunk:
+            email = item["contact"].get("email", "")
+            if not email or email in unsub_set:
+                continue
+
+            unsub_url = f"{BASE_URL}/api/b2b/unsubscribe?email={email}"
+            html = item["html"].replace("{{unsubscribe_link}}", unsub_url)
+            from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
+
+            payload = {
+                "from": from_email,
+                "to": [email],
+                "subject": item["subject"],
+                "html": html,
+                "reply_to": settings.b2b_reply_to,
+            }
+            if attachments:
+                payload["attachments"] = attachments
+            batch_payloads.append(payload)
+            batch_meta.append(item)
+
+        if batch_payloads:
+            results = await resend_client.send_batch(batch_payloads)
+            for j, result in enumerate(results):
+                if j >= len(batch_meta):
+                    break
+                resend_id = result.get("id", "")
+                meta = batch_meta[j]
+                await _record_outreach(
+                    lead_id=meta["lead"]["id"],
+                    contact_id=meta["contact"]["id"],
+                    sequence_step=meta.get("step", 1),
+                    subject=meta["subject"],
+                    html=meta["html"],
+                    resend_email_id=resend_id,
+                )
+                # Update lead status
+                lead = meta["lead"]
+                if lead.get("status") in ("new", "researched"):
+                    await _update_lead_status(lead["id"], "contacted")
+                sent += 1
+
+        # Short delay between chunks
+        if i + chunk_size < len(items):
+            await asyncio.sleep(random.uniform(5, 10))
 
     return sent
 
@@ -208,6 +277,11 @@ async def _update_lead_status(lead_id: str, status: str) -> None:
 
 
 async def _get_today_send_count() -> int:
+    """Get today's send count (cached 30s)."""
+    cached = cache.get("b2b_today_count", ttl=30.0)
+    if cached is not None:
+        return cached
+
     if not supabase_client._is_configured():
         return 0
     supabase_client._init()
@@ -223,9 +297,23 @@ async def _get_today_send_count() -> int:
                 "limit": "0",
             },
         )
-        return int(resp.headers.get("content-range", "0/0").split("/")[-1])
+        count = int(resp.headers.get("content-range", "0/0").split("/")[-1])
+        cache.put("b2b_today_count", count, ttl=30.0)
+        return count
     except Exception:
         return 0
+
+
+async def _get_cached_attachment() -> list[dict] | None:
+    """Get active PDF attachment (cached 5min)."""
+    cached = cache.get("b2b_attachment", ttl=300.0)
+    if cached is not None:
+        return cached
+
+    from api.b2b_routes import _get_active_attachment
+    result = await _get_active_attachment()
+    cache.put("b2b_attachment", result, ttl=300.0)
+    return result
 
 
 async def _is_unsubscribed(email: str) -> bool:
@@ -242,6 +330,23 @@ async def _is_unsubscribed(email: str) -> bool:
         return bool(resp.json())
     except Exception:
         return False
+
+
+async def _get_unsubscribe_set() -> set[str]:
+    """Fetch all unsubscribed emails as a set (one query instead of N)."""
+    if not supabase_client._is_configured():
+        return set()
+    supabase_client._init()
+    try:
+        client = supabase_client._get_client()
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_unsubscribes",
+            headers=supabase_client._HEADERS,
+            params={"select": "email", "limit": "10000"},
+        )
+        return {r["email"] for r in resp.json()}
+    except Exception:
+        return set()
 
 
 async def _add_unsubscribe(email: str) -> None:

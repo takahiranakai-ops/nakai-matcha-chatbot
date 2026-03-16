@@ -7,6 +7,7 @@ import logging
 from datetime import datetime, timezone
 
 from services import supabase_client
+from services.b2b import cache
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,8 @@ async def record_daily_stats(pipeline_stats: dict) -> dict | None:
         )
         resp.raise_for_status()
         rows = resp.json()
+        # Invalidate stats cache after recording new data
+        cache.invalidate("b2b_stats")
         return rows[0] if rows else None
     except Exception as e:
         logger.error(f"[B2B] Stats record failed: {e}")
@@ -52,7 +55,11 @@ async def record_daily_stats(pipeline_stats: dict) -> dict | None:
 
 
 async def get_dashboard_stats() -> dict:
-    """Get comprehensive stats for the dashboard."""
+    """Get comprehensive stats for the dashboard (cached 60s)."""
+    cached = cache.get("b2b_stats", ttl=60.0)
+    if cached is not None:
+        return cached
+
     if not supabase_client._is_configured():
         return {}
     supabase_client._init()
@@ -69,29 +76,38 @@ async def get_dashboard_stats() -> dict:
         )
         stats["total_leads"] = int(resp.headers.get("content-range", "0/0").split("/")[-1])
 
-        # Leads by status
+        # Leads by status + score distribution (combined query)
         resp = await client.get(
             f"{supabase_client._BASE_URL}/b2b_leads",
             headers=supabase_client._HEADERS,
-            params={"select": "status", "limit": "10000"},
+            params={"select": "status,region,lead_score", "limit": "10000"},
         )
+        all_leads = resp.json()
+
         status_counts: dict[str, int] = {}
-        for row in resp.json():
+        region_counts: dict[str, int] = {}
+        score_dist = {"0-20": 0, "21-40": 0, "41-60": 0, "61-80": 0, "81-100": 0}
+
+        for row in all_leads:
             s = row.get("status", "unknown")
             status_counts[s] = status_counts.get(s, 0) + 1
-        stats["leads_by_status"] = status_counts
-
-        # Leads by region
-        resp = await client.get(
-            f"{supabase_client._BASE_URL}/b2b_leads",
-            headers=supabase_client._HEADERS,
-            params={"select": "region", "limit": "10000"},
-        )
-        region_counts: dict[str, int] = {}
-        for row in resp.json():
             r = row.get("region", "unknown")
             region_counts[r] = region_counts.get(r, 0) + 1
+            score = row.get("lead_score") or 0
+            if score <= 20:
+                score_dist["0-20"] += 1
+            elif score <= 40:
+                score_dist["21-40"] += 1
+            elif score <= 60:
+                score_dist["41-60"] += 1
+            elif score <= 80:
+                score_dist["61-80"] += 1
+            else:
+                score_dist["81-100"] += 1
+
+        stats["leads_by_status"] = status_counts
         stats["leads_by_region"] = region_counts
+        stats["score_distribution"] = score_dist
 
         # Total contacts
         resp = await client.get(
@@ -144,9 +160,23 @@ async def get_dashboard_stats() -> dict:
         )
         stats["recent_leads"] = resp.json()
 
+        # High-value leads (score >= 70, not won/lost)
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_leads",
+            headers=supabase_client._HEADERS,
+            params={
+                "lead_score": "gte.70",
+                "status": "not.in.(won,lost)",
+                "order": "lead_score.desc",
+                "limit": "10",
+            },
+        )
+        stats["high_value_leads"] = resp.json()
+
     except Exception as e:
         logger.error(f"[B2B] Dashboard stats failed: {e}", exc_info=True)
 
+    cache.put("b2b_stats", stats, ttl=60.0)
     return stats
 
 
