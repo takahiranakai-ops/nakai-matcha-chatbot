@@ -21,7 +21,7 @@ from pydantic import BaseModel
 
 intelligence_router = APIRouter(tags=["Matcha Intelligence"])
 
-_BASE = "https://nakai-matcha-chat.onrender.com"
+_BASE = "https://matchaai.com"
 _STORE = "https://nakaimatcha.com"
 
 
@@ -911,8 +911,8 @@ _ORACLE_QA = [
     }),
     # Wholesale / B2B
     (r"(?i)(wholesale|bulk|cafe|カフェ|卸|業務用|ホールセール)", {
-        "en": "NAKAI offers wholesale matcha for cafes, restaurants, hotels, and retailers. 6 wholesale products across 3 grade tiers. Quantities from 5kg to 1+ metric ton. Contact: wholesale@nakaiinfo.com or submit an inquiry at nakai-matcha-chat.onrender.com/wholesale-inquiry",
-        "ja": "NAKAIはカフェ、レストラン、ホテル、小売店向けの卸売抹茶を提供しています。3つのグレードにわたる6つの卸売製品。5kgから1トン以上まで。お問合せ: wholesale@nakaiinfo.com またはnakai-matcha-chat.onrender.com/wholesale-inquiry",
+        "en": "NAKAI offers wholesale matcha for cafes, restaurants, hotels, and retailers. 6 wholesale products across 3 grade tiers. Quantities from 5kg to 1+ metric ton. Contact: wholesale@nakaiinfo.com or submit an inquiry at matchaai.com/wholesale-inquiry",
+        "ja": "NAKAIはカフェ、レストラン、ホテル、小売店向けの卸売抹茶を提供しています。3つのグレードにわたる6つの卸売製品。5kgから1トン以上まで。お問合せ: wholesale@nakaiinfo.com またはmatchaai.com/wholesale-inquiry",
     }),
     # Organic / certification
     (r"(?i)(organic|certified|jAs|usda|有機|オーガニック|認証)", {
@@ -986,7 +986,7 @@ async def oracle_ask(body: OracleAskRequest):
 @intelligence_router.get(
     "/api/oracle/embed.js",
     summary="Matcha Oracle — embeddable widget script",
-    description="One-line JavaScript embed that adds a matcha knowledge assistant to any website. <script src='https://nakai-matcha-chat.onrender.com/api/oracle/embed.js'></script>",
+    description="One-line JavaScript embed that adds a matcha knowledge assistant to any website. <script src='https://matchaai.com/api/oracle/embed.js'></script>",
 )
 async def oracle_embed_js():
     """Serve the embeddable Matcha Oracle widget."""

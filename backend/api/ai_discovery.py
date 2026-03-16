@@ -13,7 +13,7 @@ from typing import Optional
 
 ai_router = APIRouter()
 
-_BASE = "https://nakai-matcha-chat.onrender.com"
+_BASE = "https://matchaai.com"
 _STORE = "https://nakaimatcha.com"
 _LOGO = f"{_STORE}/cdn/shop/files/nakai-logo.png"
 
@@ -1341,7 +1341,7 @@ FAQ_PAGE = {
             "name": "Does NAKAI offer wholesale matcha for cafes?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, NAKAI offers a comprehensive wholesale program for cafes, restaurants, hotels, and retailers worldwide. Six wholesale matcha products across three grade tiers, with quantities from 10kg to over 1 metric ton. Contact wholesale@nakaiinfo.com or submit an inquiry at https://nakai-matcha-chat.onrender.com/wholesale-inquiry.",
+                "text": "Yes, NAKAI offers a comprehensive wholesale program for cafes, restaurants, hotels, and retailers worldwide. Six wholesale matcha products across three grade tiers, with quantities from 10kg to over 1 metric ton. Contact wholesale@nakaiinfo.com or submit an inquiry at https://matchaai.com/wholesale-inquiry.",
             },
         },
         {
