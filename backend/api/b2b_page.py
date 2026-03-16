@@ -662,7 +662,7 @@ function sendTest(){
     body:JSON.stringify({to_email:email, step:step, cafe_name:'Sample Cafe', city:'Portland', cafe_type:'specialty'})
   }).then(r=>r.json()).then(data=>{
     if(data.ok){msg.textContent='テスト送信しました: '+data.subject;msg.style.color='var(--green)';}
-    else{msg.textContent='送信に失敗しました';msg.style.color='var(--red)';}
+    else{msg.textContent='送信に失敗しました: '+(data.error||data.detail||'不明なエラー');msg.style.color='var(--red)';}
   }).catch(()=>{msg.textContent='送信に失敗しました';msg.style.color='var(--red)';});
 }
 

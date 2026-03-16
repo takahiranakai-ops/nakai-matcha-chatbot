@@ -235,32 +235,36 @@ async def test_send(
     _auth: bool = Depends(verify_admin),
 ):
     """Send a test email to a specified address."""
-    from services.b2b.outreach_writer import generate_outreach_email
-    from services import resend_client
+    try:
+        from services.b2b.outreach_writer import generate_outreach_email
+        from services import resend_client
 
-    lead = {
-        "name": body.cafe_name,
-        "city": body.city,
-        "cafe_type": body.cafe_type,
-    }
-    email = await generate_outreach_email(lead, step=body.step)
+        lead = {
+            "name": body.cafe_name,
+            "city": body.city,
+            "cafe_type": body.cafe_type,
+        }
+        email = await generate_outreach_email(lead, step=body.step)
 
-    # Get PDF attachment if exists
-    attachments = await _get_active_attachment()
+        # Get PDF attachment if exists
+        attachments = await _get_active_attachment()
 
-    from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
-    result = await resend_client.send_email(
-        to=body.to_email,
-        subject=f"[TEST] {email['subject']}",
-        html=email["html"],
-        from_email=from_email,
-        reply_to=settings.b2b_reply_to,
-        attachments=attachments,
-    )
+        from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
+        result = await resend_client.send_email(
+            to=body.to_email,
+            subject=f"[TEST] {email['subject']}",
+            html=email["html"],
+            from_email=from_email,
+            reply_to=settings.b2b_reply_to,
+            attachments=attachments,
+        )
 
-    if result:
-        return {"ok": True, "subject": email["subject"], "resend_id": result.get("id")}
-    raise HTTPException(500, "Failed to send test email")
+        if result:
+            return {"ok": True, "subject": email["subject"], "resend_id": result.get("id")}
+        return {"ok": False, "error": "Resend API returned no result. Check API key and domain."}
+    except Exception as e:
+        logger.error(f"[B2B] Test send failed: {e}")
+        return {"ok": False, "error": str(e)}
 
 
 # ── PDF Attachment ────────────────────────────────────────────
