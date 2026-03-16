@@ -4,6 +4,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 
 from api.routes import router, vector_store, rag_engine
 from api.widget import widget_router
@@ -13,7 +14,7 @@ from api.admin_page import admin_page_router
 from api.wholesale import wholesale_router
 from api.wholesale_inquiry import inquiry_router
 from api.contact_inquiry import contact_inquiry_router
-from api.ai_discovery import ai_router
+from api.ai_discovery import ai_router, LLMS_TXT
 from api.matcha_intelligence import intelligence_router
 from api.matcha_guide import guide_router
 from api.webhooks import webhook_router
@@ -146,6 +147,16 @@ app.include_router(command_center_router)
 app.include_router(email_router)
 app.include_router(email_page_router)
 app.include_router(tips_router)
+
+
+@app.get("/.well-known/llms.txt", include_in_schema=False)
+async def well_known_llms_txt_root():
+    """LLM-readable site info at .well-known path (registered on app directly to avoid router conflict)."""
+    return PlainTextResponse(
+        content=LLMS_TXT,
+        media_type="text/plain; charset=utf-8",
+        headers={"Cache-Control": "public, max-age=86400", "X-Robots-Tag": "all"},
+    )
 
 
 @app.get("/health")
