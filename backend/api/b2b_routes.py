@@ -259,6 +259,50 @@ async def list_segments(_auth: bool = Depends(verify_admin)):
 
 # ── Sequences (Template CRUD) ────────────────────────────────
 
+@b2b_router.post("/sequences/init")
+async def init_sequences(_auth: bool = Depends(verify_admin)):
+    """Seed sequence rows for all segments (idempotent)."""
+    from services.b2b.segments import SEGMENTS
+
+    if not supabase_client._is_configured():
+        raise HTTPException(503, "Supabase not configured")
+    supabase_client._init()
+
+    try:
+        client = supabase_client._get_client()
+        created = 0
+        for seg_id, seg in SEGMENTS.items():
+            delays = seg["delays"]
+            for step in range(1, 4):
+                # Check if exists
+                resp = await client.get(
+                    f"{supabase_client._BASE_URL}/b2b_sequences",
+                    headers=supabase_client._HEADERS,
+                    params={"name": f"eq.{seg_id}", "step_number": f"eq.{step}", "limit": "1"},
+                )
+                if resp.json():
+                    continue
+                # Insert
+                delay = delays[step - 1] if step - 1 < len(delays) else 7
+                resp2 = await client.post(
+                    f"{supabase_client._BASE_URL}/b2b_sequences",
+                    headers={**supabase_client._HEADERS, "Prefer": "return=minimal"},
+                    json={
+                        "name": seg_id,
+                        "step_number": step,
+                        "delay_days": delay,
+                        "subject_template": "",
+                        "body_template": "",
+                        "is_active": False,
+                    },
+                )
+                resp2.raise_for_status()
+                created += 1
+        return {"ok": True, "created": created}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
 @b2b_router.get("/sequences")
 async def list_sequences(_auth: bool = Depends(verify_admin)):
     """Get all email sequence templates."""
