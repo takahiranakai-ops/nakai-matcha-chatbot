@@ -1,28 +1,50 @@
-"""B2B Daily Pipeline — Orchestrates the full outreach cycle.
+"""B2B Daily Pipeline — Segment-aware orchestration.
 
-Runs daily via scheduler. Coordinates all 32 virtual team members.
+Runs daily via scheduler. Discovers leads and sends outreach
+per enabled segment (cafe, luxury_hotel, fine_dining).
 """
 
 import logging
 from datetime import datetime, timezone, timedelta
 
 from services import supabase_client
+from services.b2b.segments import SEGMENTS, get_segment_delays
 
 logger = logging.getLogger(__name__)
+
+
+async def get_enabled_segments() -> list[str]:
+    """Return segment names that have at least one active sequence in DB."""
+    if not supabase_client._is_configured():
+        return []
+    supabase_client._init()
+    try:
+        client = supabase_client._get_client()
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_sequences",
+            headers=supabase_client._HEADERS,
+            params={
+                "is_active": "eq.true",
+                "select": "name",
+                "limit": "100",
+            },
+        )
+        names = {r["name"] for r in resp.json()}
+        return [s for s in SEGMENTS if s in names]
+    except Exception as e:
+        logger.error(f"[B2B] Failed to get enabled segments: {e}")
+        return []
 
 
 async def run_daily_pipeline() -> dict:
     """Execute the full daily B2B pipeline.
 
     Steps:
-    1. Discover new cafes (Lead Researchers #1-8)
-    2. Find emails for researched leads (Email Hunters #9-12)
-    3. Verify unverified emails (Verifiers #13-14)
-    4. Generate outreach emails (Copywriters #15-20)
-    5. Send emails via batch API (Executors #21-24)
-    6. Record daily stats (Analytics #25-27)
-
-    Returns summary dict.
+    1. Discover new leads per enabled segment
+    2. Find emails for researched leads
+    3. Verify unverified emails
+    4. Generate and send outreach emails (batch)
+    5. Record daily stats
     """
     from config import settings
     if not settings.b2b_enabled:
@@ -38,20 +60,23 @@ async def run_daily_pipeline() -> dict:
         "emails_sent": 0,
     }
 
-    # Step 1: Discover new cafes
+    enabled = await get_enabled_segments()
+    logger.info(f"[B2B] Enabled segments: {enabled or 'none'}")
+
+    # Step 1: Discover new leads per segment
     try:
         from services.b2b.lead_researcher import search_region, REGIONS
 
         day = datetime.now(timezone.utc).timetuple().tm_yday
         region_keys = list(REGIONS.keys())
-        # Rotate: 3 regions/day, 3 cities each, ~100+ leads/day
         indices = [(day + i) % len(region_keys) for i in range(3)]
         daily_regions = [region_keys[i] for i in indices]
 
-        for region_key in daily_regions:
-            results = await search_region(region_key, max_cities=3)
-            stats["leads_added"] += len(results)
-            logger.info(f"[B2B] Region {region_key}: {len(results)} new leads")
+        for segment in enabled:
+            for region_key in daily_regions:
+                results = await search_region(region_key, segment=segment, max_cities=3)
+                stats["leads_added"] += len(results)
+                logger.info(f"[B2B] {segment}/{region_key}: {len(results)} new leads")
 
     except Exception as e:
         logger.error(f"[B2B] Lead discovery failed: {e}", exc_info=True)
@@ -81,7 +106,10 @@ async def run_daily_pipeline() -> dict:
         from services.b2b.outreach_writer import generate_outreach_email
         from services.b2b.outreach_executor import send_batch_optimized
 
-        ready_leads = await _get_leads_ready_for_outreach(limit=settings.b2b_daily_send_limit)
+        ready_leads = await _get_leads_ready_for_outreach(
+            limit=settings.b2b_daily_send_limit,
+            enabled_segments=enabled,
+        )
 
         batch_items = []
         for lead, contact, step in ready_leads:
@@ -122,7 +150,6 @@ async def run_test_pipeline(lead_id: str | None = None) -> dict:
     try:
         client = supabase_client._get_client()
 
-        # Get a lead
         params = {"limit": "1", "order": "created_at.desc"}
         if lead_id:
             params["id"] = f"eq.{lead_id}"
@@ -136,14 +163,12 @@ async def run_test_pipeline(lead_id: str | None = None) -> dict:
             return {"error": "No leads found"}
 
         lead = leads[0]
-        result = {"lead": lead["name"]}
+        result = {"lead": lead["name"], "segment": lead.get("cafe_type", "cafe")}
 
-        # Find emails
         from services.b2b.email_hunter import find_emails_for_lead
         contacts = await find_emails_for_lead(lead)
         result["contacts_found"] = len(contacts)
 
-        # Generate email (don't send)
         if contacts:
             from services.b2b.outreach_writer import generate_outreach_email
             email = await generate_outreach_email(lead, step=1)
@@ -157,13 +182,12 @@ async def run_test_pipeline(lead_id: str | None = None) -> dict:
 
 
 async def _get_leads_without_contacts(limit: int = 20) -> list[dict]:
-    """Get leads that have no contacts yet (batch query: 2 requests instead of N+1)."""
+    """Get leads that have no contacts yet (batch query)."""
     if not supabase_client._is_configured():
         return []
     supabase_client._init()
     try:
         client = supabase_client._get_client()
-        # Get candidate leads (fetch more than needed since some will have contacts)
         resp = await client.get(
             f"{supabase_client._BASE_URL}/b2b_leads",
             headers=supabase_client._HEADERS,
@@ -178,7 +202,6 @@ async def _get_leads_without_contacts(limit: int = 20) -> list[dict]:
         if not leads:
             return []
 
-        # Batch: get all contacts for these lead IDs in ONE query
         lead_ids = [l["id"] for l in leads]
         ids_str = ",".join(lead_ids)
         resp2 = await client.get(
@@ -192,7 +215,6 @@ async def _get_leads_without_contacts(limit: int = 20) -> list[dict]:
         )
         leads_with_contacts = {c["lead_id"] for c in resp2.json()}
 
-        # Filter: only leads without contacts
         result = [l for l in leads if l["id"] not in leads_with_contacts]
         return result[:limit]
     except Exception as e:
@@ -200,9 +222,14 @@ async def _get_leads_without_contacts(limit: int = 20) -> list[dict]:
         return []
 
 
-async def _get_leads_ready_for_outreach(limit: int = 50) -> list[tuple[dict, dict, int]]:
-    """Get leads ready for outreach (batch query: 3 requests instead of N*2+1).
+async def _get_leads_ready_for_outreach(
+    limit: int = 50,
+    enabled_segments: list[str] | None = None,
+) -> list[tuple[dict, dict, int]]:
+    """Get leads ready for outreach (batch query).
 
+    Only includes leads whose cafe_type is in enabled_segments.
+    Uses per-segment delay_days from segments config.
     Returns list of (lead, contact, step_number).
     """
     if not supabase_client._is_configured():
@@ -212,7 +239,7 @@ async def _get_leads_ready_for_outreach(limit: int = 50) -> list[tuple[dict, dic
     try:
         client = supabase_client._get_client()
 
-        # Step 1: Get verified contacts (1 request)
+        # Step 1: Get verified contacts
         resp = await client.get(
             f"{supabase_client._BASE_URL}/b2b_contacts",
             headers=supabase_client._HEADERS,
@@ -227,7 +254,7 @@ async def _get_leads_ready_for_outreach(limit: int = 50) -> list[tuple[dict, dic
         if not contacts:
             return []
 
-        # Step 2: Batch-fetch all referenced leads (1 request)
+        # Step 2: Batch-fetch all referenced leads
         lead_ids = list({c["lead_id"] for c in contacts if c.get("lead_id")})
         if not lead_ids:
             return []
@@ -239,7 +266,7 @@ async def _get_leads_ready_for_outreach(limit: int = 50) -> list[tuple[dict, dic
         )
         leads_map = {l["id"]: l for l in resp2.json()}
 
-        # Step 3: Batch-fetch all outreach for these contacts (1 request)
+        # Step 3: Batch-fetch all outreach for these contacts
         contact_ids = [c["id"] for c in contacts]
         cids_str = ",".join(contact_ids)
         resp3 = await client.get(
@@ -255,9 +282,10 @@ async def _get_leads_ready_for_outreach(limit: int = 50) -> list[tuple[dict, dic
         for o in resp3.json():
             cid = o.get("contact_id")
             if cid not in outreach_by_contact:
-                outreach_by_contact[cid] = o  # Only keep latest (desc order)
+                outreach_by_contact[cid] = o
 
-        # Step 4: Assemble results in-memory (0 requests)
+        # Step 4: Assemble results with segment-aware delays
+        enabled_set = set(enabled_segments) if enabled_segments else set(SEGMENTS.keys())
         results = []
         seen_leads = set()
 
@@ -270,21 +298,25 @@ async def _get_leads_ready_for_outreach(limit: int = 50) -> list[tuple[dict, dic
             if not lead or lead.get("status") in ("won", "lost"):
                 continue
 
-            # Determine next step from outreach history
+            segment = lead.get("cafe_type", "cafe")
+            if segment not in enabled_set:
+                continue
+
+            delays = get_segment_delays(segment)
+
             last_outreach = outreach_by_contact.get(contact["id"])
             if not last_outreach:
                 next_step = 1
             else:
                 last_step = last_outreach.get("sequence_step", 0)
                 if last_step >= 3:
-                    continue  # Fully sequenced
-                # Check delay (5 days for step 2, 7 for step 3)
+                    continue
                 sent_at = last_outreach.get("sent_at", "")
                 if sent_at:
                     sent_dt = datetime.fromisoformat(sent_at.replace("Z", "+00:00"))
-                    delay = 5 if last_step == 1 else 7
+                    delay = delays[last_step] if last_step < len(delays) else 7
                     if datetime.now(timezone.utc) - sent_dt < timedelta(days=delay):
-                        continue  # Too soon
+                        continue
                 next_step = last_step + 1
 
             seen_leads.add(lead_id)

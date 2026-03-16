@@ -52,6 +52,7 @@ async def get_stats(_auth: bool = Depends(verify_admin)):
 async def list_leads(
     region: str = "",
     status: str = "",
+    segment: str = "",
     search: str = "",
     limit: int = 100,
     offset: int = 0,
@@ -70,6 +71,8 @@ async def list_leads(
         params["region"] = f"eq.{region}"
     if status:
         params["status"] = f"eq.{status}"
+    if segment:
+        params["cafe_type"] = f"eq.{segment}"
     if search:
         params["or"] = f"(name.ilike.%{search}%,city.ilike.%{search}%)"
 
@@ -179,6 +182,81 @@ async def list_outreach(
         raise HTTPException(500, str(e))
 
 
+# ── Segments ──────────────────────────────────────────────────
+
+@b2b_router.get("/segments")
+async def list_segments(_auth: bool = Depends(verify_admin)):
+    """Get segment definitions with lead counts and enabled status."""
+    from services.b2b.segments import SEGMENTS
+
+    if not supabase_client._is_configured():
+        return list(SEGMENTS.values())
+    supabase_client._init()
+
+    try:
+        client = supabase_client._get_client()
+
+        # Lead counts per segment (cafe_type)
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_leads",
+            headers=supabase_client._HEADERS,
+            params={"select": "cafe_type", "limit": "50000"},
+        )
+        type_counts: dict[str, int] = {}
+        for r in resp.json():
+            t = r.get("cafe_type", "cafe")
+            type_counts[t] = type_counts.get(t, 0) + 1
+
+        # Outreach stats per segment
+        resp2 = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_outreach",
+            headers=supabase_client._HEADERS,
+            params={"select": "lead_id,status", "limit": "50000"},
+        )
+        # Get lead_id → segment mapping
+        resp3 = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_leads",
+            headers=supabase_client._HEADERS,
+            params={"select": "id,cafe_type", "limit": "50000"},
+        )
+        lead_seg = {r["id"]: r.get("cafe_type", "cafe") for r in resp3.json()}
+
+        seg_sent: dict[str, int] = {}
+        seg_opened: dict[str, int] = {}
+        for o in resp2.json():
+            seg = lead_seg.get(o.get("lead_id", ""), "cafe")
+            seg_sent[seg] = seg_sent.get(seg, 0) + 1
+            if o.get("status") in ("opened", "clicked", "replied"):
+                seg_opened[seg] = seg_opened.get(seg, 0) + 1
+
+        # Active sequences per segment
+        resp4 = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_sequences",
+            headers=supabase_client._HEADERS,
+            params={"is_active": "eq.true", "select": "name", "limit": "100"},
+        )
+        active_names = {r["name"] for r in resp4.json()}
+
+        result = []
+        for seg_id, seg in SEGMENTS.items():
+            sent = seg_sent.get(seg_id, 0)
+            opened = seg_opened.get(seg_id, 0)
+            result.append({
+                "id": seg_id,
+                "label": seg["label"],
+                "label_en": seg["label_en"],
+                "icon": seg["icon"],
+                "leads": type_counts.get(seg_id, 0),
+                "sent": sent,
+                "open_rate": round(opened / sent * 100, 1) if sent else 0,
+                "enabled": seg_id in active_names,
+            })
+        return result
+
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
 # ── Sequences (Template CRUD) ────────────────────────────────
 
 @b2b_router.get("/sequences")
@@ -192,20 +270,21 @@ async def list_sequences(_auth: bool = Depends(verify_admin)):
         resp = await client.get(
             f"{supabase_client._BASE_URL}/b2b_sequences",
             headers=supabase_client._HEADERS,
-            params={"order": "step_number.asc"},
+            params={"order": "name.asc,step_number.asc"},
         )
         return resp.json()
     except Exception as e:
         raise HTTPException(500, str(e))
 
 
-@b2b_router.put("/sequences/{step_number}")
+@b2b_router.put("/sequences/{segment}/{step_number}")
 async def update_sequence(
+    segment: str,
     step_number: int,
     body: SequenceUpdate,
     _auth: bool = Depends(verify_admin),
 ):
-    """Update email template for a specific step."""
+    """Update email template for a specific segment + step."""
     if not supabase_client._is_configured():
         raise HTTPException(503, "Supabase not configured")
     supabase_client._init()
@@ -214,7 +293,7 @@ async def update_sequence(
         resp = await client.patch(
             f"{supabase_client._BASE_URL}/b2b_sequences",
             headers={**supabase_client._HEADERS, "Prefer": "return=representation"},
-            params={"step_number": f"eq.{step_number}", "name": "eq.Default"},
+            params={"step_number": f"eq.{step_number}", "name": f"eq.{segment}"},
             json={
                 "subject_template": body.subject_template,
                 "body_template": body.body_template,
@@ -223,6 +302,45 @@ async def update_sequence(
         resp.raise_for_status()
         rows = resp.json()
         return rows[0] if rows else {}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@b2b_router.put("/sequences/{segment}/toggle")
+async def toggle_segment(
+    segment: str,
+    _auth: bool = Depends(verify_admin),
+):
+    """Toggle all steps for a segment on/off."""
+    from services.b2b.segments import SEGMENTS
+    if segment not in SEGMENTS:
+        raise HTTPException(400, f"Unknown segment: {segment}")
+
+    if not supabase_client._is_configured():
+        raise HTTPException(503, "Supabase not configured")
+    supabase_client._init()
+
+    try:
+        client = supabase_client._get_client()
+        # Check current state
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_sequences",
+            headers=supabase_client._HEADERS,
+            params={"name": f"eq.{segment}", "select": "is_active", "limit": "1"},
+        )
+        rows = resp.json()
+        current = rows[0]["is_active"] if rows else False
+        new_state = not current
+
+        # Toggle all steps
+        resp2 = await client.patch(
+            f"{supabase_client._BASE_URL}/b2b_sequences",
+            headers={**supabase_client._HEADERS, "Prefer": "return=representation"},
+            params={"name": f"eq.{segment}"},
+            json={"is_active": new_state},
+        )
+        resp2.raise_for_status()
+        return {"segment": segment, "enabled": new_state}
     except Exception as e:
         raise HTTPException(500, str(e))
 
@@ -576,21 +694,28 @@ async def run_pipeline(_auth: bool = Depends(verify_admin)):
 # ── Discovery ─────────────────────────────────────────────────
 
 @b2b_router.post("/discover")
-async def discover_cafes(
+async def discover_leads(
     region: str = "",
     city: str = "",
+    segment: str = "cafe",
     _auth: bool = Depends(verify_admin),
 ):
-    """Manually trigger cafe discovery for a region or city."""
-    from services.b2b.lead_researcher import search_region, search_cafes_in_city, SEARCH_KEYWORDS
+    """Manually trigger lead discovery for a region or city + segment."""
+    from services.b2b.lead_researcher import search_region, search_leads_in_city
+    from services.b2b.segments import SEGMENTS
+
+    seg = SEGMENTS.get(segment)
+    if not seg:
+        return {"error": f"Unknown segment: {segment}"}
 
     if city:
-        results = await search_cafes_in_city(city, SEARCH_KEYWORDS[0], region or "us_west")
-        return {"found": len(results)}
+        keyword = seg["keywords"][0]
+        results = await search_leads_in_city(city, keyword, region or "us_west", segment)
+        return {"found": len(results), "segment": segment}
 
     if region:
-        results = await search_region(region, max_cities=3)
-        return {"found": len(results)}
+        results = await search_region(region, segment=segment, max_cities=3)
+        return {"found": len(results), "segment": segment}
 
     return {"error": "Provide region or city parameter"}
 
