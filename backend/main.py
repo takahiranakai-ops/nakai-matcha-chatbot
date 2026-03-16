@@ -130,6 +130,19 @@ app.add_middleware(
 
 setup_rate_limiting(app)
 
+
+@app.middleware("http")
+async def well_known_llms_middleware(request, call_next):
+    """Serve /.well-known/llms.txt via middleware (FastAPI routing fails for this path)."""
+    if request.url.path == "/.well-known/llms.txt":
+        return PlainTextResponse(
+            content=LLMS_TXT,
+            media_type="text/plain; charset=utf-8",
+            headers={"Cache-Control": "public, max-age=86400", "X-Robots-Tag": "all"},
+        )
+    return await call_next(request)
+
+
 app.include_router(router, prefix="/api")
 app.include_router(admin_api_router)
 app.include_router(admin_page_router)
@@ -149,16 +162,6 @@ app.include_router(email_page_router)
 app.include_router(tips_router)
 
 
-@app.get("/.well-known/llms.txt", include_in_schema=False)
-async def well_known_llms_txt_root():
-    """LLM-readable site info at .well-known path (registered on app directly to avoid router conflict)."""
-    return PlainTextResponse(
-        content=LLMS_TXT,
-        media_type="text/plain; charset=utf-8",
-        headers={"Cache-Control": "public, max-age=86400", "X-Robots-Tag": "all"},
-    )
-
-
 @app.get("/health")
 async def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "v": "3.0.1"}
