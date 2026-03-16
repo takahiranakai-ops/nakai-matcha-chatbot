@@ -663,7 +663,7 @@ function sendTest(){
   }).then(r=>r.json()).then(data=>{
     if(data.ok){msg.textContent='テスト送信しました: '+data.subject;msg.style.color='var(--green)';}
     else{msg.textContent='送信に失敗しました: '+(data.error||data.detail||'不明なエラー');msg.style.color='var(--red)';}
-  }).catch(()=>{msg.textContent='送信に失敗しました';msg.style.color='var(--red)';});
+  }).catch(e=>{msg.textContent='送信に失敗しました: '+e.message;msg.style.color='var(--red)';});
 }
 
 function loadPdfStatus(){

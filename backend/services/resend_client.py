@@ -37,6 +37,7 @@ async def send_email(
     if not settings.resend_api_key:
         logger.warning("Resend API key not configured")
         return None
+    last_error = ""
     try:
         payload = {
             "from": from_email,
@@ -54,9 +55,13 @@ async def send_email(
                 headers=_headers(),
                 json=payload,
             )
-            resp.raise_for_status()
+            if resp.status_code >= 400:
+                last_error = f"Resend API {resp.status_code}: {resp.text}"
+                logger.error(last_error)
+                return None
             return resp.json()
     except Exception as e:
+        last_error = str(e)
         logger.error(f"Resend send failed: {e}")
         return None
 

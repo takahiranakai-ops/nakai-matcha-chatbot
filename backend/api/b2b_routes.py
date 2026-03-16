@@ -235,9 +235,10 @@ async def test_send(
     _auth: bool = Depends(verify_admin),
 ):
     """Send a test email to a specified address."""
+    import httpx
+
     try:
         from services.b2b.outreach_writer import generate_outreach_email
-        from services import resend_client
 
         lead = {
             "name": body.cafe_name,
@@ -246,22 +247,38 @@ async def test_send(
         }
         email = await generate_outreach_email(lead, step=body.step)
 
+        if not settings.resend_api_key:
+            return {"ok": False, "error": "RESEND_API_KEY が未設定です"}
+
         # Get PDF attachment if exists
         attachments = await _get_active_attachment()
 
         from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
-        result = await resend_client.send_email(
-            to=body.to_email,
-            subject=f"[TEST] {email['subject']}",
-            html=email["html"],
-            from_email=from_email,
-            reply_to=settings.b2b_reply_to,
-            attachments=attachments,
-        )
+        payload = {
+            "from": from_email,
+            "to": [body.to_email],
+            "subject": f"[TEST] {email['subject']}",
+            "html": email["html"],
+            "reply_to": settings.b2b_reply_to,
+        }
+        if attachments:
+            payload["attachments"] = attachments
 
-        if result:
-            return {"ok": True, "subject": email["subject"], "resend_id": result.get("id")}
-        return {"ok": False, "error": "Resend API returned no result. Check API key and domain."}
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {settings.resend_api_key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+            )
+
+        if resp.status_code >= 400:
+            return {"ok": False, "error": f"Resend API {resp.status_code}: {resp.text}"}
+
+        data = resp.json()
+        return {"ok": True, "subject": email["subject"], "resend_id": data.get("id")}
     except Exception as e:
         logger.error(f"[B2B] Test send failed: {e}")
         return {"ok": False, "error": str(e)}
