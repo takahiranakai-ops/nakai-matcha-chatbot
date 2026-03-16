@@ -210,6 +210,7 @@ tr:hover{background:#fafaf8}
         <option value="won">成約</option>
         <option value="lost">失注</option>
       </select>
+      <button class="btn btn-secondary btn-sm" onclick="exportLeads()" style="white-space:nowrap;">Excel出力</button>
     </div>
     <div class="card">
       <table><thead><tr><th>カフェ名</th><th>都市</th><th>国</th><th>業態</th><th>ステータス</th><th>スコア</th><th>サイト</th><th></th></tr></thead>
@@ -488,6 +489,24 @@ function loadLeads(offset){
 function deleteLead(id){
   if(!confirm('このリードを削除しますか？')) return;
   fetch(`${API}/leads/${id}`,{method:'DELETE',headers:headers()}).then(()=>loadLeads(leadsOffset));
+}
+
+function exportLeads(){
+  const region = document.getElementById('lead-region').value;
+  const status = document.getElementById('lead-status').value;
+  let url = `${API}/export?`;
+  if(region) url += `region=${region}&`;
+  if(status) url += `status=${status}&`;
+  fetch(url,{headers:headers()}).then(r=>{
+    if(!r.ok) throw new Error('Export failed');
+    return r.blob();
+  }).then(blob=>{
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `NAKAI_B2B_Leads_${new Date().toISOString().slice(0,10)}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }).catch(e=>alert('エクスポートに失敗しました: '+e.message));
 }
 
 function showLeadDetail(id){

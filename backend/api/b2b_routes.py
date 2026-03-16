@@ -374,6 +374,98 @@ async def _get_active_attachment() -> list[dict] | None:
     return None
 
 
+# ── Export ────────────────────────────────────────────────────
+
+@b2b_router.get("/export")
+async def export_leads(
+    region: str = "",
+    status: str = "",
+    _auth: bool = Depends(verify_admin),
+):
+    """Export all leads (with contacts) as Excel file."""
+    from fastapi.responses import Response
+    import io
+    from openpyxl import Workbook
+
+    if not supabase_client._is_configured():
+        raise HTTPException(503, "Supabase not configured")
+    supabase_client._init()
+
+    try:
+        client = supabase_client._get_client()
+        params: dict = {"order": "created_at.desc", "limit": "10000"}
+        if region:
+            params["region"] = f"eq.{region}"
+        if status:
+            params["status"] = f"eq.{status}"
+
+        resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_leads",
+            headers=supabase_client._HEADERS,
+            params=params,
+        )
+        leads = resp.json()
+
+        # Get all contacts
+        contact_resp = await client.get(
+            f"{supabase_client._BASE_URL}/b2b_contacts",
+            headers=supabase_client._HEADERS,
+            params={"order": "created_at.desc", "limit": "50000"},
+        )
+        contacts = contact_resp.json()
+        contacts_by_lead = {}
+        for c in contacts:
+            lid = c.get("lead_id", "")
+            if lid not in contacts_by_lead:
+                contacts_by_lead[lid] = []
+            contacts_by_lead[lid].append(c)
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Leads"
+        ws.append([
+            "Name", "City", "State", "Country", "Region",
+            "Type", "Status", "Score", "Website", "Phone",
+            "Email 1", "Email 2", "Source", "Created",
+        ])
+
+        for lead in leads:
+            lid = lead.get("id", "")
+            lead_contacts = contacts_by_lead.get(lid, [])
+            email1 = lead_contacts[0]["email"] if len(lead_contacts) > 0 else ""
+            email2 = lead_contacts[1]["email"] if len(lead_contacts) > 1 else ""
+            ws.append([
+                lead.get("name", ""),
+                lead.get("city", ""),
+                lead.get("state", ""),
+                lead.get("country", ""),
+                lead.get("region", ""),
+                lead.get("cafe_type", ""),
+                lead.get("status", ""),
+                lead.get("lead_score", 0),
+                lead.get("website", ""),
+                lead.get("phone", ""),
+                email1,
+                email2,
+                lead.get("source", ""),
+                lead.get("created_at", "")[:10] if lead.get("created_at") else "",
+            ])
+
+        buf = io.BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        return Response(
+            content=buf.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="NAKAI_B2B_Leads_{today}.xlsx"'},
+        )
+
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
 # ── Import ────────────────────────────────────────────────────
 
 @b2b_router.post("/import")
