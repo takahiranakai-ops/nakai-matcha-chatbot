@@ -298,7 +298,7 @@ NAKAI ships worldwide from Japan to 40+ countries. Standard shipping takes 5-10 
 Returns: 8-day return policy from delivery date. Items must be unopened and in original condition.
 
 For order inquiries: contact@nakaiinfo.com
-For wholesale inquiries: wholesale@nakaiinfo.com or visit https://nakai-matcha-chat.onrender.com/wholesale-inquiry
+For wholesale inquiries: wholesale@nakaiinfo.com or visit https://matcha-sensei.onrender.com/wholesale-inquiry
 
 ===
 
@@ -307,4 +307,4 @@ Contact and Support
 - Website: https://nakaimatcha.com
 - Email: contact@nakaiinfo.com
 - Wholesale inquiries: wholesale@nakaiinfo.com
-- AI Matcha Concierge: https://nakai-matcha-chat.onrender.com/app
+- AI Matcha Concierge: https://matcha-sensei.onrender.com/app

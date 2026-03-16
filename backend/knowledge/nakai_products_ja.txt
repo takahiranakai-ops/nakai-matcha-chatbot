@@ -210,4 +210,4 @@ Signature Reserve Bundle — NAKAIの全旅路。
 - ウェブサイト：https://nakaimatcha.com
 - メール：contact@nakaiinfo.com
 - 卸売のお問い合わせ：wholesale@nakaiinfo.com
-- AI抹茶コンシェルジュ：https://nakai-matcha-chat.onrender.com/app
+- AI抹茶コンシェルジュ：https://matcha-sensei.onrender.com/app

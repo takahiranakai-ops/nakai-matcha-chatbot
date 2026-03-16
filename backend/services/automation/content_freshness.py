@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
-_BASE = "https://nakai-matcha-chat.onrender.com"
+_BASE = "https://matcha-sensei.onrender.com"
 
 # AI discovery endpoints to warm after refresh
 _WARM_PATHS = [
