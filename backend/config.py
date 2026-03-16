@@ -35,6 +35,15 @@ class Settings(BaseSettings):
     # Email Marketing
     resend_api_key: str = ""
     anthropic_api_key: str = ""
+    # Daily AI Tips auto-posting
+    twitter_api_key: str = ""
+    twitter_api_secret: str = ""
+    twitter_access_token: str = ""
+    twitter_access_secret: str = ""
+    threads_access_token: str = ""
+    threads_user_id: str = ""
+    line_channel_access_token: str = ""
+    daily_tips_hour_utc: int = 23  # 23:00 UTC = 08:00 JST
 
     class Config:
         env_file = ".env"

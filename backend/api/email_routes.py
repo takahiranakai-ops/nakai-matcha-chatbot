@@ -16,7 +16,7 @@ from api.middleware import limiter
 from config import settings
 from services import supabase_client
 from services import resend_client
-from services.email_ai import generate_email_design, extract_editable_blocks, apply_editable_text
+from services.email_ai import generate_email_design, extract_editable_blocks, apply_editable_text, apply_editable_links
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,7 @@ class CampaignCreate(BaseModel):
     description: str = Field(..., min_length=1, max_length=2000)
     target_tags: list[str] = Field(default_factory=list)
     target_language: str = Field(default="", max_length=5)
+    campaign_photos: list[str] = Field(default_factory=list)
 
 
 class CampaignUpdate(BaseModel):
@@ -64,6 +65,7 @@ class CampaignUpdate(BaseModel):
     target_tags: Optional[list[str]] = None
     target_language: Optional[str] = None
     edits: Optional[dict[str, str]] = None  # {block_name: new_text}
+    link_edits: Optional[dict[str, str]] = None  # {link_name: new_url}
 
 
 class SendTestRequest(BaseModel):
@@ -151,6 +153,44 @@ async def delete_brand_photo(idx: int, _auth: bool = Depends(verify_admin)):
     photos.pop(idx)
     await supabase_client.upsert_email_brand_assets({"photos": photos})
     return {"ok": True}
+
+
+# ── Campaign Photo Upload ─────────────────────────────────────
+
+@email_router.post("/campaign-photo")
+async def upload_campaign_photo(
+    file: UploadFile = File(...),
+    _auth: bool = Depends(verify_admin),
+):
+    """Upload a photo for use in a campaign email design."""
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(400, "Only image files allowed")
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(400, "File too large (max 5MB)")
+
+    import uuid
+    ext = file.filename.rsplit(".", 1)[-1] if file.filename and "." in file.filename else "jpg"
+    filename = f"campaign-{uuid.uuid4().hex}.{ext}"
+
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                f"{settings.supabase_url}/storage/v1/object/email-assets/{filename}",
+                headers={
+                    "Authorization": f"Bearer {settings.supabase_service_key}",
+                    "Content-Type": file.content_type or "image/jpeg",
+                },
+                content=content,
+            )
+            resp.raise_for_status()
+    except Exception as e:
+        logger.error(f"Campaign photo upload failed: {e}")
+        raise HTTPException(500, "Failed to upload photo")
+
+    photo_url = f"{settings.supabase_url}/storage/v1/object/public/email-assets/{filename}"
+    return {"url": photo_url}
 
 
 # ── Subscribers ───────────────────────────────────────────────
@@ -257,14 +297,15 @@ async def create_campaign(body: CampaignCreate, _auth: bool = Depends(verify_adm
         description=body.description,
         brand_assets=brand_assets,
         language=body.target_language or "en",
+        campaign_photos=body.campaign_photos or None,
     )
 
     blocks = extract_editable_blocks(html)
 
-    await supabase_client.update_email_campaign(campaign["id"], {
-        "html_content": html,
-        "status": "ready",
-    })
+    update_data = {"html_content": html, "status": "ready"}
+    if body.campaign_photos:
+        update_data["campaign_photos"] = body.campaign_photos
+    await supabase_client.update_email_campaign(campaign["id"], update_data)
 
     campaign["html_content"] = html
     campaign["status"] = "ready"
@@ -287,12 +328,17 @@ async def update_campaign(campaign_id: str, body: CampaignUpdate, _auth: bool = 
     if not campaign:
         raise HTTPException(404, "Campaign not found")
 
-    data = {k: v for k, v in body.model_dump().items() if v is not None and k != "edits"}
+    data = {k: v for k, v in body.model_dump().items() if v is not None and k not in ("edits", "link_edits")}
     data["updated_at"] = datetime.now(timezone.utc).isoformat()
 
     # Apply text edits to HTML
-    if body.edits and campaign.get("html_content"):
-        data["html_content"] = apply_editable_text(campaign["html_content"], body.edits)
+    html = campaign.get("html_content", "")
+    if body.edits and html:
+        html = apply_editable_text(html, body.edits)
+    if body.link_edits and html:
+        html = apply_editable_links(html, body.link_edits)
+    if body.edits or body.link_edits:
+        data["html_content"] = html
 
     result = await supabase_client.update_email_campaign(campaign_id, data)
     if not result:
@@ -329,6 +375,7 @@ async def regenerate_campaign(campaign_id: str, _auth: bool = Depends(verify_adm
         description=campaign["description"],
         brand_assets=brand_assets,
         language=campaign.get("target_language") or "en",
+        campaign_photos=campaign.get("campaign_photos") or None,
     )
 
     result = await supabase_client.update_email_campaign(campaign_id, {

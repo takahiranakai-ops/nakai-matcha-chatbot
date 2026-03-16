@@ -7,94 +7,108 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = """You are NAKAI's email designer. Generate responsive HTML email templates for a premium Japanese matcha brand.
+SYSTEM_PROMPT = """You are the creative director for NAKAI, a Japanese luxury matcha maison.
+Your email designs channel Hermès editorial restraint and Apple spatial clarity.
 
-## Brand Identity
-- NAKAI is a specialty organic matcha brand from Kagoshima, Japan
-- Aesthetic: Refined Japanese minimalism. Clean, spacious, premium
-- Never loud or aggressive. Quiet confidence, like the matcha itself
+## Design Philosophy
+- EXTREME white space. Let every element breathe. 60%+ of the email should be empty space
+- One idea per scroll. Never crowd
+- Typography IS the design. Large, light-weight headlines. Small, quiet body text
+- Photography speaks louder than words — one hero image, full-width, no borders
+- Colors used surgically: 90% white/cream, 10% brand accent
+- No gradients, no patterns, no decorative borders, no icons
+- Buttons: minimal, pill-shaped or text-link style. Never chunky
+- Footer: whisper-quiet. Almost invisible. Elegant
 
-## Technical Requirements
-- Responsive HTML email using tables for layout (no CSS grid/flexbox)
-- Inline CSS only (no <style> blocks)
-- Max width: 600px, centered
-- All images use <img> tags with alt text and explicit width/height
-- Test-safe: works in Gmail, Apple Mail, Outlook 2019+, Yahoo Mail
+## Brand Essence
+NAKAI is organic matcha from Kagoshima. The brand sits between Aesop and Hermès —
+quiet luxury, Japanese precision, nature-rooted.
 
 ## Brand Assets
-- Logo URL: {logo_url}
-- Primary color: {primary_color}
-- Secondary color (background): {secondary_color}
-- Accent color: {accent_color}
-- Text color: {text_color}
-- Font stack: {font_family}
+- Logo: {logo_url}
+- Primary: {primary_color}
+- Background: {secondary_color}
+- Text: {text_color}
+- Font: {font_family}
 
-## Editable Text Blocks
-Every text area the user should customize MUST be wrapped in a tag with:
-  data-editable="block-name"
-  data-placeholder="Description of what goes here"
+## Technical Rules
+- HTML tables only (no grid/flexbox). Inline CSS only. Max-width 600px
+- Works in Gmail, Apple Mail, Outlook 2019+
+- All images: <img> with alt, width, height, style="display:block"
+
+## Editable Blocks
+Wrap every user-editable text in:
+  data-editable="block-name" data-placeholder="hint"
 Example:
-  <td data-editable="headline" data-placeholder="Main headline">
-    [Headline Text]
-  </td>
+  <td data-editable="headline" data-placeholder="Main headline">[Headline]</td>
 
-Use descriptive placeholder text inside brackets: [Headline Text], [Your message here], [Product description], etc.
+## Editable Links
+Every link the user should customize MUST have:
+  data-editable-link="link-name" data-link-placeholder="Where this links to"
+Example:
+  <a href="#" data-editable-link="cta-link" data-link-placeholder="Product page URL" data-editable="cta-text" data-placeholder="Button text">[Shop Now]</a>
 
-## Required Sections
-1. Header: Logo centered
-2. Hero: Large visual area with headline
-3. Body: 1-3 content blocks
-4. CTA: One clear call-to-action button (brand primary color background, white text, rounded corners)
-5. Footer: Brand name, unsubscribe link {{{{unsubscribe_url}}}}
+## Structure (top to bottom)
+1. **Header**: Logo only. Centered. Generous padding (48px+ top/bottom). White or cream background
+2. **Hero Image**: Full-width product photo if provided. No text overlay. Let the image speak
+3. **Headline**: One line. Large (28-36px). Light weight (300). Centered. Massive padding around it
+4. **Body**: 2-3 short sentences max. Small (14-15px). Muted color. Centered. Line-height 1.8
+5. **CTA**: Minimal button OR subtle text link with arrow. Not loud
+6. **Footer**: Tiny (11px). Brand name. City. Unsubscribe via {{{{unsubscribe_url}}}}. Nearly transparent gray
 
-## Product Photos Available
+## Campaign Photos
 {photo_list}
 
-## Do NOT Generate
-- The actual copy text (use placeholders)
-- Subject line
-- Tracking pixels
-
-Generate ONLY the raw HTML. No explanation, no markdown code fences."""
+## Rules
+- Generate ONLY raw HTML. No explanation. No markdown fences
+- Use placeholder text in brackets: [Headline], [Your message], [Shop Now]
+- NEVER write actual marketing copy. Only placeholders
+- If a hero photo URL is provided, USE IT as the hero image"""
 
 
 async def generate_email_design(
     description: str,
     brand_assets: dict,
     language: str = "en",
+    campaign_photos: list[str] | None = None,
 ) -> str:
     """Generate branded HTML email template using Claude.
 
     Args:
-        description: User's campaign description (e.g. "Spring new product announcement")
+        description: User's campaign description
         brand_assets: Dict with logo_url, colors, font_family, photos
         language: "en" or "ja" for placeholder language
+        campaign_photos: URLs of photos uploaded for this specific campaign
 
     Returns:
         HTML string of the email template
     """
     if not settings.anthropic_api_key:
         logger.warning("Anthropic API key not configured, using fallback template")
-        return _fallback_template(brand_assets)
+        return _fallback_template(brand_assets, campaign_photos)
 
     colors = brand_assets.get("colors", {})
-    photos = brand_assets.get("photos", [])
-    photo_list = "\n".join(
-        f"- {p.get('label', 'Photo')}: {p.get('url', '')}" for p in photos
-    ) if photos else "No product photos available. Use solid color blocks instead."
+
+    # Combine brand photos + campaign-specific photos
+    all_photos = []
+    for p in brand_assets.get("photos", []):
+        all_photos.append(f"- Brand: {p.get('label', 'Photo')}: {p.get('url', '')}")
+    for url in (campaign_photos or []):
+        all_photos.append(f"- Campaign photo (USE AS HERO): {url}")
+
+    photo_list = "\n".join(all_photos) if all_photos else "No photos. Use elegant solid color blocks with generous spacing."
 
     system = SYSTEM_PROMPT.format(
         logo_url=brand_assets.get("logo_url", ""),
         primary_color=colors.get("primary", "#406546"),
         secondary_color=colors.get("secondary", "#F9F0E2"),
-        accent_color=colors.get("accent", "#FFFFFF"),
         text_color=colors.get("text", "#1a1a1a"),
         font_family=brand_assets.get("font_family", "Work Sans, Helvetica, Arial, sans-serif"),
         photo_list=photo_list,
     )
 
     lang_hint = "Japanese" if language == "ja" else "English"
-    user_prompt = f"Design an email for: {description}\nPlaceholder text language: {lang_hint}"
+    user_prompt = f"Design an email for: {description}\nPlaceholder language: {lang_hint}"
 
     try:
         import anthropic
@@ -107,42 +121,44 @@ async def generate_email_design(
             temperature=0.7,
         )
         html = response.content[0].text
-
-        # Strip markdown fences if Claude wrapped it
         html = re.sub(r'^```html?\s*\n?', '', html)
         html = re.sub(r'\n?```\s*$', '', html)
-
         return html.strip()
     except Exception as e:
         logger.error(f"Claude email generation failed: {e}")
-        return _fallback_template(brand_assets)
+        return _fallback_template(brand_assets, campaign_photos)
 
 
 def extract_editable_blocks(html: str) -> list[dict]:
-    """Extract data-editable blocks from generated HTML.
-
-    Returns list of {"name": str, "placeholder": str, "current_text": str}
-    """
-    pattern = r'data-editable="([^"]+)"[^>]*data-placeholder="([^"]*)"[^>]*>([^<]*)'
+    """Extract data-editable text blocks and data-editable-link blocks."""
     blocks = []
+
+    # Text blocks
+    pattern = r'data-editable="([^"]+)"[^>]*data-placeholder="([^"]*)"[^>]*>([^<]*)'
     for match in re.finditer(pattern, html):
         blocks.append({
+            "type": "text",
             "name": match.group(1),
             "placeholder": match.group(2),
             "current_text": match.group(3).strip(),
         })
+
+    # Link blocks
+    link_pattern = r'data-editable-link="([^"]+)"[^>]*data-link-placeholder="([^"]*)"[^>]*href="([^"]*)"'
+    for match in re.finditer(link_pattern, html):
+        blocks.append({
+            "type": "link",
+            "name": match.group(1),
+            "placeholder": match.group(2),
+            "current_url": match.group(3),
+        })
+
     return blocks
 
 
 def apply_editable_text(html: str, edits: dict[str, str]) -> str:
-    """Replace editable block content with user-provided text.
-
-    Args:
-        html: Original HTML with data-editable blocks
-        edits: Dict of {block_name: new_text}
-    """
+    """Replace editable block content with user-provided text."""
     for name, text in edits.items():
-        # Match the editable element and replace its text content
         pattern = (
             r'(data-editable="' + re.escape(name) + r'"[^>]*>)'
             r'[^<]*'
@@ -151,39 +167,66 @@ def apply_editable_text(html: str, edits: dict[str, str]) -> str:
     return html
 
 
-def _fallback_template(brand_assets: dict) -> str:
-    """Simple fallback template when Claude API is unavailable."""
+def apply_editable_links(html: str, link_edits: dict[str, str]) -> str:
+    """Replace editable link hrefs with user-provided URLs."""
+    for name, url in link_edits.items():
+        pattern = (
+            r'(data-editable-link="' + re.escape(name) + r'"[^>]*)'
+            r'href="[^"]*"'
+        )
+        html = re.sub(pattern, r'\g<1>href="' + url + '"', html)
+    return html
+
+
+def _fallback_template(brand_assets: dict, campaign_photos: list[str] | None = None) -> str:
+    """Hermès-level minimal fallback when Claude API is unavailable."""
     colors = brand_assets.get("colors", {})
     primary = colors.get("primary", "#406546")
     secondary = colors.get("secondary", "#F9F0E2")
     text_color = colors.get("text", "#1a1a1a")
     logo_url = brand_assets.get("logo_url", "")
 
-    logo_html = f'<img src="{logo_url}" alt="NAKAI" width="120" style="display:block;margin:0 auto;">' if logo_url else '<h1 style="margin:0;color:#fff;font-size:28px;">NAKAI</h1>'
+    logo_html = f'<img src="{logo_url}" alt="NAKAI" width="100" style="display:block;margin:0 auto;">' if logo_url else '<p style="margin:0;font-size:13px;letter-spacing:0.3em;color:{0};text-transform:uppercase;font-weight:400;">NAKAI</p>'.format(text_color)
+
+    hero_html = ""
+    if campaign_photos:
+        hero_html = f'''<tr><td style="padding:0;">
+    <img src="{campaign_photos[0]}" alt="" width="600" style="display:block;width:100%;height:auto;" />
+  </td></tr>'''
 
     return f"""<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin:0;padding:0;background-color:{secondary};font-family:Work Sans,Helvetica,Arial,sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:{secondary};">
-<tr><td align="center" style="padding:40px 20px;">
-<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:8px;overflow:hidden;">
-  <tr><td align="center" style="background-color:{primary};padding:32px 40px;">
+<body style="margin:0;padding:0;background-color:#ffffff;font-family:Work Sans,Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
+<tr><td align="center" style="padding:0;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
+
+  <tr><td align="center" style="padding:48px 40px 40px;">
     {logo_html}
   </td></tr>
-  <tr><td style="padding:40px;" data-editable="headline" data-placeholder="Main headline">
-    <h2 style="margin:0 0 16px;color:{text_color};font-size:24px;font-weight:500;">[Headline Text]</h2>
+
+  {hero_html}
+
+  <tr><td align="center" style="padding:56px 60px 24px;">
+    <h1 style="margin:0;font-size:32px;font-weight:300;color:{text_color};letter-spacing:0.02em;line-height:1.2;" data-editable="headline" data-placeholder="Main headline">[Headline]</h1>
   </td></tr>
-  <tr><td style="padding:0 40px 32px;" data-editable="body" data-placeholder="Main message body">
-    <p style="margin:0;color:{text_color};font-size:16px;line-height:1.6;">[Your message here]</p>
+
+  <tr><td align="center" style="padding:0 80px 48px;">
+    <p style="margin:0;font-size:14px;font-weight:300;color:#888;line-height:1.8;" data-editable="body" data-placeholder="Brief message">[Your message here]</p>
   </td></tr>
-  <tr><td align="center" style="padding:0 40px 40px;">
-    <a href="#" style="display:inline-block;background-color:{primary};color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:6px;font-size:16px;font-weight:500;" data-editable="cta" data-placeholder="Call to action text">[Shop Now]</a>
+
+  <tr><td align="center" style="padding:0 40px 56px;">
+    <a href="#" data-editable-link="cta-link" data-link-placeholder="Product page URL" data-editable="cta-text" data-placeholder="Button text" style="display:inline-block;background-color:{primary};color:#ffffff;text-decoration:none;padding:13px 36px;border-radius:24px;font-size:13px;font-weight:400;letter-spacing:0.06em;">[Shop Now]</a>
   </td></tr>
-  <tr><td align="center" style="padding:24px 40px;border-top:1px solid #eee;color:#999;font-size:12px;">
-    NAKAI Matcha | Kagoshima, Japan<br>
-    <a href="{{{{unsubscribe_url}}}}" style="color:#999;">Unsubscribe</a>
+
+  <tr><td align="center" style="padding:40px;border-top:1px solid #f0f0f0;">
+    <p style="margin:0;font-size:11px;color:#bbb;line-height:1.8;">
+      NAKAI · Kagoshima, Japan<br>
+      <a href="{{{{unsubscribe_url}}}}" style="color:#bbb;text-decoration:underline;">Unsubscribe</a>
+    </p>
   </td></tr>
+
 </table>
 </td></tr>
 </table>

@@ -160,6 +160,8 @@ td{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-alig
       <div class="editor-panel">
         <h4>Edit Text</h4>
         <div id="editable-blocks"></div>
+        <h4 id="links-heading" style="display:none;margin-top:20px">Edit Links</h4>
+        <div id="editable-links"></div>
         <div class="editor-actions">
           <button class="btn btn-green" onclick="saveCampaign()">Save</button>
           <button class="btn btn-outline" onclick="sendTest()">Send Test</button>
@@ -230,6 +232,11 @@ td{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-alig
   <div class="form-group"><label>Describe your email</label><textarea id="new-camp-desc" placeholder="e.g. 新商品の発売お知らせメール。春らしい明るいデザインで、JU-NANA 17の写真を使いたい"></textarea></div>
   <div class="form-group"><label>Target Language</label>
     <select id="new-camp-lang"><option value="en">English</option><option value="ja">Japanese</option></select>
+  </div>
+  <div class="form-group">
+    <label>Campaign Photos (used as hero image)</label>
+    <input type="file" id="new-camp-photos" accept="image/*" multiple>
+    <div id="camp-photo-preview" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"></div>
   </div>
   <div class="modal-actions">
     <button class="btn btn-outline" onclick="closeModal('modal-new-campaign')">Cancel</button>
@@ -351,9 +358,22 @@ async function createCampaign(){
   const lang=document.getElementById('new-camp-lang').value;
   if(!name||!desc){alert('Name and description are required');return;}
   const btn=document.getElementById('gen-btn');
-  btn.textContent='Generating...';btn.disabled=true;
-  const r=await api('POST','/api/email/campaigns',{name,description:desc,target_language:lang});
+  btn.textContent='Uploading photos...';btn.disabled=true;
+
+  // Upload campaign photos first
+  const photoFiles=document.getElementById('new-camp-photos').files;
+  const photoUrls=[];
+  for(const file of photoFiles){
+    const fd=new FormData();fd.append('file',file);
+    const up=await apiForm('POST','/api/email/campaign-photo',fd);
+    if(up.ok&&up.data.url)photoUrls.push(up.data.url);
+  }
+
+  btn.textContent='Generating design...';
+  const r=await api('POST','/api/email/campaigns',{name,description:desc,target_language:lang,campaign_photos:photoUrls});
   btn.textContent='Generate Design';btn.disabled=false;
+  document.getElementById('new-camp-photos').value='';
+  document.getElementById('camp-photo-preview').innerHTML='';
   closeModal('modal-new-campaign');
   if(r.ok){openCampaignData(r.data);}else{alert('Failed to create campaign');}
 }
@@ -377,16 +397,32 @@ function openCampaignData(c){
   const iframe=document.getElementById('preview-iframe');
   iframe.srcdoc=c.html_content||'<p style="padding:40px;color:#999;text-align:center">No content generated yet</p>';
 
-  // Editable blocks
+  // Editable blocks — separate text vs link
   const blocks=c.editable_blocks||[];
+  const textBlocks=blocks.filter(b=>b.type==='text');
+  const linkBlocks=blocks.filter(b=>b.type==='link');
+
   const el=document.getElementById('editable-blocks');
-  if(blocks.length===0){
+  if(textBlocks.length===0){
     el.innerHTML='<p style="color:var(--gray);font-size:.85rem">No editable text blocks found</p>';
   }else{
-    el.innerHTML=blocks.map(b=>`<div class="edit-block">
+    el.innerHTML=textBlocks.map(b=>`<div class="edit-block">
       <label>${b.name}</label>
       <textarea data-block="${b.name}" placeholder="${esc(b.placeholder)}">${esc(b.current_text)}</textarea>
     </div>`).join('');
+  }
+
+  const linksEl=document.getElementById('editable-links');
+  const linksHeading=document.getElementById('links-heading');
+  if(linkBlocks.length>0){
+    linksHeading.style.display='block';
+    linksEl.innerHTML=linkBlocks.map(b=>`<div class="edit-block">
+      <label>${b.name}</label>
+      <input type="url" data-link="${b.name}" placeholder="${esc(b.placeholder)}" value="${esc(b.current_url||'')}" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:.88rem;font-family:var(--font);outline:none">
+    </div>`).join('');
+  }else{
+    linksHeading.style.display='none';
+    linksEl.innerHTML='';
   }
 }
 
@@ -405,7 +441,13 @@ async function saveCampaign(){
   document.querySelectorAll('#editable-blocks textarea').forEach(ta=>{
     edits[ta.dataset.block]=ta.value;
   });
-  const r=await api('PATCH','/api/email/campaigns/'+currentCampaignId,{subject,edits});
+  const link_edits={};
+  document.querySelectorAll('#editable-links input[data-link]').forEach(inp=>{
+    if(inp.value.trim())link_edits[inp.dataset.link]=inp.value.trim();
+  });
+  const body={subject,edits};
+  if(Object.keys(link_edits).length>0)body.link_edits=link_edits;
+  const r=await api('PATCH','/api/email/campaigns/'+currentCampaignId,body);
   if(r.ok){openCampaignData(r.data);alert('Saved!');}else{alert('Save failed');}
 }
 
@@ -589,6 +631,16 @@ async function deletePhoto(idx){
   await api('DELETE','/api/email/brand-assets/photo/'+idx);
   loadBrandAssets();
 }
+
+// ── Photo Preview ──
+document.getElementById('new-camp-photos').addEventListener('change',function(){
+  const el=document.getElementById('camp-photo-preview');
+  el.innerHTML='';
+  for(const f of this.files){
+    const url=URL.createObjectURL(f);
+    el.innerHTML+=`<div style="width:60px;height:60px;border-radius:6px;overflow:hidden;background:var(--light)"><img src="${url}" style="width:100%;height:100%;object-fit:cover"></div>`;
+  }
+});
 
 // ── Helpers ──
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}

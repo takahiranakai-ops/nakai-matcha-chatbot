@@ -5,6 +5,7 @@ Schedule:
 - Daily 00:00 UTC: AI citation monitor (WS35)
 - Daily 01:00 UTC: Review aggregator (WS37)
 - Daily 02:00 UTC: SEO ranking tracker (WS40)
+- Daily 23:00 UTC (08:00 JST): AI Tips auto-post (Twitter/Threads/LINE)
 - Weekly Wed 03:00 UTC: Content freshness refresh (WS38)
 - Weekly Mon 06:00 UTC: Competitor monitor (WS36)
 
@@ -79,6 +80,18 @@ async def run_social_monitor():
     await _safe_run("social_monitor", monitor_social_mentions())
 
 
+async def run_daily_tips():
+    """Daily AI Tips auto-post to Twitter/Threads/LINE."""
+    from services.daily_content import generate_daily_tips
+    from services.social_poster import post_all
+
+    async def _generate_and_post():
+        content = await generate_daily_tips()
+        await post_all(content)
+
+    await _safe_run("daily_tips", _generate_and_post())
+
+
 # ---------------------------------------------------------------------------
 # Simple asyncio-based scheduler (no external dependency needed)
 # ---------------------------------------------------------------------------
@@ -90,11 +103,12 @@ async def _scheduler_loop():
     """Main scheduler loop using simple time-based checks."""
     logger.info("[SCHEDULER] Starting automation scheduler...")
 
-    last_run = {
+    last_run: dict[str, float] = {
         "social": 0,       # every 6h
         "citation": 0,     # daily
         "reviews": 0,      # daily
         "seo": 0,          # daily
+        "daily_tips": 0,   # daily 23:00 UTC
         "freshness": 0,    # weekly
         "competitor": 0,   # weekly
     }
@@ -134,6 +148,11 @@ async def _scheduler_loop():
             if weekday == 0 and hour == 6 and (now.timestamp() - last_run["competitor"]) >= 6 * 24 * 3600:
                 last_run["competitor"] = now.timestamp()
                 asyncio.create_task(run_competitor_monitor())
+
+            # Daily at 23:xx UTC (08:00 JST): AI Tips auto-post
+            if hour == 23 and (now.timestamp() - last_run["daily_tips"]) >= 23 * 3600:
+                last_run["daily_tips"] = now.timestamp()
+                asyncio.create_task(run_daily_tips())
 
         except Exception as e:
             logger.error(f"[SCHEDULER] Loop error: {e}")
