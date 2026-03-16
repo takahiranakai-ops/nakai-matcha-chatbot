@@ -395,6 +395,49 @@ async def _get_active_attachment() -> list[dict] | None:
     return None
 
 
+# ── Resend Domain Check ───────────────────────────────────────
+
+@b2b_router.get("/resend-domain")
+async def check_resend_domain(_auth: bool = Depends(verify_admin)):
+    """Check Resend domain verification status and show DNS records."""
+    import httpx
+
+    if not settings.resend_api_key:
+        return {"ok": False, "error": "RESEND_API_KEY が未設定です"}
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(
+                "https://api.resend.com/domains",
+                headers={
+                    "Authorization": f"Bearer {settings.resend_api_key}",
+                    "Content-Type": "application/json",
+                },
+            )
+        if resp.status_code >= 400:
+            return {"ok": False, "error": f"Resend API {resp.status_code}: {resp.text}"}
+
+        data = resp.json()
+        domains = data.get("data", [])
+        target = None
+        for d in domains:
+            if "nakaimatcha" in d.get("name", ""):
+                target = d
+                break
+
+        if not target:
+            return {"ok": False, "error": "nakaimatcha.com が Resend に登録されていません。Resend で Add Domain してください。"}
+
+        return {
+            "ok": True,
+            "domain": target.get("name"),
+            "status": target.get("status"),
+            "records": target.get("records", []),
+        }
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
 # ── Export ────────────────────────────────────────────────────
 
 @b2b_router.get("/export")

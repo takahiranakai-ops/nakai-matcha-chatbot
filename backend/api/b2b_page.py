@@ -325,6 +325,14 @@ tr:hover{background:#fafaf8}
       </div>
     </div>
 
+    <!-- Resend ドメイン認証 -->
+    <div class="card" style="padding:32px;margin-bottom:20px;">
+      <h3 style="font-size:.95rem;font-weight:500;margin-bottom:8px;">Resend ドメイン認証</h3>
+      <p style="font-size:.82rem;color:var(--gray);margin-bottom:16px;">メール送信にはドメイン認証が必要です。以下の DNS レコードを Shopify のドメイン設定に追加してください。</p>
+      <button class="btn btn-secondary btn-sm" onclick="checkResendDomain()" style="margin-bottom:16px;">認証状態を確認</button>
+      <div id="resend-domain-status"></div>
+    </div>
+
     <!-- API接続状態 -->
     <div class="card" style="padding:32px;">
       <h3 style="font-size:.95rem;font-weight:500;margin-bottom:20px;">パイプライン設定</h3>
@@ -699,6 +707,41 @@ function removePdf(){
   if(!confirm('添付ファイルを削除しますか？')) return;
   fetch(API+'/attachment',{method:'DELETE',headers:headers()}).then(()=>loadPdfStatus());
   document.getElementById('pdf-msg').textContent='';
+}
+
+// ── Resend ドメイン確認 ──
+function checkResendDomain(){
+  const el = document.getElementById('resend-domain-status');
+  el.innerHTML='<p style="color:var(--gray);font-size:.85rem;">確認中...</p>';
+  fetch(API+'/resend-domain',{headers:headers()}).then(r=>r.json()).then(data=>{
+    if(!data.ok){
+      el.innerHTML='<p style="color:var(--red);font-size:.85rem;">'+esc(data.error)+'</p>';
+      return;
+    }
+    const statusColor = data.status==='verified'?'var(--green)':'#e67e22';
+    const statusText = data.status==='verified'?'認証済み':'未認証 ('+data.status+')';
+    let html = '<p style="margin-bottom:12px;font-size:.9rem;"><strong>'+esc(data.domain)+'</strong> &mdash; <span style="color:'+statusColor+';font-weight:600;">'+statusText+'</span></p>';
+
+    if(data.records && data.records.length>0 && data.status!=='verified'){
+      html += '<p style="font-size:.82rem;color:var(--gray);margin-bottom:12px;">以下のレコードを <strong>Shopify &gt; Settings &gt; Domains &gt; nakaimatcha.com &gt; DNS settings &gt; Add custom record</strong> に追加してください：</p>';
+      html += '<table style="font-size:.78rem;width:100%;border-collapse:collapse;"><thead><tr style="background:#f8f8f8;"><th style="padding:8px;text-align:left;border:1px solid #eee;">Type</th><th style="padding:8px;text-align:left;border:1px solid #eee;">Name (Shopifyに入力)</th><th style="padding:8px;text-align:left;border:1px solid #eee;">Value (コピー)</th><th style="padding:8px;text-align:left;border:1px solid #eee;">状態</th></tr></thead><tbody>';
+      data.records.forEach(r=>{
+        const name = (r.name||r.record||'').replace('.nakaimatcha.com','');
+        const val = r.value||r.data||'';
+        const recType = r.record_type||r.type||'';
+        const recStatus = r.status==='verified'?'<span style="color:var(--green);">OK</span>':'<span style="color:#e67e22;">未設定</span>';
+        html += '<tr><td style="padding:8px;border:1px solid #eee;font-weight:600;">'+esc(recType)+'</td>';
+        html += '<td style="padding:8px;border:1px solid #eee;font-family:monospace;font-size:.75rem;word-break:break-all;">'+esc(name)+'</td>';
+        html += '<td style="padding:8px;border:1px solid #eee;font-family:monospace;font-size:.75rem;word-break:break-all;cursor:pointer;" onclick="navigator.clipboard.writeText(\''+val.replace(/'/g,"\\'")+'\');this.style.background=\'#e8f5e9\';setTimeout(()=>this.style.background=\'\',1000);" title="クリックでコピー">'+esc(val)+'</td>';
+        html += '<td style="padding:8px;border:1px solid #eee;text-align:center;">'+recStatus+'</td></tr>';
+      });
+      html += '</tbody></table>';
+      html += '<p style="font-size:.78rem;color:var(--gray);margin-top:12px;">Value 列をクリックするとコピーできます。全レコードを Shopify に追加後、再度「認証状態を確認」を押してください。</p>';
+    } else if(data.status==='verified'){
+      html += '<p style="font-size:.85rem;color:var(--green);">ドメイン認証完了。メール送信が可能です。</p>';
+    }
+    el.innerHTML = html;
+  }).catch(e=>{el.innerHTML='<p style="color:var(--red);font-size:.85rem;">エラー: '+e.message+'</p>';});
 }
 
 // ── ヘルパー ──
