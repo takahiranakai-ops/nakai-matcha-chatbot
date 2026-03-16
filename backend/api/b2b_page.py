@@ -374,18 +374,26 @@ let leadsOffset = 0;
 let debounceTimer = null;
 
 // ── ログイン ──
+function enterApp(statsData){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='block';
+  try{ renderOverview(statsData||{}); }catch(e){ console.error('renderOverview error',e); }
+}
+
 function doLogin(){
   PWD = document.getElementById('pw').value;
+  if(!PWD){document.getElementById('login-err').style.display='block';return;}
   fetch(API+'/stats', {headers:{'X-Admin-Password':PWD}})
     .then(r=>{
-      if(!r.ok) throw new Error();
+      if(!r.ok) throw new Error('パスワードが正しくありません');
       sessionStorage.setItem('nakai_admin_pw', PWD);
-      document.getElementById('login').style.display='none';
-      document.getElementById('app').style.display='block';
       return r.json();
     })
-    .then(renderOverview)
-    .catch(()=>{document.getElementById('login-err').style.display='block'});
+    .then(data=>enterApp(data))
+    .catch(e=>{
+      document.getElementById('login-err').textContent=e.message||'ログインに失敗しました';
+      document.getElementById('login-err').style.display='block';
+    });
 }
 
 // Auto-login from /admin session
@@ -396,11 +404,9 @@ function doLogin(){
     fetch(API+'/stats', {headers:{'X-Admin-Password':PWD}})
       .then(r=>{
         if(!r.ok) throw new Error();
-        document.getElementById('login').style.display='none';
-        document.getElementById('app').style.display='block';
         return r.json();
       })
-      .then(renderOverview)
+      .then(data=>enterApp(data))
       .catch(()=>{});
   }
 })();
