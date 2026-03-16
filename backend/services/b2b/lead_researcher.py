@@ -175,23 +175,26 @@ async def search_new_openings(city: str, region: str) -> list[dict]:
     return await search_cafes_in_city(city, "new coffee shop opened recently", region)
 
 
-async def search_region(region_key: str, max_cities: int = 3) -> list[dict]:
-    """Search a few cities in a region (called daily with rotation)."""
+async def search_region(region_key: str, max_cities: int = 3, max_keywords: int = 3) -> list[dict]:
+    """Search cities in a region with multiple keywords for higher volume."""
     region = REGIONS.get(region_key)
     if not region:
         return []
 
-    # Rotate through cities based on day of year
     day = datetime.now(timezone.utc).timetuple().tm_yday
     cities = region["cities"]
     start = (day * max_cities) % len(cities)
     selected = [cities[(start + i) % len(cities)] for i in range(max_cities)]
 
+    # Use multiple keywords per city for more results
+    kw_start = day % len(SEARCH_KEYWORDS)
+    keywords = [SEARCH_KEYWORDS[(kw_start + i) % len(SEARCH_KEYWORDS)] for i in range(max_keywords)]
+
     all_results = []
     for city in selected:
-        keyword_idx = day % len(SEARCH_KEYWORDS)
-        results = await search_cafes_in_city(city, SEARCH_KEYWORDS[keyword_idx], region_key)
-        all_results.extend(results)
+        for keyword in keywords:
+            results = await search_cafes_in_city(city, keyword, region_key)
+            all_results.extend(results)
 
     return all_results
 
