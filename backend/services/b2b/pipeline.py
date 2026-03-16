@@ -44,12 +44,12 @@ async def run_daily_pipeline() -> dict:
 
         day = datetime.now(timezone.utc).timetuple().tm_yday
         region_keys = list(REGIONS.keys())
-        # Rotate: 2 regions per day
-        r1 = region_keys[day % len(region_keys)]
-        r2 = region_keys[(day + 1) % len(region_keys)]
+        # Rotate: 3 regions/day, 3 cities each, ~100+ leads/day
+        indices = [(day + i) % len(region_keys) for i in range(3)]
+        daily_regions = [region_keys[i] for i in indices]
 
-        for region_key in (r1, r2):
-            results = await search_region(region_key, max_cities=2)
+        for region_key in daily_regions:
+            results = await search_region(region_key, max_cities=3)
             stats["leads_added"] += len(results)
             logger.info(f"[B2B] Region {region_key}: {len(results)} new leads")
 
