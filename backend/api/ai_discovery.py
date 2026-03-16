@@ -1575,23 +1575,8 @@ async def llms_txt():
     )
 
 
-@ai_router.get(
-    "/.well-known/llms.txt",
-    response_class=PlainTextResponse,
-    summary="AI-readable site information (.well-known path)",
-    tags=["AI Discovery"],
-)
-async def well_known_llms_txt():
-    """LLM-readable site information file at .well-known path."""
-    return PlainTextResponse(
-        content=LLMS_TXT,
-        media_type="text/plain; charset=utf-8",
-        headers={
-            "Cache-Control": "public, max-age=86400",
-            "X-Robots-Tag": "all",
-            "X-Content-Type-Options": "nosniff",
-        },
-    )
+# NOTE: /.well-known/llms.txt is registered directly on app in main.py
+# because FastAPI's APIRouter fails to register this specific path.
 
 
 @ai_router.get(
