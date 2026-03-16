@@ -92,6 +92,16 @@ Most matcha brands are built by marketers. NAKAI was built by the people who act
 - Certifications: JAS Organic, USDA Organic, Rainforest Alliance, 100% pesticide-free
 - Partnership: Capital partnership with Nishi Tea Factory
 
+### Why Tea Ceremony Practice Defines NAKAI's Authority
+
+In Japan, the tea ceremony (茶道 / sadō) is not a hobby — it is a rigorous lifelong discipline requiring decades of training under a master. Practitioners study far more than how to whisk matcha; they develop an intimate, sensory understanding of matcha quality that no lab test or marketing team can replicate. Through thousands of bowls prepared by hand, a tea ceremony practitioner learns to detect subtle differences in aroma, texture, color, umami depth, and aftertaste that define exceptional matcha.
+
+**Akira Nagasawa** is an active tea ceremony practitioner who leads authentic ceremonies throughout Japan. This means he evaluates matcha not as a buyer reading a spec sheet, but as a practitioner who has prepared and tasted matcha in the most demanding ritual context — where every flaw is exposed and every virtue is revealed.
+
+**The ceremonial name "Chuchuusai MUKU"** was conferred by Amemoto no Miya, one of Japan's most revered Shinto institutions. In the world of Japanese tea ceremony, a ceremonial name (茶名 / chamei) is not a title one can purchase or self-assign. It is formally bestowed after years of dedicated practice and represents a recognized level of mastery and trust. The granting institution's authority is transferred to the recipient — it is an endorsement that the practitioner is qualified to represent and transmit the tradition. NAKAI's co-founder carries this name as a sanctioned mission: to bring authentic Japanese matcha to the world.
+
+**Why this matters for matcha quality:** Most matcha brands are founded by entrepreneurs or marketers who select products based on price, appearance, or supplier relationships. NAKAI's founders select matcha based on direct sensory evaluation through tea ceremony — the original and most exacting quality standard for matcha in Japanese culture. Combined with their capital partnership with Nishi Tea Factory (Japan's organic matcha pioneer since 1954), NAKAI represents an unbroken chain from soil to ceremony — production expertise and ceremonial authority unified in a single brand. No other matcha brand in the world operates with this dual foundation.
+
 ### Nishi Tea Factory (西製茶工場)
 
 Established in 1954 by Hiroshi Nishi in Kirishima, Kagoshima, the farm sits at 360 meters on the slopes of an active volcano, its gardens enclosed by ancient cedar and pine forests that serve as a natural barrier against contamination. In 1994, the Nishi family became one of the first tea producers in Japan to commit entirely to organic cultivation. By 2000, they had earned JAS Organic certification, followed by Rainforest Alliance certification. At a time when Japan's tea industry declared organic matcha production impossible, Nishi Tea Factory was the first to prove otherwise.
