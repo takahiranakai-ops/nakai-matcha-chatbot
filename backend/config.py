@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     # B2B Sales Automation
     google_places_api_key: str = ""
     hunter_io_api_key: str = ""
-    b2b_daily_send_limit: int = 50
+    b2b_daily_send_limit: int = 333
     b2b_from_email: str = "wholesale@nakaimatcha.com"
     b2b_reply_to: str = "wholesale@nakaimatcha.com"
     b2b_enabled: bool = False

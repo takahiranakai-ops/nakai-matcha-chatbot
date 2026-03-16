@@ -584,7 +584,7 @@ let templates = {};
 
 function loadSettings(){
   fetch(API+'/stats',{headers:headers()}).then(r=>r.json()).then(s=>{
-    document.getElementById('cfg-limit').textContent = '50 通/日';
+    document.getElementById('cfg-limit').textContent = '333 通/日';
     document.getElementById('cfg-from').textContent = 'wholesale@nakaimatcha.com';
     document.getElementById('cfg-gp').textContent = s.total_leads > 0 ? '接続済' : '未設定';
     document.getElementById('cfg-resend').textContent = s.total_sent > 0 ? '接続済' : '環境変数を確認';
