@@ -749,23 +749,32 @@ function checkResendDomain(){
     if(data.records && data.records.length>0 && data.status!=='verified'){
       html += '<p style="font-size:.82rem;color:var(--gray);margin-bottom:12px;">以下のレコードを <strong>Shopify &gt; Settings &gt; Domains &gt; nakaimatcha.com &gt; DNS settings &gt; Add custom record</strong> に追加してください：</p>';
       html += '<table style="font-size:.78rem;width:100%;border-collapse:collapse;"><thead><tr style="background:#f8f8f8;"><th style="padding:8px;text-align:left;border:1px solid #eee;">Type</th><th style="padding:8px;text-align:left;border:1px solid #eee;">Name (Shopifyに入力)</th><th style="padding:8px;text-align:left;border:1px solid #eee;">Value (コピー)</th><th style="padding:8px;text-align:left;border:1px solid #eee;">状態</th></tr></thead><tbody>';
-      data.records.forEach(r=>{
-        const name = (r.name||r.record||'').replace('.nakaimatcha.com','');
-        const val = r.value||r.data||'';
-        const recType = r.record_type||r.type||'';
-        const recStatus = r.status==='verified'?'<span style="color:var(--green);">OK</span>':'<span style="color:#e67e22;">未設定</span>';
+      data.records.forEach(function(r){
+        var name = (r.name||r.record||'').replace('.nakaimatcha.com','');
+        var val = r.value||r.data||'';
+        var recType = r.record_type||r.type||'';
+        var recStatus = r.status==='verified'?'<span style="color:var(--green);">OK</span>':'<span style="color:#e67e22;">未設定</span>';
         html += '<tr><td style="padding:8px;border:1px solid #eee;font-weight:600;">'+esc(recType)+'</td>';
         html += '<td style="padding:8px;border:1px solid #eee;font-family:monospace;font-size:.75rem;word-break:break-all;">'+esc(name)+'</td>';
-        html += '<td style="padding:8px;border:1px solid #eee;font-family:monospace;font-size:.75rem;word-break:break-all;cursor:pointer;" onclick="navigator.clipboard.writeText(\''+val.replace(/'/g,"\\'")+'\');this.style.background=\'#e8f5e9\';setTimeout(()=>this.style.background=\'\',1000);" title="クリックでコピー">'+esc(val)+'</td>';
+        html += '<td class="copy-val" style="padding:8px;border:1px solid #eee;font-family:monospace;font-size:.75rem;word-break:break-all;cursor:pointer;" data-val="'+esc(val)+'" title="クリックでコピー">'+esc(val)+'</td>';
         html += '<td style="padding:8px;border:1px solid #eee;text-align:center;">'+recStatus+'</td></tr>';
       });
       html += '</tbody></table>';
       html += '<p style="font-size:.78rem;color:var(--gray);margin-top:12px;">Value 列をクリックするとコピーできます。全レコードを Shopify に追加後、再度「認証状態を確認」を押してください。</p>';
+    } else if(!data.records || data.records.length===0){
+      html += '<p style="font-size:.85rem;color:#e67e22;">DNS レコードが取得できませんでした。Resend のドメインページを確認してください。</p>';
     } else if(data.status==='verified'){
       html += '<p style="font-size:.85rem;color:var(--green);">ドメイン認証完了。メール送信が可能です。</p>';
     }
     el.innerHTML = html;
-  }).catch(e=>{el.innerHTML='<p style="color:var(--red);font-size:.85rem;">エラー: '+e.message+'</p>';});
+    el.querySelectorAll('.copy-val').forEach(function(td){
+      td.addEventListener('click',function(){
+        navigator.clipboard.writeText(td.dataset.val);
+        td.style.background='#e8f5e9';
+        setTimeout(function(){td.style.background='';},1000);
+      });
+    });
+  }).catch(function(e){el.innerHTML='<p style="color:var(--red);font-size:.85rem;">エラー: '+e.message+'</p>';});
 }
 
 // ── ヘルパー ──
