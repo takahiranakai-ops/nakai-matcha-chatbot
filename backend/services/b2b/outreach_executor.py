@@ -14,7 +14,7 @@ from services import resend_client, supabase_client
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://matcha.ai"
+BASE_URL = "https://nakai-matcha-chat.onrender.com"
 
 
 async def send_outreach(
