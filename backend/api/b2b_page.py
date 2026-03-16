@@ -668,7 +668,7 @@ function sendTest(){
   var names={cafe:'Sample Cafe',luxury_hotel:'The Grand Hotel',fine_dining:'Le Bistrot'};
   fetch(API+'/test-send',{method:'POST',headers:hdr(),body:JSON.stringify({to_email:email,step:step,cafe_name:names[seg]||'Sample',city:'Portland',cafe_type:seg})})
     .then(function(r){return r.json();}).then(function(d){
-      if(d.ok){msg.textContent='送信しました: '+d.subject;msg.style.color='#406546';}
+      if(d.ok){msg.textContent='送信しました: '+d.subject+(d.note?' ('+d.note+')':'');msg.style.color='#406546';}
       else{msg.textContent='失敗: '+(d.error||d.detail||'不明');msg.style.color='#c0392b';}
       btnL(btn,false);
     }).catch(function(e){msg.textContent='失敗: '+e.message;msg.style.color='#c0392b';btnL(btn,false);});

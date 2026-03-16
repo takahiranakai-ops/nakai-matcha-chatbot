@@ -415,7 +415,11 @@ async def test_send(
         # Get PDF attachment if exists
         attachments = await _get_active_attachment()
 
+        # Try custom domain first, fall back to Resend onboarding address
         from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
+        fallback_from = "NAKAI Matcha <onboarding@resend.dev>"
+        used_fallback = False
+
         payload = {
             "from": from_email,
             "to": [body.to_email],
@@ -436,11 +440,27 @@ async def test_send(
                 json=payload,
             )
 
+            # If domain not verified, retry with Resend onboarding address
+            if resp.status_code == 403 and "not verified" in resp.text.lower():
+                payload["from"] = fallback_from
+                resp = await client.post(
+                    "https://api.resend.com/emails",
+                    headers={
+                        "Authorization": f"Bearer {settings.resend_api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json=payload,
+                )
+                used_fallback = True
+
         if resp.status_code >= 400:
             return {"ok": False, "error": f"Resend API {resp.status_code}: {resp.text}"}
 
         data = resp.json()
-        return {"ok": True, "subject": email["subject"], "resend_id": data.get("id")}
+        result = {"ok": True, "subject": email["subject"], "resend_id": data.get("id")}
+        if used_fallback:
+            result["note"] = "ドメイン未認証のため onboarding@resend.dev から送信しました"
+        return result
     except Exception as e:
         logger.error(f"[B2B] Test send failed: {e}")
         return {"ok": False, "error": str(e)}
