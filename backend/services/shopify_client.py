@@ -63,6 +63,50 @@ async def _admin_get(endpoint: str) -> dict:
     return response.json()
 
 
+async def fetch_customers() -> list[dict]:
+    """Fetch customers who accepted marketing via Admin API.
+
+    Only returns customers with email_marketing_consent.state == 'subscribed'.
+    Paginates using since_id.
+    """
+    if not settings.shopify_admin_token:
+        logger.warning("Shopify Admin token not configured — cannot sync customers")
+        return []
+
+    all_customers: list[dict] = []
+    since_id = 0
+
+    while True:
+        endpoint = (
+            f"/customers.json?limit=250"
+            f"&fields=id,email,first_name,last_name,tags,email_marketing_consent"
+        )
+        if since_id:
+            endpoint += f"&since_id={since_id}"
+
+        try:
+            data = await _admin_get(endpoint)
+        except Exception as e:
+            logger.error(f"Shopify customer fetch failed: {e}")
+            break
+
+        customers = data.get("customers", [])
+        if not customers:
+            break
+
+        for c in customers:
+            consent = c.get("email_marketing_consent") or {}
+            if consent.get("state") == "subscribed" and c.get("email"):
+                all_customers.append(c)
+
+        if len(customers) < 250:
+            break
+        since_id = customers[-1]["id"]
+
+    logger.info(f"[SHOPIFY] Fetched {len(all_customers)} marketing-consented customers")
+    return all_customers
+
+
 async def fetch_products() -> list:
     """Fetch all products via public JSON endpoint."""
     all_products = []

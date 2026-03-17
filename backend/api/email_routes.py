@@ -16,7 +16,7 @@ from api.middleware import limiter
 from config import settings
 from services import supabase_client
 from services import resend_client
-from services.email_ai import generate_email_design, extract_editable_blocks, apply_editable_text, apply_editable_links
+from services.email_ai import generate_email_design, extract_editable_blocks, apply_editable_text, apply_editable_links, NEWSLETTER_TEMPLATES
 
 logger = logging.getLogger(__name__)
 
@@ -243,6 +243,44 @@ async def import_subscribers(
             imported += 1
 
     return {"imported": imported, "errors": errors}
+
+
+@email_router.post("/subscribers/sync-shopify")
+async def sync_shopify_customers(_auth: bool = Depends(verify_admin)):
+    """Sync customers from Shopify Admin API into email subscribers."""
+    from services import shopify_client
+
+    try:
+        customers = await shopify_client.fetch_customers()
+    except Exception as e:
+        raise HTTPException(500, f"Shopify API error: {e}") from e
+
+    if not customers:
+        return {"synced": 0, "skipped": 0, "total_shopify": 0}
+
+    synced = 0
+    skipped = 0
+
+    for c in customers:
+        email = (c.get("email") or "").strip().lower()
+        if not email or "@" not in email:
+            continue
+
+        name = f"{c.get('first_name', '')} {c.get('last_name', '')}".strip()
+        shopify_tags = [t.strip().lower() for t in (c.get("tags") or "").split(",") if t.strip()]
+
+        segment = "wholesale" if "wholesale" in shopify_tags else "retail"
+        tags = [segment, "shopify"]
+
+        result = await supabase_client.create_email_subscriber(
+            email=email, name=name, tags=tags, language="en",
+        )
+        if result:
+            synced += 1
+        else:
+            skipped += 1
+
+    return {"synced": synced, "skipped": skipped, "total_shopify": len(customers)}
 
 
 @email_router.patch("/subscribers/{sub_id}")
@@ -548,3 +586,131 @@ async def process_unsubscribe(request: Request):
         raise HTTPException(400, "Missing token")
     ok = await supabase_client.unsubscribe_by_token(token)
     return {"ok": ok}
+
+
+# ── Newsletter Templates ─────────────────────────────────────
+
+@email_router.get("/newsletter-templates")
+async def list_newsletter_templates(_auth: bool = Depends(verify_admin)):
+    """Return available newsletter content templates."""
+    return {k: {"name_ja": v["name_ja"], "name_en": v["name_en"], "subject_prefix": v["subject_prefix"]} for k, v in NEWSLETTER_TEMPLATES.items()}
+
+
+# ── Newsletter Schedules ─────────────────────────────────────
+
+class ScheduleCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(default="", max_length=1000)
+    template_key: str = Field(default="", max_length=50)
+    custom_prompt: str = Field(default="", max_length=2000)
+    target_tags: list[str] = Field(default_factory=list)
+    target_language: str = Field(default="en", max_length=5)
+    days_of_week: list[int] = Field(default=[1, 4])  # Mon=1, Thu=4 (JS convention)
+    send_time_utc: str = Field(default="14:00", max_length=5)
+    is_active: bool = Field(default=False)
+
+
+class ScheduleUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    template_key: Optional[str] = None
+    custom_prompt: Optional[str] = None
+    target_tags: Optional[list[str]] = None
+    target_language: Optional[str] = None
+    days_of_week: Optional[list[int]] = None
+    send_time_utc: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+@email_router.get("/schedules")
+async def list_schedules(_auth: bool = Depends(verify_admin)):
+    return await supabase_client.list_newsletter_schedules()
+
+
+@email_router.post("/schedules")
+async def create_schedule(body: ScheduleCreate, _auth: bool = Depends(verify_admin)):
+    data = body.model_dump()
+    data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    result = await supabase_client.create_newsletter_schedule(data)
+    if not result:
+        raise HTTPException(500, "Failed to create schedule")
+    return result
+
+
+@email_router.patch("/schedules/{schedule_id}")
+async def update_schedule(schedule_id: str, body: ScheduleUpdate, _auth: bool = Depends(verify_admin)):
+    data = {k: v for k, v in body.model_dump().items() if v is not None}
+    data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    result = await supabase_client.update_newsletter_schedule(schedule_id, data)
+    if not result:
+        raise HTTPException(404, "Schedule not found")
+    return result
+
+
+@email_router.delete("/schedules/{schedule_id}")
+async def delete_schedule(schedule_id: str, _auth: bool = Depends(verify_admin)):
+    ok = await supabase_client.delete_newsletter_schedule(schedule_id)
+    if not ok:
+        raise HTTPException(404, "Schedule not found")
+    return {"ok": True}
+
+
+@email_router.post("/newsletter/init-table")
+async def init_newsletter_table(_auth: bool = Depends(verify_admin)):
+    """Create newsletter_schedules table if it doesn't exist."""
+    import httpx
+    sql = """
+    CREATE TABLE IF NOT EXISTS newsletter_schedules (
+        id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        template_key TEXT DEFAULT '',
+        custom_prompt TEXT DEFAULT '',
+        target_tags TEXT[] DEFAULT '{}',
+        target_language TEXT DEFAULT 'en',
+        is_active BOOLEAN DEFAULT FALSE,
+        days_of_week INT[] DEFAULT '{1,4}',
+        send_time_utc TEXT DEFAULT '14:00',
+        last_sent_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                f"{settings.supabase_url}/rest/v1/rpc/exec_sql",
+                headers={
+                    "apikey": settings.supabase_service_key,
+                    "Authorization": f"Bearer {settings.supabase_service_key}",
+                    "Content-Type": "application/json",
+                },
+                json={"query": sql},
+            )
+            if resp.status_code >= 400:
+                # Try raw SQL via pg endpoint
+                resp2 = await client.post(
+                    f"{settings.supabase_url}/pg",
+                    headers={
+                        "apikey": settings.supabase_service_key,
+                        "Authorization": f"Bearer {settings.supabase_service_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={"query": sql},
+                )
+                return {"ok": True, "method": "pg", "note": "Table creation attempted. If this fails, run SQL manually in Supabase dashboard.", "sql": sql.strip()}
+            return {"ok": True, "method": "rpc"}
+    except Exception as e:
+        return {"ok": False, "error": str(e), "sql": sql.strip()}
+
+
+@email_router.post("/schedules/{schedule_id}/trigger")
+async def trigger_schedule(schedule_id: str, _auth: bool = Depends(verify_admin)):
+    """Manually trigger a newsletter send right now."""
+    schedule = await supabase_client.get_newsletter_schedule(schedule_id)
+    if not schedule:
+        raise HTTPException(404, "Schedule not found")
+
+    from services.newsletter_sender import _generate_and_send
+    asyncio.create_task(_generate_and_send(schedule))
+    return {"ok": True, "status": "sending"}

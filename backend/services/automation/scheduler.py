@@ -99,6 +99,12 @@ async def run_b2b_pipeline():
     await _safe_run("b2b_pipeline", run_daily_pipeline())
 
 
+async def run_newsletter_check():
+    """Check and send due newsletter schedules."""
+    from services.newsletter_sender import check_and_send_due_newsletters
+    await _safe_run("newsletter", check_and_send_due_newsletters())
+
+
 # ---------------------------------------------------------------------------
 # Simple asyncio-based scheduler (no external dependency needed)
 # ---------------------------------------------------------------------------
@@ -119,6 +125,7 @@ async def _scheduler_loop():
         "b2b": 0,          # daily 14:00 UTC
         "freshness": 0,    # weekly
         "competitor": 0,   # weekly
+        "newsletter": 0,   # every 10 min
     }
 
     while True:
@@ -166,6 +173,11 @@ async def _scheduler_loop():
             if hour == 23 and (now.timestamp() - last_run["daily_tips"]) >= 23 * 3600:
                 last_run["daily_tips"] = now.timestamp()
                 asyncio.create_task(run_daily_tips())
+
+            # Every 10 min: Newsletter schedule check
+            if (now.timestamp() - last_run["newsletter"]) >= 600:
+                last_run["newsletter"] = now.timestamp()
+                asyncio.create_task(run_newsletter_check())
 
         except Exception as e:
             logger.error(f"[SCHEDULER] Loop error: {e}")

@@ -232,3 +232,66 @@ def _fallback_template(brand_assets: dict, campaign_photos: list[str] | None = N
 </table>
 </body>
 </html>"""
+
+
+# ── Newsletter Templates ──────────────────────────────────────
+
+NEWSLETTER_TEMPLATES: dict[str, dict] = {
+    "matcha_recipe": {
+        "name_ja": "抹茶レシピ",
+        "name_en": "Matcha Recipe",
+        "prompt": (
+            "Create a newsletter featuring a seasonal matcha recipe. "
+            "Include a short intro about the season, ingredients list, "
+            "step-by-step instructions, and a tip from our tea master. "
+            "Keep it warm and approachable for home baristas. "
+            "Vary the recipe each time — lattes, smoothies, desserts, savory dishes."
+        ),
+        "subject_prefix": "This Week's Matcha Recipe",
+    },
+    "matcha_knowledge": {
+        "name_ja": "抹茶知識",
+        "name_en": "Matcha Knowledge",
+        "prompt": (
+            "Create an educational newsletter about matcha. "
+            "Pick ONE topic and go deep: matcha grades and how to choose, "
+            "health benefits backed by research, the history of tea ceremony, "
+            "Kagoshima terroir and volcanic soil, or the stone-grinding process. "
+            "Tone: authoritative yet warm. Include one surprising fact."
+        ),
+        "subject_prefix": "The Art of Matcha",
+    },
+    "brewing_guide": {
+        "name_ja": "点て方ガイド",
+        "name_en": "Brewing Guide",
+        "prompt": (
+            "Create a newsletter with a matcha brewing technique. "
+            "Cover ONE method in detail: traditional usucha, koicha thick tea, "
+            "iced matcha, matcha latte art, or matcha cocktails. "
+            "Include water temperature, ratio, whisking technique, and common mistakes."
+        ),
+        "subject_prefix": "Matcha Brewing Mastery",
+    },
+    "seasonal": {
+        "name_ja": "季節のご挨拶",
+        "name_en": "Seasonal Greeting",
+        "prompt": (
+            "Create a seasonal greeting newsletter for NAKAI Matcha. "
+            "Weave in Japanese seasonal tradition (shun/旬), connect it to matcha culture, "
+            "mention what's happening in our Kagoshima tea fields right now, "
+            "and include a soft product recommendation."
+        ),
+        "subject_prefix": "From Kagoshima",
+    },
+    "wholesale_update": {
+        "name_ja": "卸パートナー向け",
+        "name_en": "Wholesale Update",
+        "prompt": (
+            "Create a professional B2B newsletter for wholesale partners. "
+            "Cover: seasonal harvest updates, new product grades available, "
+            "ordering deadlines, menu inspiration ideas for cafes/restaurants, "
+            "and matcha market trends. Professional but warm tone."
+        ),
+        "subject_prefix": "NAKAI Wholesale Update",
+    },
+}

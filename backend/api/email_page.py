@@ -1,9 +1,10 @@
 """Email Marketing dashboard for NAKAI.
 
-GET /email → Password-gated email marketing UI with 3 tabs:
+GET /email → Password-gated email marketing UI with 4 tabs:
   1. Campaigns - Create, edit, preview, send emails
-  2. Subscribers - Manage email list
-  3. Brand Assets - Logo, colors, photos
+  2. Newsletter - Automated schedule management
+  3. Subscribers - Manage email list + Shopify sync
+  4. Brand Assets - Logo, colors, photos
 """
 
 from fastapi import APIRouter
@@ -109,6 +110,20 @@ td{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-alig
 .empty-state{text-align:center;padding:60px 20px;color:var(--gray)}
 .empty-state p{font-size:.9rem;margin-bottom:16px}
 .loading{text-align:center;padding:40px;color:var(--gray);font-size:.9rem}
+
+/* Schedule Cards */
+.schedule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px}
+.sched-card{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.sched-card h4{font-size:.95rem;font-weight:600;color:#333;margin-bottom:8px}
+.sched-card .meta{font-size:.78rem;color:var(--gray);line-height:1.6}
+.sched-card .actions{display:flex;gap:8px;margin-top:12px;align-items:center}
+.toggle{position:relative;width:40px;height:22px;background:#ccc;border-radius:11px;cursor:pointer;transition:background .2s}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:var(--white);border-radius:50%;transition:transform .2s}
+.toggle.on::after{transform:translateX(18px)}
+.day-checks{display:flex;gap:4px;margin:8px 0}
+.day-check{width:28px;height:28px;border-radius:50%;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:.68rem;color:var(--gray);cursor:pointer;font-family:var(--font)}
+.day-check.sel{background:var(--green);color:var(--white);border-color:var(--green)}
 </style>
 </head>
 <body>
@@ -132,6 +147,7 @@ td{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-alig
 </div>
 <div class="tabs">
   <div class="tab active" onclick="switchTab('campaigns')">Campaigns</div>
+  <div class="tab" onclick="switchTab('newsletter')">Newsletter</div>
   <div class="tab" onclick="switchTab('subscribers')">Subscribers</div>
   <div class="tab" onclick="switchTab('brand')">Brand Assets</div>
 </div>
@@ -173,11 +189,57 @@ td{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-alig
   </div>
 </div>
 
+<!-- Newsletter Panel -->
+<div class="panel" id="panel-newsletter">
+  <div class="toolbar">
+    <button class="btn btn-green" onclick="showNewSchedule()">+ New Schedule</button>
+  </div>
+  <div id="schedules-list"><div class="loading">Loading...</div></div>
+  <!-- New Schedule Form -->
+  <div id="schedule-form" style="display:none;background:var(--white);border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-top:16px">
+    <h4 style="font-size:.95rem;font-weight:600;color:var(--green);margin-bottom:16px">New Newsletter Schedule</h4>
+    <div class="form-group"><label>Name</label><input type="text" id="sched-name" placeholder="e.g. Weekly Matcha Recipe"></div>
+    <div class="form-group"><label>Template</label>
+      <select id="sched-template"><option value="">Loading...</option></select>
+    </div>
+    <div class="form-group"><label>Custom Prompt (optional, overrides template)</label>
+      <textarea id="sched-prompt" placeholder="Custom AI prompt for content generation..."></textarea>
+    </div>
+    <div class="form-group"><label>Target Audience</label>
+      <select id="sched-target">
+        <option value="">All subscribers</option>
+        <option value="retail">Retail customers</option>
+        <option value="wholesale">Wholesale partners</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Language</label>
+      <select id="sched-lang"><option value="en">English</option><option value="ja">Japanese</option></select>
+    </div>
+    <div class="form-group"><label>Days of Week</label>
+      <div class="day-checks" id="sched-days">
+        <div class="day-check" data-day="0" onclick="toggleDay(this)">Su</div>
+        <div class="day-check sel" data-day="1" onclick="toggleDay(this)">Mo</div>
+        <div class="day-check" data-day="2" onclick="toggleDay(this)">Tu</div>
+        <div class="day-check" data-day="3" onclick="toggleDay(this)">We</div>
+        <div class="day-check sel" data-day="4" onclick="toggleDay(this)">Th</div>
+        <div class="day-check" data-day="5" onclick="toggleDay(this)">Fr</div>
+        <div class="day-check" data-day="6" onclick="toggleDay(this)">Sa</div>
+      </div>
+    </div>
+    <div class="form-group"><label>Send Time (UTC)</label><input type="time" id="sched-time" value="14:00"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-green" onclick="createSchedule()">Create</button>
+      <button class="btn btn-outline" onclick="hideScheduleForm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Subscribers Panel -->
 <div class="panel" id="panel-subscribers">
   <div class="toolbar">
     <button class="btn btn-green" onclick="showAddSubscriber()">+ Add Subscriber</button>
     <button class="btn btn-outline" onclick="showImportCSV()">Import CSV</button>
+    <button class="btn btn-outline" onclick="syncShopify()">Sync Shopify</button>
     <select id="sub-tag-filter" onchange="loadSubscribers()">
       <option value="">All Tags</option>
     </select>
@@ -316,14 +378,16 @@ async function apiForm(method,path,formData){
 }
 
 // ── Tabs ──
+const TAB_ORDER=['campaigns','newsletter','subscribers','brand'];
 function switchTab(name){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['campaigns','subscribers','brand'][i]===name));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',TAB_ORDER[i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   if(name==='campaigns')backToCampaigns();
+  if(name==='newsletter')loadSchedules();
 }
 
-function loadAll(){loadCampaigns();loadSubscribers();loadBrandAssets();}
+function loadAll(){loadCampaigns();loadSubscribers();loadBrandAssets();loadTemplates();}
 
 // ── Campaigns ──
 async function loadCampaigns(){
@@ -641,6 +705,102 @@ document.getElementById('new-camp-photos').addEventListener('change',function(){
     el.innerHTML+=`<div style="width:60px;height:60px;border-radius:6px;overflow:hidden;background:var(--light)"><img src="${url}" style="width:100%;height:100%;object-fit:cover"></div>`;
   }
 });
+
+// ── Shopify Sync ──
+async function syncShopify(){
+  if(!confirm('Sync marketing-consented customers from Shopify?'))return;
+  const r=await api('POST','/api/email/subscribers/sync-shopify');
+  if(r.ok){
+    alert(`Synced: ${r.data.synced}, Skipped: ${r.data.skipped} (${r.data.total_shopify} total from Shopify)`);
+    loadSubscribers();
+  }else{alert('Shopify sync failed');}
+}
+
+// ── Newsletter Templates & Schedules ──
+let nlTemplates={};
+async function loadTemplates(){
+  const r=await api('GET','/api/email/newsletter-templates');
+  if(r.ok){
+    nlTemplates=r.data;
+    const sel=document.getElementById('sched-template');
+    sel.innerHTML='<option value="">(Custom prompt)</option>'+Object.entries(r.data).map(([k,v])=>`<option value="${k}">${esc(v.name_en)} / ${esc(v.name_ja)}</option>`).join('');
+  }
+}
+
+const DAY_NAMES=['Su','Mo','Tu','We','Th','Fr','Sa'];
+function toggleDay(el){el.classList.toggle('sel');}
+function getSelectedDays(){return[...document.querySelectorAll('#sched-days .day-check.sel')].map(e=>parseInt(e.dataset.day));}
+
+function showNewSchedule(){document.getElementById('schedule-form').style.display='block';}
+function hideScheduleForm(){document.getElementById('schedule-form').style.display='none';}
+
+async function createSchedule(){
+  const name=document.getElementById('sched-name').value.trim();
+  if(!name){alert('Name is required');return;}
+  const template_key=document.getElementById('sched-template').value;
+  const custom_prompt=document.getElementById('sched-prompt').value.trim();
+  const target=document.getElementById('sched-target').value;
+  const target_tags=target?[target]:[];
+  const target_language=document.getElementById('sched-lang').value;
+  const days_of_week=getSelectedDays();
+  const send_time_utc=document.getElementById('sched-time').value||'14:00';
+  if(days_of_week.length===0){alert('Select at least one day');return;}
+  const r=await api('POST','/api/email/schedules',{name,template_key,custom_prompt,target_tags,target_language,days_of_week,send_time_utc,is_active:false});
+  if(r.ok){hideScheduleForm();loadSchedules();}else{alert('Failed to create schedule');}
+}
+
+async function loadSchedules(){
+  const r=await api('GET','/api/email/schedules');
+  const el=document.getElementById('schedules-list');
+  if(!r.ok||!r.data||r.data.length===0){
+    el.innerHTML='<div class="empty-state"><p>No newsletter schedules yet</p><button class="btn btn-green" onclick="showNewSchedule()">Create your first schedule</button></div>';
+    return;
+  }
+  let html='<div class="schedule-grid">';
+  for(const s of r.data){
+    const days=(s.days_of_week||[]).map(d=>DAY_NAMES[d]||d).join(', ');
+    const tpl=nlTemplates[s.template_key];
+    const tplName=tpl?tpl.name_en:(s.custom_prompt?'Custom':'—');
+    const tags=(s.target_tags||[]).join(', ')||'All';
+    const lastSent=s.last_sent_at?new Date(s.last_sent_at).toLocaleDateString():'Never';
+    const toggleCls=s.is_active?'toggle on':'toggle';
+    html+=`<div class="sched-card">
+      <h4>${esc(s.name)}</h4>
+      <div class="meta">
+        Template: ${esc(tplName)}<br>
+        Days: ${days} at ${s.send_time_utc||'14:00'} UTC<br>
+        Audience: ${esc(tags)} | ${s.target_language||'en'}<br>
+        Last sent: ${lastSent}
+      </div>
+      <div class="actions">
+        <div class="${toggleCls}" onclick="toggleSchedule('${s.id}',${!s.is_active})"></div>
+        <span style="font-size:.78rem;color:var(--gray)">${s.is_active?'Active':'Paused'}</span>
+        <button class="btn btn-outline btn-sm" onclick="triggerSchedule('${s.id}')">Send Now</button>
+        <button class="btn btn-outline btn-sm" onclick="deleteSchedule('${s.id}')">Delete</button>
+      </div>
+    </div>`;
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+async function toggleSchedule(id,active){
+  await api('PATCH','/api/email/schedules/'+id,{is_active:active});
+  loadSchedules();
+}
+
+async function triggerSchedule(id){
+  if(!confirm('Send this newsletter now?'))return;
+  const r=await api('POST','/api/email/schedules/'+id+'/trigger');
+  if(r.ok)alert('Newsletter is being generated and sent!');
+  else alert('Failed to trigger');
+}
+
+async function deleteSchedule(id){
+  if(!confirm('Delete this schedule?'))return;
+  await api('DELETE','/api/email/schedules/'+id);
+  loadSchedules();
+}
 
 // ── Helpers ──
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}

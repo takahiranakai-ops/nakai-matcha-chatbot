@@ -974,3 +974,104 @@ async def delete_email_campaign(campaign_id: str) -> bool:
     except Exception as e:
         logger.warning(f"Failed to delete campaign: {e}")
         return False
+
+
+# ----------------------------------------------------------------
+# EMAIL MARKETING: NEWSLETTER SCHEDULES
+# ----------------------------------------------------------------
+
+async def list_newsletter_schedules(active_only: bool = False) -> list[dict]:
+    if not _is_configured():
+        return []
+    _init()
+    params: dict = {"order": "created_at.desc", "limit": "100"}
+    if active_only:
+        params["is_active"] = "eq.true"
+    try:
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/newsletter_schedules",
+            headers=_HEADERS,
+            params=params,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logger.warning(f"Failed to list newsletter schedules: {e}")
+        return []
+
+
+async def get_newsletter_schedule(schedule_id: str) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/newsletter_schedules",
+            headers=_HEADERS,
+            params={"id": f"eq.{schedule_id}", "limit": "1"},
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to get newsletter schedule: {e}")
+        return None
+
+
+async def create_newsletter_schedule(data: dict) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.post(
+            f"{_BASE_URL}/newsletter_schedules",
+            headers=_HEADERS,
+            json=data,
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to create newsletter schedule: {e}")
+        return None
+
+
+async def update_newsletter_schedule(schedule_id: str, updates: dict) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.patch(
+            f"{_BASE_URL}/newsletter_schedules",
+            headers={**_HEADERS, "Prefer": "return=representation"},
+            params={"id": f"eq.{schedule_id}"},
+            json=updates,
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to update newsletter schedule: {e}")
+        return None
+
+
+async def delete_newsletter_schedule(schedule_id: str) -> bool:
+    if not _is_configured():
+        return False
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.delete(
+            f"{_BASE_URL}/newsletter_schedules",
+            headers=_HEADERS,
+            params={"id": f"eq.{schedule_id}"},
+        )
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to delete newsletter schedule: {e}")
+        return False
