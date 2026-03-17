@@ -630,10 +630,28 @@ async def list_schedules(_auth: bool = Depends(verify_admin)):
 @email_router.post("/schedules")
 async def create_schedule(body: ScheduleCreate, _auth: bool = Depends(verify_admin)):
     data = body.model_dump()
-    result = await supabase_client.create_newsletter_schedule(data)
-    if not result:
-        raise HTTPException(500, "Failed to create schedule")
-    return result
+    # Direct Supabase call with error details for debugging
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.post(
+                f"{settings.supabase_url}/rest/v1/newsletter_schedules",
+                headers={
+                    "apikey": settings.supabase_service_key,
+                    "Authorization": f"Bearer {settings.supabase_service_key}",
+                    "Content-Type": "application/json",
+                    "Prefer": "return=representation",
+                },
+                json=data,
+            )
+            if resp.status_code >= 400:
+                raise HTTPException(resp.status_code, f"Supabase: {resp.text[:500]}")
+            rows = resp.json()
+            return rows[0] if rows else {"ok": True, "note": "created but no return"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Error: {str(e)}")
 
 
 @email_router.patch("/schedules/{schedule_id}")
