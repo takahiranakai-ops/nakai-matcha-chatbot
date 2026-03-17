@@ -630,28 +630,10 @@ async def list_schedules(_auth: bool = Depends(verify_admin)):
 @email_router.post("/schedules")
 async def create_schedule(body: ScheduleCreate, _auth: bool = Depends(verify_admin)):
     data = body.model_dump()
-    # Direct Supabase call with error details for debugging
-    import httpx
-    try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            resp = await client.post(
-                f"{settings.supabase_url}/rest/v1/newsletter_schedules",
-                headers={
-                    "apikey": settings.supabase_service_key,
-                    "Authorization": f"Bearer {settings.supabase_service_key}",
-                    "Content-Type": "application/json",
-                    "Prefer": "return=representation",
-                },
-                json=data,
-            )
-            if resp.status_code >= 400:
-                raise HTTPException(resp.status_code, f"Supabase: {resp.text[:500]}")
-            rows = resp.json()
-            return rows[0] if rows else {"ok": True, "note": "created but no return"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(500, f"Error: {str(e)}")
+    result = await supabase_client.create_newsletter_schedule(data)
+    if not result:
+        raise HTTPException(500, "Failed to create schedule")
+    return result
 
 
 @email_router.patch("/schedules/{schedule_id}")
@@ -672,155 +654,21 @@ async def delete_schedule(schedule_id: str, _auth: bool = Depends(verify_admin))
     return {"ok": True}
 
 
-@email_router.get("/newsletter/reload-schema")
 @email_router.post("/newsletter/reload-schema")
 async def reload_postgrest_schema(_auth: bool = Depends(verify_admin)):
-    """Reload PostgREST schema cache via direct PostgreSQL NOTIFY. v3
-
-    Auto-derives connection from SUPABASE_URL + SUPABASE_SERVICE_KEY if
-    DATABASE_URL is not set. Tries direct DB and multiple pooler regions.
-    """
-    import asyncpg
-    import re
-
-    async def _try_connect(dsn: str, label: str) -> dict:
-        """Attempt connection and NOTIFY."""
+    """Reload PostgREST schema cache via direct PostgreSQL NOTIFY."""
+    if not settings.database_url:
+        return {"ok": False, "error": "DATABASE_URL not configured"}
+    try:
+        import asyncpg
+        conn = await asyncpg.connect(settings.database_url, timeout=10)
         try:
-            conn = await asyncpg.connect(dsn, timeout=10, ssl="require")
-            try:
-                await conn.execute("NOTIFY pgrst, 'reload schema'")
-                await conn.execute("""
-                    CREATE OR REPLACE FUNCTION public.reload_schema_cache()
-                    RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
-                    BEGIN
-                        NOTIFY pgrst, 'reload schema';
-                    END;
-                    $$;
-                """)
-                table_exists = await conn.fetchval(
-                    "SELECT EXISTS (SELECT 1 FROM information_schema.tables "
-                    "WHERE table_schema='public' AND table_name='newsletter_schedules')"
-                )
-                return {"ok": True, "method": label, "table_exists": table_exists, "rpc_created": True}
-            finally:
-                await conn.close()
-        except Exception as e:
-            return {"ok": False, "method": label, "error": str(e)[:200]}
-
-    # 1) If DATABASE_URL is set, use it directly
-    if settings.database_url:
-        return await _try_connect(settings.database_url, "database_url")
-
-    # 2) Auto-derive from SUPABASE_URL + SUPABASE_SERVICE_KEY
-    if not settings.supabase_url or not settings.supabase_service_key:
-        return {"ok": False, "error": "Need DATABASE_URL or SUPABASE_URL+SUPABASE_SERVICE_KEY"}
-
-    m = re.match(r"https://([^.]+)\.supabase\.co", settings.supabase_url)
-    if not m:
-        return {"ok": False, "error": f"Cannot parse project ref from: {settings.supabase_url}"}
-    ref = m.group(1)
-    key = settings.supabase_service_key
-
-    # Method A: Try Supabase Management API (execute SQL directly)
-    import httpx
-    mgmt_headers = {
-        "Authorization": f"Bearer {key}",
-        "Content-Type": "application/json",
-    }
-    mgmt_results = {}
-    async with httpx.AsyncClient(timeout=15) as client:
-        # Try Management API SQL execution
-        try:
-            r = await client.post(
-                f"https://api.supabase.com/v1/projects/{ref}/database/query",
-                headers=mgmt_headers,
-                json={"query": "NOTIFY pgrst, 'reload schema'"},
-            )
-            mgmt_results["mgmt_query"] = {"status": r.status_code, "body": r.text[:300]}
-            if r.status_code < 400:
-                return {"ok": True, "method": "management_api", "ref": ref}
-        except Exception as e:
-            mgmt_results["mgmt_query"] = {"error": str(e)[:200]}
-
-        # Try Management API PostgREST restart
-        try:
-            r2 = await client.patch(
-                f"https://api.supabase.com/v1/projects/{ref}/postgrest",
-                headers=mgmt_headers,
-                json={"db_schema": "public,extensions"},
-            )
-            mgmt_results["mgmt_postgrest"] = {"status": r2.status_code, "body": r2.text[:300]}
-        except Exception as e:
-            mgmt_results["mgmt_postgrest"] = {"error": str(e)[:200]}
-
-    # Method B: Try direct PostgreSQL connections
-    attempts = [
-        (f"postgresql://postgres.{ref}:{key}@db.{ref}.supabase.co:5432/postgres", "direct_jwt"),
-    ]
-    for region in ["us-east-1", "us-west-1", "ap-northeast-1", "eu-west-1"]:
-        attempts.append((
-            f"postgresql://postgres.{ref}:{key}@aws-0-{region}.pooler.supabase.com:6543/postgres",
-            f"pooler_{region}",
-        ))
-
-    errors = []
-    for dsn, label in attempts:
-        result = await _try_connect(dsn, label)
-        if result.get("ok"):
-            return result
-        errors.append({"method": label, "error": result.get("error", "")[:100]})
-
-    return {
-        "ok": False,
-        "ref": ref,
-        "mgmt_api": mgmt_results,
-        "db_errors": errors,
-        "hint": "Set DATABASE_URL in Render. Get it from Supabase Dashboard > Settings > Database > Connection string (URI)",
-    }
-
-
-@email_router.get("/newsletter/debug-table")
-async def debug_newsletter_table(_auth: bool = Depends(verify_admin)):
-    """Debug: directly test Supabase REST access to newsletter_schedules."""
-    import httpx
-    headers = {
-        "apikey": settings.supabase_service_key,
-        "Authorization": f"Bearer {settings.supabase_service_key}",
-        "Content-Type": "application/json",
-    }
-    results = {}
-    async with httpx.AsyncClient(timeout=15) as client:
-        # Test GET
-        r1 = await client.get(
-            f"{settings.supabase_url}/rest/v1/newsletter_schedules?limit=1",
-            headers=headers,
-        )
-        results["get"] = {"status": r1.status_code, "body": r1.text[:500]}
-
-        # Test POST (insert then delete)
-        r2 = await client.post(
-            f"{settings.supabase_url}/rest/v1/newsletter_schedules",
-            headers={**headers, "Prefer": "return=representation"},
-            json={"name": "debug-test", "template_key": "matcha_recipe", "days_of_week": [2, 5]},
-        )
-        results["post"] = {"status": r2.status_code, "body": r2.text[:500]}
-        if r2.status_code < 400:
-            try:
-                rows = r2.json()
-                if rows:
-                    tid = rows[0].get("id")
-                    await client.delete(
-                        f"{settings.supabase_url}/rest/v1/newsletter_schedules?id=eq.{tid}",
-                        headers=headers,
-                    )
-                    results["cleanup"] = "ok"
-            except Exception:
-                pass
-
-        # Check REST root
-        r3 = await client.get(f"{settings.supabase_url}/rest/v1/", headers=headers)
-        results["root_has_table"] = "newsletter_schedules" in r3.text
-    return results
+            await conn.execute("NOTIFY pgrst, 'reload schema'")
+            return {"ok": True}
+        finally:
+            await conn.close()
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
 
 
 @email_router.post("/schedules/{schedule_id}/trigger")
