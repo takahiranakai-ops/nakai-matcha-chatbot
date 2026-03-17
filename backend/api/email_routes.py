@@ -654,9 +654,10 @@ async def delete_schedule(schedule_id: str, _auth: bool = Depends(verify_admin))
     return {"ok": True}
 
 
+@email_router.get("/newsletter/reload-schema")
 @email_router.post("/newsletter/reload-schema")
 async def reload_postgrest_schema(_auth: bool = Depends(verify_admin)):
-    """Reload PostgREST schema cache via direct PostgreSQL NOTIFY.
+    """Reload PostgREST schema cache via direct PostgreSQL NOTIFY. v3
 
     Auto-derives connection from SUPABASE_URL + SUPABASE_SERVICE_KEY if
     DATABASE_URL is not set. Tries direct DB and multiple pooler regions.
