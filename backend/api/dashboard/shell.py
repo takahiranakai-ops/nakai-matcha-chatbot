@@ -183,13 +183,19 @@ SHELL_SIDEBAR = """
     <div class="nav-item" data-sec="email" onclick="showSection('email')">
       <i class="ti ti-mail"></i> Email Marketing
     </div>
+    <div class="nav-item" data-sec="social" onclick="showSection('social')">
+      <i class="ti ti-brand-reddit"></i> Content & Social
+    </div>
     <div class="nav-item" data-sec="content" onclick="showSection('content')">
-      <i class="ti ti-book"></i> Content
+      <i class="ti ti-book"></i> Content Management
     </div>
     <div class="nav-item" data-sec="analytics" onclick="showSection('analytics')">
       <i class="ti ti-chart-bar"></i> Analytics
     </div>
     <div class="nav-sep"></div>
+    <div class="nav-item" data-sec="guide" onclick="showSection('guide')">
+      <i class="ti ti-help"></i> Guide
+    </div>
     <a class="nav-link-ext" href="/app" target="_blank"><i class="ti ti-external-link"></i> Matcha Concierge</a>
     <a class="nav-link-ext" href="/admin"><i class="ti ti-settings"></i> Legacy Admin</a>
   </nav>
@@ -248,7 +254,7 @@ function showSection(name) {
   });
 
   // Update mobile topbar title
-  var titles = {home:'Home',b2b:'B2B Sales Team',email:'Email Marketing',content:'Content',analytics:'Analytics'};
+  var titles = {home:'Home',b2b:'B2B Sales Team',email:'Email Marketing',social:'Content & Social',content:'Content Management',analytics:'Analytics',guide:'Guide'};
   var titleEl = document.getElementById('dash-topbar-title');
   if (titleEl) titleEl.textContent = titles[name] || name;
 

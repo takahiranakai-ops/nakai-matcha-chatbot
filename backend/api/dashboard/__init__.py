@@ -4,7 +4,10 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
 from .shell import SHELL_CSS, SHELL_LOGIN, SHELL_SIDEBAR, SHELL_JS
-from . import section_home, section_b2b, section_email, section_content, section_analytics
+from . import (
+    section_home, section_b2b, section_email, section_content,
+    section_analytics, section_social, section_guide,
+)
 
 dashboard_router = APIRouter()
 
@@ -12,8 +15,10 @@ SECTIONS = {
     "home": section_home,
     "b2b": section_b2b,
     "email": section_email,
+    "social": section_social,
     "content": section_content,
     "analytics": section_analytics,
+    "guide": section_guide,
 }
 
 DASHBOARD_HTML = f"""<!DOCTYPE html>

@@ -1,4 +1,4 @@
-"""Home section — unified KPI overview + quick actions."""
+"""Home section — unified KPI overview + section cards + system status."""
 
 
 def html() -> str:
@@ -8,7 +8,7 @@ def html() -> str:
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h2 style="font-size:1.1rem;font-weight:400;color:#333">Overview</h2>
       <div class="d-flex gap-2">
-        <button class="btn btn-sm btn-outline-secondary" onclick="homeRefresh()">Refresh</button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="homeRefresh()"><i class="ti ti-refresh"></i> Refresh</button>
       </div>
     </div>
   </div>
@@ -24,16 +24,96 @@ def html() -> str:
   <div class="col-sm-6 col-lg-2"><div class="skeleton skeleton-kpi"></div></div>
 </div>
 
+<!-- System Status -->
+<div class="card mb-4">
+  <div class="card-header"><h3 class="card-title"><i class="ti ti-server" style="margin-right:6px;color:#406546"></i> System Status</h3></div>
+  <div class="card-body" id="home-sys-status">
+    <div class="d-flex flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-2"><div class="home-dot home-dot-loading"></div><span class="text-muted" style="font-size:.82rem">Core API</span></div>
+      <div class="d-flex align-items-center gap-2"><div class="home-dot home-dot-loading"></div><span class="text-muted" style="font-size:.82rem">Supabase</span></div>
+      <div class="d-flex align-items-center gap-2"><div class="home-dot home-dot-loading"></div><span class="text-muted" style="font-size:.82rem">Shopify</span></div>
+      <div class="d-flex align-items-center gap-2"><div class="home-dot home-dot-loading"></div><span class="text-muted" style="font-size:.82rem">Email (Resend)</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section Cards — Navigate the Console -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h3 style="font-size:.95rem;font-weight:500;color:#555">Sections</h3>
+  <a style="font-size:.78rem;color:#406546;text-decoration:none;cursor:pointer" onclick="showSection('guide')">View Guide &rarr;</a>
+</div>
+<div class="row row-deck row-cards mb-4">
+  <div class="col-sm-6 col-lg-4">
+    <div class="card home-sec-card" onclick="showSection('b2b')">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="seg-icon" style="background:#2c3e50"><i class="ti ti-users-group" style="font-size:1rem"></i></div>
+          <div><h4 class="mb-0" style="font-size:.88rem;font-weight:500">B2B Sales Team</h4><p class="text-muted mb-0" style="font-size:.75rem">Lead management & automated outreach</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card home-sec-card" onclick="showSection('email')">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="seg-icon" style="background:#8e3b2e"><i class="ti ti-mail" style="font-size:1rem"></i></div>
+          <div><h4 class="mb-0" style="font-size:.88rem;font-weight:500">Email Marketing</h4><p class="text-muted mb-0" style="font-size:.75rem">AI campaigns & newsletter</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card home-sec-card" onclick="showSection('social')">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="seg-icon" style="background:#FF4500"><i class="ti ti-brand-reddit" style="font-size:1rem"></i></div>
+          <div><h4 class="mb-0" style="font-size:.88rem;font-weight:500">Content & Social</h4><p class="text-muted mb-0" style="font-size:.75rem">Auto-post to 5 platforms daily</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card home-sec-card" onclick="showSection('content')">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="seg-icon" style="background:#5856D6"><i class="ti ti-book" style="font-size:1rem"></i></div>
+          <div><h4 class="mb-0" style="font-size:.88rem;font-weight:500">Content Management</h4><p class="text-muted mb-0" style="font-size:.75rem">Knowledge base & chat history</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card home-sec-card" onclick="showSection('analytics')">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="seg-icon" style="background:#007AFF"><i class="ti ti-chart-bar" style="font-size:1rem"></i></div>
+          <div><h4 class="mb-0" style="font-size:.88rem;font-weight:500">Analytics</h4><p class="text-muted mb-0" style="font-size:.75rem">Chat, AI citations & SEO</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="card home-sec-card" onclick="showSection('guide')">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="seg-icon" style="background:#34C759"><i class="ti ti-help" style="font-size:1rem"></i></div>
+          <div><h4 class="mb-0" style="font-size:.88rem;font-weight:500">Guide</h4><p class="text-muted mb-0" style="font-size:.75rem">How to use & API setup</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Quick Actions -->
 <div class="card mb-4">
   <div class="card-header"><h3 class="card-title">Quick Actions</h3></div>
   <div class="card-body">
     <div class="d-flex gap-2 flex-wrap">
       <button class="btn btn-primary btn-sm" onclick="homeRunPipeline()"><i class="ti ti-rocket"></i> Run B2B Pipeline</button>
+      <button class="btn btn-outline-primary btn-sm" onclick="homeForcePost()"><i class="ti ti-send"></i> Post to Social</button>
       <button class="btn btn-outline-primary btn-sm" onclick="homeSyncShopify()"><i class="ti ti-refresh"></i> Sync Shopify</button>
       <button class="btn btn-outline-primary btn-sm" onclick="homeReingest()"><i class="ti ti-database"></i> Re-ingest Knowledge</button>
-      <button class="btn btn-outline-secondary btn-sm" onclick="showSection('b2b')"><i class="ti ti-users-group"></i> Go to B2B</button>
-      <button class="btn btn-outline-secondary btn-sm" onclick="showSection('email')"><i class="ti ti-mail"></i> Go to Email</button>
     </div>
   </div>
 </div>
@@ -44,7 +124,7 @@ def html() -> str:
     <div class="card">
       <div class="card-header">
         <h3 class="card-title"><i class="ti ti-users-group" style="margin-right:6px;color:#406546"></i> B2B Sales Pipeline</h3>
-        <a class="ms-auto" href="#b2b" style="font-size:.78rem;color:#406546;text-decoration:none">View All &rarr;</a>
+        <a class="ms-auto" style="font-size:.78rem;color:#406546;text-decoration:none;cursor:pointer" onclick="showSection('b2b')">View All &rarr;</a>
       </div>
       <div class="card-body" id="home-b2b-summary">
         <div class="skeleton skeleton-chart"></div>
@@ -55,12 +135,23 @@ def html() -> str:
     <div class="card">
       <div class="card-header">
         <h3 class="card-title"><i class="ti ti-mail" style="margin-right:6px;color:#406546"></i> Email Marketing</h3>
-        <a class="ms-auto" href="#email" style="font-size:.78rem;color:#406546;text-decoration:none">View All &rarr;</a>
+        <a class="ms-auto" style="font-size:.78rem;color:#406546;text-decoration:none;cursor:pointer" onclick="showSection('email')">View All &rarr;</a>
       </div>
       <div class="card-body" id="home-email-summary">
         <div class="skeleton skeleton-chart"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Today's Content Status -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title"><i class="ti ti-news" style="margin-right:6px;color:#406546"></i> Today's Content</h3>
+    <a class="ms-auto" style="font-size:.78rem;color:#406546;text-decoration:none;cursor:pointer" onclick="showSection('social')">Manage &rarr;</a>
+  </div>
+  <div class="card-body" id="home-today-content">
+    <div class="skeleton skeleton-chart" style="height:60px"></div>
   </div>
 </div>
 
@@ -75,6 +166,16 @@ def html() -> str:
   </div>
 </div>
 
+<style>
+.home-sec-card{cursor:pointer;transition:all .2s}
+.home-sec-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-2px)}
+.home-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.home-dot-ok{background:#34C759}
+.home-dot-err{background:#FF3B30}
+.home-dot-loading{background:#ccc;animation:pulse 1.5s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+
 <script>
 (function(){
   var PWD = sessionStorage.getItem('nakai-admin-pwd') || sessionStorage.getItem('nakai_admin_pw') || '';
@@ -85,6 +186,59 @@ def html() -> str:
   var BADGE = {'new':'bg-green-lt','researched':'bg-azure-lt','contacted':'bg-orange-lt','replied':'bg-purple-lt','negotiating':'bg-pink-lt','won':'bg-green-lt','lost':'bg-secondary-lt'};
   function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
   function timeAgo(ts){if(!ts)return'-';var df=(Date.now()-new Date(ts).getTime())/1000;if(df<60)return'just now';if(df<3600)return Math.floor(df/60)+'m ago';if(df<86400)return Math.floor(df/3600)+'h ago';return Math.floor(df/86400)+'d ago';}
+
+  // ── System Status ──
+  function checkStatus(){
+    var checks=[
+      {name:'Core API',url:'/api/health'},
+      {name:'Supabase',url:'/api/admin/analytics'},
+      {name:'Shopify',url:'/api/marketing/products'},
+      {name:'Email (Resend)',url:'/api/email/brand-assets'},
+    ];
+    var el=document.getElementById('home-sys-status');
+    var results={};var done=0;
+    checks.forEach(function(c){
+      fetch(c.url,{headers:H})
+      .then(function(r){results[c.name]=r.ok;done++;if(done===checks.length)renderDots(el,checks,results)})
+      .catch(function(){results[c.name]=false;done++;if(done===checks.length)renderDots(el,checks,results)});
+    });
+  }
+  function renderDots(el,checks,results){
+    var html='<div class="d-flex flex-wrap gap-3">';
+    checks.forEach(function(c){
+      var ok=results[c.name];
+      html+='<div class="d-flex align-items-center gap-2"><div class="home-dot '+(ok?'home-dot-ok':'home-dot-err')+'"></div><span style="font-size:.82rem;'+(ok?'color:#333':'color:#999')+'">'+c.name+'</span></div>';
+    });
+    html+='</div>';
+    el.innerHTML=html;
+  }
+
+  // ── Today's Content ──
+  function loadTodayContent(){
+    fetch('/api/tips/today',{headers:H})
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var c=d.content||{};
+      var topic=c.topic||'';
+      var platforms=[];
+      if(c.twitter)platforms.push('<span class="badge bg-azure-lt">Twitter</span>');
+      if(c.reddit)platforms.push('<span class="badge bg-orange-lt">Reddit</span>');
+      if(c.threads)platforms.push('<span class="badge bg-purple-lt">Threads</span>');
+      if(c.line)platforms.push('<span class="badge bg-green-lt">LINE</span>');
+      if(c.blog)platforms.push('<span class="badge bg-green-lt">Blog</span>');
+      var html='';
+      if(topic){
+        html+='<div style="font-weight:500;color:#406546;margin-bottom:8px">'+esc(topic)+'</div>';
+        html+='<div class="d-flex gap-2 flex-wrap">'+platforms.join('')+'</div>';
+      }else{
+        html='<p class="text-muted mb-0" style="font-size:.85rem">Content auto-generates daily. Go to Content & Social to preview or force-post.</p>';
+      }
+      document.getElementById('home-today-content').innerHTML=html;
+    })
+    .catch(function(){
+      document.getElementById('home-today-content').innerHTML='<p class="text-muted mb-0" style="font-size:.85rem">Content auto-generates daily.</p>';
+    });
+  }
 
   // Load B2B stats
   fetch('/api/b2b/stats', {headers: H})
@@ -149,11 +303,19 @@ def html() -> str:
       document.getElementById('home-email-summary').innerHTML='<p class="text-muted">Could not load email data</p>';
     });
 
+  // Init system status + today's content
+  checkStatus();
+  loadTodayContent();
+
   // Quick actions
   window.homeRefresh = function(){ location.reload(); };
   window.homeRunPipeline = function(){
     if(!confirm('Run B2B pipeline now?'))return;
     fetch('/api/b2b/pipeline/run',{method:'POST',headers:H}).then(function(){alert('Pipeline started!');}).catch(function(){alert('Failed');});
+  };
+  window.homeForcePost = function(){
+    if(!confirm('Post today\\'s content to all platforms now?'))return;
+    fetch('/api/tips/force-post',{method:'POST',headers:H}).then(function(r){return r.json()}).then(function(d){alert(d.posted?'Posted successfully!':'Post failed');}).catch(function(){alert('Failed');});
   };
   window.homeSyncShopify = function(){
     if(!confirm('Sync Shopify customers?'))return;
