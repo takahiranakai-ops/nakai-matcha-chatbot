@@ -28,6 +28,7 @@ from api.b2b_page import b2b_page_router
 from api.operations import operations_router
 from api.marketing_routes import marketing_router
 from api.design_routes import design_router
+from api.dashboard import dashboard_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -170,6 +171,7 @@ app.include_router(b2b_page_router)
 app.include_router(operations_router)
 app.include_router(marketing_router)
 app.include_router(design_router)
+app.include_router(dashboard_router)
 
 
 @app.get("/health")
