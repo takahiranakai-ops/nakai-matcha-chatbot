@@ -656,36 +656,72 @@ async def delete_schedule(schedule_id: str, _auth: bool = Depends(verify_admin))
 
 @email_router.post("/newsletter/reload-schema")
 async def reload_postgrest_schema(_auth: bool = Depends(verify_admin)):
-    """Reload PostgREST schema cache via direct PostgreSQL NOTIFY."""
-    if not settings.database_url:
-        return {
-            "ok": False,
-            "error": "DATABASE_URL not configured",
-            "hint": "Add DATABASE_URL to Render env vars. Format: postgresql://postgres.[ref]:[password]@db.[ref].supabase.co:5432/postgres",
-        }
-    try:
-        import asyncpg
-        conn = await asyncpg.connect(settings.database_url)
+    """Reload PostgREST schema cache via direct PostgreSQL NOTIFY.
+
+    Auto-derives connection from SUPABASE_URL + SUPABASE_SERVICE_KEY if
+    DATABASE_URL is not set. Tries direct DB and multiple pooler regions.
+    """
+    import asyncpg
+    import re
+
+    async def _try_connect(dsn: str, label: str) -> dict:
+        """Attempt connection and NOTIFY."""
         try:
-            await conn.execute("NOTIFY pgrst, 'reload schema'")
-            # Also create a reusable RPC function for future reloads
-            await conn.execute("""
-                CREATE OR REPLACE FUNCTION public.reload_schema_cache()
-                RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
-                BEGIN
-                    NOTIFY pgrst, 'reload schema';
-                END;
-                $$;
-            """)
-            # Verify the table exists
-            row = await conn.fetchval(
-                "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='newsletter_schedules')"
-            )
-            return {"ok": True, "schema_reloaded": True, "table_exists": row, "rpc_created": True}
-        finally:
-            await conn.close()
-    except Exception as e:
-        return {"ok": False, "error": str(e)}
+            conn = await asyncpg.connect(dsn, timeout=10, ssl="require")
+            try:
+                await conn.execute("NOTIFY pgrst, 'reload schema'")
+                await conn.execute("""
+                    CREATE OR REPLACE FUNCTION public.reload_schema_cache()
+                    RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
+                    BEGIN
+                        NOTIFY pgrst, 'reload schema';
+                    END;
+                    $$;
+                """)
+                table_exists = await conn.fetchval(
+                    "SELECT EXISTS (SELECT 1 FROM information_schema.tables "
+                    "WHERE table_schema='public' AND table_name='newsletter_schedules')"
+                )
+                return {"ok": True, "method": label, "table_exists": table_exists, "rpc_created": True}
+            finally:
+                await conn.close()
+        except Exception as e:
+            return {"ok": False, "method": label, "error": str(e)[:200]}
+
+    # 1) If DATABASE_URL is set, use it directly
+    if settings.database_url:
+        return await _try_connect(settings.database_url, "database_url")
+
+    # 2) Auto-derive from SUPABASE_URL + SUPABASE_SERVICE_KEY
+    if not settings.supabase_url or not settings.supabase_service_key:
+        return {"ok": False, "error": "Need DATABASE_URL or SUPABASE_URL+SUPABASE_SERVICE_KEY"}
+
+    m = re.match(r"https://([^.]+)\.supabase\.co", settings.supabase_url)
+    if not m:
+        return {"ok": False, "error": f"Cannot parse project ref from: {settings.supabase_url}"}
+    ref = m.group(1)
+    key = settings.supabase_service_key
+
+    # Try multiple connection methods
+    attempts = [
+        (f"postgresql://postgres.{ref}:{key}@db.{ref}.supabase.co:5432/postgres", "direct_jwt"),
+        (f"postgresql://postgres:{key}@db.{ref}.supabase.co:5432/postgres", "direct_pass"),
+    ]
+    # Try pooler with common AWS regions
+    for region in ["us-east-1", "us-west-1", "us-west-2", "eu-west-1", "ap-northeast-1", "ap-southeast-1"]:
+        attempts.append((
+            f"postgresql://postgres.{ref}:{key}@aws-0-{region}.pooler.supabase.com:6543/postgres",
+            f"pooler_{region}",
+        ))
+
+    errors = []
+    for dsn, label in attempts:
+        result = await _try_connect(dsn, label)
+        if result.get("ok"):
+            return result
+        errors.append({"method": label, "error": result.get("error", "")[:100]})
+
+    return {"ok": False, "errors": errors, "hint": "Set DATABASE_URL in Render. Get it from Supabase Dashboard > Settings > Database > Connection string (URI)"}
 
 
 @email_router.post("/newsletter/init-table")
