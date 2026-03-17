@@ -702,13 +702,43 @@ async def reload_postgrest_schema(_auth: bool = Depends(verify_admin)):
     ref = m.group(1)
     key = settings.supabase_service_key
 
-    # Try multiple connection methods
+    # Method A: Try Supabase Management API (execute SQL directly)
+    import httpx
+    mgmt_headers = {
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+    }
+    mgmt_results = {}
+    async with httpx.AsyncClient(timeout=15) as client:
+        # Try Management API SQL execution
+        try:
+            r = await client.post(
+                f"https://api.supabase.com/v1/projects/{ref}/database/query",
+                headers=mgmt_headers,
+                json={"query": "NOTIFY pgrst, 'reload schema'"},
+            )
+            mgmt_results["mgmt_query"] = {"status": r.status_code, "body": r.text[:300]}
+            if r.status_code < 400:
+                return {"ok": True, "method": "management_api", "ref": ref}
+        except Exception as e:
+            mgmt_results["mgmt_query"] = {"error": str(e)[:200]}
+
+        # Try Management API PostgREST restart
+        try:
+            r2 = await client.patch(
+                f"https://api.supabase.com/v1/projects/{ref}/postgrest",
+                headers=mgmt_headers,
+                json={"db_schema": "public,extensions"},
+            )
+            mgmt_results["mgmt_postgrest"] = {"status": r2.status_code, "body": r2.text[:300]}
+        except Exception as e:
+            mgmt_results["mgmt_postgrest"] = {"error": str(e)[:200]}
+
+    # Method B: Try direct PostgreSQL connections
     attempts = [
         (f"postgresql://postgres.{ref}:{key}@db.{ref}.supabase.co:5432/postgres", "direct_jwt"),
-        (f"postgresql://postgres:{key}@db.{ref}.supabase.co:5432/postgres", "direct_pass"),
     ]
-    # Try pooler with common AWS regions
-    for region in ["us-east-1", "us-west-1", "us-west-2", "eu-west-1", "ap-northeast-1", "ap-southeast-1"]:
+    for region in ["us-east-1", "us-west-1", "ap-northeast-1", "eu-west-1"]:
         attempts.append((
             f"postgresql://postgres.{ref}:{key}@aws-0-{region}.pooler.supabase.com:6543/postgres",
             f"pooler_{region}",
@@ -721,7 +751,13 @@ async def reload_postgrest_schema(_auth: bool = Depends(verify_admin)):
             return result
         errors.append({"method": label, "error": result.get("error", "")[:100]})
 
-    return {"ok": False, "errors": errors, "hint": "Set DATABASE_URL in Render. Get it from Supabase Dashboard > Settings > Database > Connection string (URI)"}
+    return {
+        "ok": False,
+        "ref": ref,
+        "mgmt_api": mgmt_results,
+        "db_errors": errors,
+        "hint": "Set DATABASE_URL in Render. Get it from Supabase Dashboard > Settings > Database > Connection string (URI)",
+    }
 
 
 @email_router.post("/newsletter/init-table")
