@@ -51,6 +51,14 @@ class Settings(BaseSettings):
     b2b_from_email: str = "wholesale@nakaimatcha.com"
     b2b_reply_to: str = "wholesale@nakaimatcha.com"
     b2b_enabled: bool = False
+    # Reddit API (content posting)
+    reddit_client_id: str = ""
+    reddit_client_secret: str = ""
+    reddit_username: str = ""
+    reddit_password: str = ""
+    reddit_user_agent: str = "NAKAI-Matcha/1.0"
+    # Direct PostgreSQL connection (for schema cache reload etc.)
+    database_url: str = ""
 
     class Config:
         env_file = ".env"

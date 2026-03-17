@@ -654,98 +654,38 @@ async def delete_schedule(schedule_id: str, _auth: bool = Depends(verify_admin))
     return {"ok": True}
 
 
-@email_router.post("/newsletter/debug-create")
-async def debug_create_schedule(_auth: bool = Depends(verify_admin)):
-    """Debug: try GraphQL + multiple methods to access newsletter_schedules."""
-    import httpx
-    results = {}
-    headers = {
-        "apikey": settings.supabase_service_key,
-        "Authorization": f"Bearer {settings.supabase_service_key}",
-        "Content-Type": "application/json",
-    }
-
+@email_router.post("/newsletter/reload-schema")
+async def reload_postgrest_schema(_auth: bool = Depends(verify_admin)):
+    """Reload PostgREST schema cache via direct PostgreSQL NOTIFY."""
+    if not settings.database_url:
+        return {
+            "ok": False,
+            "error": "DATABASE_URL not configured",
+            "hint": "Add DATABASE_URL to Render env vars. Format: postgresql://postgres.[ref]:[password]@db.[ref].supabase.co:5432/postgres",
+        }
     try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            # Method 1: GraphQL — pg_graphql has its own schema cache
-            gql_query = """
-            mutation {
-                insertIntonewsletter_schedulesCollection(objects: [{
-                    name: "gql-test"
-                    template_key: "matcha_recipe"
-                    days_of_week: [2, 5]
-                }]) {
-                    records { id name }
-                }
-            }
-            """
-            r1 = await client.post(
-                f"{settings.supabase_url}/graphql/v1",
-                headers=headers,
-                json={"query": gql_query},
+        import asyncpg
+        conn = await asyncpg.connect(settings.database_url)
+        try:
+            await conn.execute("NOTIFY pgrst, 'reload schema'")
+            # Also create a reusable RPC function for future reloads
+            await conn.execute("""
+                CREATE OR REPLACE FUNCTION public.reload_schema_cache()
+                RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
+                BEGIN
+                    NOTIFY pgrst, 'reload schema';
+                END;
+                $$;
+            """)
+            # Verify the table exists
+            row = await conn.fetchval(
+                "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='newsletter_schedules')"
             )
-            results["graphql"] = {"status": r1.status_code, "body": r1.text[:1000]}
-
-            # Method 2: Try creating a NOTIFY wrapper via extensions schema RPC
-            for schema in ["extensions", "public", "supabase_functions"]:
-                r2 = await client.post(
-                    f"{settings.supabase_url}/rest/v1/rpc/pgrst_ddl_watch",
-                    headers={**headers, "Accept-Profile": schema},
-                    json={},
-                )
-                results[f"ddl_watch_{schema}"] = r2.status_code
-
-            # Method 3: Check REST root for newsletter table
-            r3 = await client.get(
-                f"{settings.supabase_url}/rest/v1/",
-                headers=headers,
-            )
-            results["rest_root_has_newsletter"] = "newsletter_schedules" in r3.text
-
-            # Method 4: PostgREST direct table access
-            data = {"name": "debug-test", "template_key": "matcha_recipe", "days_of_week": [2, 5]}
-            r4 = await client.post(
-                f"{settings.supabase_url}/rest/v1/newsletter_schedules",
-                headers={**headers, "Prefer": "return=representation"},
-                json=data,
-            )
-            results["rest_insert"] = {"status": r4.status_code, "body": r4.text[:500]}
-
-            # If GraphQL insert succeeded, clean up
-            if r1.status_code == 200:
-                try:
-                    gql_data = r1.json()
-                    records = gql_data.get("data", {}).get("insertIntonewsletter_schedulesCollection", {}).get("records", [])
-                    if records:
-                        test_id = records[0].get("id")
-                        del_query = f'mutation {{ deleteFromnewsletter_schedulesCollection(filter: {{id: {{eq: "{test_id}"}}}}) {{ records {{ id }} }} }}'
-                        await client.post(
-                            f"{settings.supabase_url}/graphql/v1",
-                            headers=headers,
-                            json={"query": del_query},
-                        )
-                        results["gql_cleanup"] = "deleted"
-                except Exception:
-                    pass
-
-            # If REST insert succeeded, clean up
-            if r4.status_code < 400:
-                try:
-                    rows = r4.json()
-                    if rows:
-                        test_id = rows[0].get("id")
-                        await client.delete(
-                            f"{settings.supabase_url}/rest/v1/newsletter_schedules?id=eq.{test_id}",
-                            headers=headers,
-                        )
-                        results["rest_cleanup"] = "deleted"
-                except Exception:
-                    pass
-
-            return results
+            return {"ok": True, "schema_reloaded": True, "table_exists": row, "rpc_created": True}
+        finally:
+            await conn.close()
     except Exception as e:
-        results["error"] = str(e)
-        return results
+        return {"ok": False, "error": str(e)}
 
 
 @email_router.post("/newsletter/init-table")
