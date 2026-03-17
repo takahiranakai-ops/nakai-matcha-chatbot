@@ -1077,3 +1077,108 @@ async def delete_newsletter_schedule(schedule_id: str) -> bool:
     except Exception as e:
         logger.warning(f"Failed to delete newsletter schedule: {e}")
         return False
+
+
+# ----------------------------------------------------------------
+# CONTENT SOURCES (brand elements for content generation)
+# ----------------------------------------------------------------
+
+async def list_content_sources(active_only: bool = True) -> list[dict]:
+    """List content sources, ordered by priority."""
+    if not _is_configured():
+        return []
+    _init()
+    params: dict = {"order": "priority.desc,created_at.desc", "limit": "200"}
+    if active_only:
+        params["is_active"] = "eq.true"
+    try:
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/content_sources",
+            headers=_HEADERS,
+            params=params,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logger.warning(f"Failed to list content sources: {e}")
+        return []
+
+
+async def create_content_source(data: dict) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.post(
+            f"{_BASE_URL}/content_sources",
+            headers=_HEADERS,
+            json=data,
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to create content source: {e}")
+        return None
+
+
+async def update_content_source(source_id: str, updates: dict) -> Optional[dict]:
+    if not _is_configured():
+        return None
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.patch(
+            f"{_BASE_URL}/content_sources",
+            headers={**_HEADERS, "Prefer": "return=representation"},
+            params={"id": f"eq.{source_id}"},
+            json=updates,
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning(f"Failed to update content source: {e}")
+        return None
+
+
+async def delete_content_source(source_id: str) -> bool:
+    if not _is_configured():
+        return False
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.delete(
+            f"{_BASE_URL}/content_sources",
+            headers=_HEADERS,
+            params={"id": f"eq.{source_id}"},
+        )
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to delete content source: {e}")
+        return False
+
+
+# ----------------------------------------------------------------
+# VIDEO SCRIPTS
+# ----------------------------------------------------------------
+
+async def list_video_scripts(limit: int = 30) -> list[dict]:
+    if not _is_configured():
+        return []
+    _init()
+    try:
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/video_scripts",
+            headers=_HEADERS,
+            params={"order": "created_at.desc", "limit": str(limit)},
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logger.warning(f"Failed to list video scripts: {e}")
+        return []

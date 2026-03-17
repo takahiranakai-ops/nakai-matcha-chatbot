@@ -280,3 +280,65 @@ async def delete_wholesale_lead(lead_id: str, _auth: bool = Depends(verify_admin
 async def get_automation_stats(_auth: bool = Depends(verify_admin)):
     stats = await supabase_client.get_automation_stats()
     return stats
+
+
+# ----------------------------------------------------------------
+# CONTENT SOURCES (brand elements for content generation)
+# ----------------------------------------------------------------
+
+class ContentSourceCreate(BaseModel):
+    type: str = Field(..., pattern=r"^(key_message|product_narrative|seasonal_theme|brand_voice|custom)$")
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str = Field(..., min_length=1)
+    priority: int = Field(default=0)
+
+
+class ContentSourceUpdate(BaseModel):
+    type: Optional[str] = None
+    title: Optional[str] = None
+    content: Optional[str] = None
+    is_active: Optional[bool] = None
+    priority: Optional[int] = None
+
+
+@admin_api_router.get("/content-sources")
+async def list_content_sources(_auth: bool = Depends(verify_admin)):
+    sources = await supabase_client.list_content_sources(active_only=False)
+    return {"sources": sources}
+
+
+@admin_api_router.post("/content-sources")
+async def create_content_source(body: ContentSourceCreate, _auth: bool = Depends(verify_admin)):
+    source = await supabase_client.create_content_source(body.model_dump())
+    if not source:
+        raise HTTPException(status_code=500, detail="Failed to create content source")
+    return source
+
+
+@admin_api_router.patch("/content-sources/{source_id}")
+async def update_content_source(source_id: str, body: ContentSourceUpdate, _auth: bool = Depends(verify_admin)):
+    updates = body.model_dump(exclude_none=True)
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    source = await supabase_client.update_content_source(source_id, updates)
+    if not source:
+        raise HTTPException(status_code=500, detail="Failed to update content source")
+    return source
+
+
+@admin_api_router.delete("/content-sources/{source_id}")
+async def delete_content_source(source_id: str, _auth: bool = Depends(verify_admin)):
+    success = await supabase_client.delete_content_source(source_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete content source")
+    return {"deleted": True}
+
+
+# ----------------------------------------------------------------
+# VIDEO SCRIPTS (read-only viewer)
+# ----------------------------------------------------------------
+
+@admin_api_router.get("/video-scripts")
+async def list_video_scripts(limit: int = 30, _auth: bool = Depends(verify_admin)):
+    scripts = await supabase_client.list_video_scripts(limit)
+    return {"scripts": scripts}

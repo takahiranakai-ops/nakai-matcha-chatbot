@@ -1,9 +1,12 @@
 """Admin dashboard for NAKAI Matcha Chatbot.
 
-GET /admin → Password-gated admin HTML with 3 tabs:
+GET /admin → Password-gated admin HTML with 6 tabs:
   1. Knowledge Base management
   2. Chat History browser
   3. Analytics dashboard
+  4. Wholesale Leads
+  5. AI Visibility
+  6. Content Sources + Video Scripts
 """
 
 import base64
@@ -117,6 +120,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     <div class="tab" data-tab="analytics">Analytics</div>
     <div class="tab" data-tab="leads">Wholesale Leads</div>
     <div class="tab" data-tab="ai">AI Visibility</div>
+    <div class="tab" data-tab="content">Content</div>
   </div>
   <div class="panel active" id="panel-knowledge">
     <div class="toolbar">
@@ -196,6 +200,34 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
         </div>
         <p style="font-size:.72rem;color:var(--gray);margin-top:8px">Requires SERP_API_KEY for WS35/WS40. Jobs run automatically when env vars are set.</p>
       </div>
+    </div>
+  </div>
+  <div class="panel" id="panel-content">
+    <h3 style="font-size:.95rem;color:var(--green);margin-bottom:16px">Content Sources (ブランド素材)</h3>
+    <div class="toolbar">
+      <button class="btn btn-green" onclick="openCreateSource()">+ New Source</button>
+      <button class="btn btn-outline" onclick="loadContentSources()">Refresh</button>
+    </div>
+    <table><thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Priority</th><th>Actions</th></tr></thead><tbody id="sources-tbody"></tbody></table>
+    <h3 style="font-size:.95rem;color:var(--green);margin:32px 0 16px">Video Scripts (動画スクリプト)</h3>
+    <div class="toolbar">
+      <button class="btn btn-outline" onclick="loadVideoScripts()">Refresh</button>
+      <span id="scripts-count" style="font-size:.85rem;color:var(--gray)"></span>
+    </div>
+    <div id="scripts-list"></div>
+  </div>
+</div>
+<div class="modal-bg" id="source-modal">
+  <div class="modal">
+    <h3 id="source-modal-title">New Content Source</h3>
+    <input type="hidden" id="source-edit-id" />
+    <div class="form-group"><label>Type</label><select id="src-type"><option value="key_message">キーメッセージ</option><option value="product_narrative">商品ストーリー</option><option value="seasonal_theme">季節テーマ</option><option value="brand_voice">ブランドボイス</option><option value="custom">カスタム</option></select></div>
+    <div class="form-group"><label>Title</label><input id="src-title" /></div>
+    <div class="form-group"><label>Content</label><textarea id="src-content" style="min-height:150px"></textarea></div>
+    <div class="form-group"><label>Priority (0=low, higher=more important)</label><input id="src-priority" type="number" value="0" min="0" max="100" /></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeSourceModal()">Cancel</button>
+      <button class="btn btn-green" onclick="saveSource()">Save</button>
     </div>
   </div>
 </div>
@@ -278,6 +310,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
       if(t.getAttribute('data-tab')==='analytics')loadAnalytics();
       if(t.getAttribute('data-tab')==='leads')loadLeads();
       if(t.getAttribute('data-tab')==='ai')loadAIStats();
+      if(t.getAttribute('data-tab')==='content'){{loadContentSources();loadVideoScripts()}}
     }});
   }});
 
@@ -536,6 +569,104 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     .catch(function(){{
       document.getElementById('ai-stats-grid').innerHTML='<div class="stat-card"><div class="label">Status</div><div class="value" style="font-size:1rem;color:var(--gray)">Set SERP_API_KEY to enable AI citation tracking</div></div>';
     }});
+  }};
+
+  var TYPE_LABELS={{key_message:'キーメッセージ',product_narrative:'商品ストーリー',seasonal_theme:'季節テーマ',brand_voice:'ブランドボイス',custom:'カスタム'}};
+
+  window.loadContentSources=function(){{
+    fetch('/api/admin/content-sources',{{headers:hdrs()}})
+    .then(function(r){{return r.json()}})
+    .then(function(d){{
+      var tb=document.getElementById('sources-tbody');tb.innerHTML='';
+      (d.sources||[]).forEach(function(s){{
+        var tr=document.createElement('tr');
+        var st=s.is_active?'<span class="badge badge-active">Active</span>':'<span class="badge badge-inactive">Inactive</span>';
+        var sid=esc(s.id);
+        var typeLabel=TYPE_LABELS[s.type]||s.type;
+        tr.innerHTML='<td><strong>'+esc(s.title)+'</strong><div style="font-size:.78rem;color:var(--gray);margin-top:4px">'+esc((s.content||'').substring(0,80))+(s.content&&s.content.length>80?'...':'')+'</div></td>'
+          +'<td>'+esc(typeLabel)+'</td><td>'+st+'</td><td>'+s.priority+'</td>'
+          +'<td><button class="btn btn-outline btn-sm" onclick="editSource(\\''+sid+'\\')">Edit</button> '
+          +'<button class="btn btn-outline btn-sm" onclick="toggleSource(\\''+sid+'\\','+(!s.is_active)+')">'+(s.is_active?'Off':'On')+'</button> '
+          +'<button class="btn btn-red btn-sm" onclick="deleteSource(\\''+sid+'\\')">Del</button></td>';
+        tb.appendChild(tr);
+      }});
+    }});
+  }};
+
+  window.openCreateSource=function(){{
+    document.getElementById('source-modal-title').textContent='New Content Source';
+    document.getElementById('source-edit-id').value='';
+    document.getElementById('src-type').value='key_message';
+    document.getElementById('src-title').value='';
+    document.getElementById('src-content').value='';
+    document.getElementById('src-priority').value='0';
+    document.getElementById('source-modal').classList.add('show');
+  }};
+
+  window.editSource=function(id){{
+    fetch('/api/admin/content-sources',{{headers:hdrs()}})
+    .then(function(r){{return r.json()}})
+    .then(function(d){{
+      var s=(d.sources||[]).find(function(x){{return x.id===id}});
+      if(!s)return;
+      document.getElementById('source-modal-title').textContent='Edit Content Source';
+      document.getElementById('source-edit-id').value=id;
+      document.getElementById('src-type').value=s.type||'custom';
+      document.getElementById('src-title').value=s.title||'';
+      document.getElementById('src-content').value=s.content||'';
+      document.getElementById('src-priority').value=s.priority||0;
+      document.getElementById('source-modal').classList.add('show');
+    }});
+  }};
+
+  window.saveSource=function(){{
+    var id=document.getElementById('source-edit-id').value;
+    var data={{type:document.getElementById('src-type').value,title:document.getElementById('src-title').value,content:document.getElementById('src-content').value,priority:parseInt(document.getElementById('src-priority').value)||0}};
+    var url=id?'/api/admin/content-sources/'+id:'/api/admin/content-sources';
+    var method=id?'PATCH':'POST';
+    fetch(url,{{method:method,headers:hdrs(),body:JSON.stringify(data)}})
+    .then(function(r){{if(!r.ok)throw new Error();return r.json()}})
+    .then(function(){{closeSourceModal();loadContentSources()}})
+    .catch(function(){{alert('Failed to save content source')}});
+  }};
+
+  window.toggleSource=function(id,newState){{
+    fetch('/api/admin/content-sources/'+id,{{method:'PATCH',headers:hdrs(),body:JSON.stringify({{is_active:newState}})}})
+    .then(function(){{loadContentSources()}});
+  }};
+
+  window.deleteSource=function(id){{
+    if(!confirm('Delete this content source?'))return;
+    fetch('/api/admin/content-sources/'+id,{{method:'DELETE',headers:hdrs()}})
+    .then(function(){{loadContentSources()}});
+  }};
+
+  window.closeSourceModal=function(){{document.getElementById('source-modal').classList.remove('show')}};
+
+  window.loadVideoScripts=function(){{
+    fetch('/api/admin/video-scripts',{{headers:hdrs()}})
+    .then(function(r){{return r.json()}})
+    .then(function(d){{
+      var scripts=d.scripts||[];
+      document.getElementById('scripts-count').textContent=scripts.length+' script'+(scripts.length!==1?'s':'');
+      var list=document.getElementById('scripts-list');list.innerHTML='';
+      if(!scripts.length){{list.innerHTML='<p style="color:var(--gray);font-size:.85rem;padding:20px;background:var(--white);border-radius:8px">No video scripts yet. Scripts are generated daily at 06:00 UTC.</p>';return}}
+      scripts.forEach(function(s){{
+        var card=document.createElement('div');
+        card.style.cssText='background:var(--white);border-radius:8px;padding:20px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)';
+        var dt=s.date||'';
+        var tags=(s.hashtags||[]).join(' ');
+        card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+          +'<strong style="color:var(--green)">'+esc(s.topic||'Untitled')+'</strong>'
+          +'<span style="font-size:.78rem;color:var(--gray)">'+esc(dt)+' \u00b7 '+(s.estimated_duration||'')+'</span></div>'
+          +'<div style="font-size:.85rem;margin-bottom:8px"><b>Hook:</b> '+esc(s.hook||'')+'</div>'
+          +'<div style="font-size:.85rem;margin-bottom:8px"><b>Content:</b> '+esc(s.content||'')+'</div>'
+          +'<div style="font-size:.85rem;margin-bottom:8px"><b>CTA:</b> '+esc(s.cta||'')+'</div>'
+          +'<div style="font-size:.78rem;color:var(--gray)">'+esc(tags)+'</div>';
+        list.appendChild(card);
+      }});
+    }})
+    .catch(function(){{}});
   }};
 }})();
 </script>

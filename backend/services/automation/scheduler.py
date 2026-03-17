@@ -1,14 +1,24 @@
 """NAKAI Automation Scheduler — Orchestrates all background jobs.
 
-Schedule:
+6-Slot Content System:
+- Slot 1  00:00 UTC (09:00 JST): Twitter — 抹茶豆知識
+- Slot 2  04:00 UTC (13:00 JST): Reddit #1 — 教育的投稿
+-         06:00 UTC (15:00 JST): Video script generation
+- Slot 3  08:00 UTC (17:00 JST): Blog — SEO最適化記事
+- Slot 4  12:00 UTC (21:00 JST): Threads — 会話型コンテンツ
+- Slot 5  16:00 UTC (01:00 JST): Reddit #2 — コミュニティ
+- Slot 6  20:00 UTC (05:00 JST): LINE + Twitter #2
+
+Automation Jobs:
 - Every 6 hours: Social mention monitor (WS39)
 - Daily 00:00 UTC: AI citation monitor (WS35)
 - Daily 01:00 UTC: Review aggregator (WS37)
 - Daily 02:00 UTC: SEO ranking tracker (WS40)
-- Daily 23:00 UTC (08:00 JST): AI Tips auto-post (Twitter/Threads/LINE)
-- Daily 14:00 UTC (06:00 PST): B2B Sales Pipeline
-- Weekly Wed 03:00 UTC: Content freshness refresh (WS38)
+- Daily 04:00 UTC: Matcha research pipeline
+- Daily 14:00 UTC: B2B Sales Pipeline
+- Bi-weekly Wed/Sat 03:00 UTC: Content freshness refresh (WS38)
 - Weekly Mon 06:00 UTC: Competitor monitor (WS36)
+- Every 10 min: Newsletter schedule check
 
 Realtime (webhook-driven):
 - WS34: Product sync → /webhooks/shopify/product-update
@@ -82,7 +92,7 @@ async def run_social_monitor():
 
 
 async def run_daily_tips():
-    """Daily AI Tips auto-post to Twitter/Threads/LINE."""
+    """Daily matcha content auto-post to Twitter/Threads/LINE (legacy wrapper)."""
     from services.daily_content import generate_daily_tips
     from services.social_poster import post_all
 
@@ -91,6 +101,45 @@ async def run_daily_tips():
         await post_all(content)
 
     await _safe_run("daily_tips", _generate_and_post())
+
+
+async def run_content_slot(slot: int, platform: str):
+    """Generic content slot runner — generates and posts for one platform."""
+    from services.daily_content import generate_daily_content
+    from services.social_poster import post_to_twitter, post_to_threads, post_to_line, post_to_reddit
+    from services.blog_poster import publish_blog_article
+
+    async def _generate_and_post():
+        actual_platform = "reddit" if platform == "reddit_community" else platform
+        content = await generate_daily_content([platform], slot=slot)
+        text = content.get(platform, "")
+        if not text:
+            return
+
+        if actual_platform == "twitter":
+            await post_to_twitter(text)
+        elif actual_platform == "threads":
+            await post_to_threads(text)
+        elif actual_platform == "reddit":
+            await post_to_reddit(text)
+        elif actual_platform == "blog":
+            await publish_blog_article(text)
+        elif actual_platform == "line":
+            await post_to_line(text)
+
+    await _safe_run(f"slot_{slot}_{platform}", _generate_and_post())
+
+
+async def run_video_script():
+    """Daily video script generation."""
+    from services.video_script_generator import run_daily_video_script
+    await _safe_run("video_script", run_daily_video_script())
+
+
+async def run_matcha_research():
+    """Daily global matcha research pipeline."""
+    from services.matcha_research import run_daily_research
+    await _safe_run("matcha_research", run_daily_research())
 
 
 async def run_b2b_pipeline():
@@ -121,7 +170,14 @@ async def _scheduler_loop():
         "citation": 0,     # daily
         "reviews": 0,      # daily
         "seo": 0,          # daily
-        "daily_tips": 0,   # daily 23:00 UTC
+        "slot_1": 0,       # 00:00 UTC — Twitter
+        "slot_2": 0,       # 04:00 UTC — Reddit #1 (educational)
+        "slot_3": 0,       # 08:00 UTC — Blog
+        "slot_4": 0,       # 12:00 UTC — Threads
+        "slot_5": 0,       # 16:00 UTC — Reddit #2 (community)
+        "slot_6": 0,       # 20:00 UTC — LINE + Twitter #2
+        "video_script": 0, # 06:00 UTC — Video script
+        "research": 0,     # daily 04:00 UTC
         "b2b": 0,          # daily 14:00 UTC
         "freshness": 0,    # weekly
         "competitor": 0,   # weekly
@@ -164,15 +220,53 @@ async def _scheduler_loop():
                 last_run["competitor"] = now.timestamp()
                 asyncio.create_task(run_competitor_monitor())
 
+            # Daily at 04:xx UTC: Matcha research pipeline
+            if hour == 4 and (now.timestamp() - last_run["research"]) >= 23 * 3600:
+                last_run["research"] = now.timestamp()
+                asyncio.create_task(run_matcha_research())
+
+            # === 6-SLOT CONTENT SYSTEM ===
+
+            # Slot 1: 00:xx UTC (09:00 JST) — Twitter matcha tip
+            if hour == 0 and (now.timestamp() - last_run["slot_1"]) >= 23 * 3600:
+                last_run["slot_1"] = now.timestamp()
+                asyncio.create_task(run_content_slot(1, "twitter"))
+
+            # Slot 2: 04:xx UTC (13:00 JST) — Reddit #1 educational
+            if hour == 4 and (now.timestamp() - last_run["slot_2"]) >= 23 * 3600:
+                last_run["slot_2"] = now.timestamp()
+                asyncio.create_task(run_content_slot(2, "reddit"))
+
+            # Daily at 06:xx UTC: Video script generation
+            if hour == 6 and (now.timestamp() - last_run["video_script"]) >= 23 * 3600:
+                last_run["video_script"] = now.timestamp()
+                asyncio.create_task(run_video_script())
+
+            # Slot 3: 08:xx UTC (17:00 JST) — Blog article
+            if hour == 8 and (now.timestamp() - last_run["slot_3"]) >= 23 * 3600:
+                last_run["slot_3"] = now.timestamp()
+                asyncio.create_task(run_content_slot(3, "blog"))
+
+            # Slot 4: 12:xx UTC (21:00 JST) — Threads
+            if hour == 12 and (now.timestamp() - last_run["slot_4"]) >= 23 * 3600:
+                last_run["slot_4"] = now.timestamp()
+                asyncio.create_task(run_content_slot(4, "threads"))
+
             # Daily at 14:xx UTC (06:00 PST): B2B Sales Pipeline
             if hour == 14 and (now.timestamp() - last_run["b2b"]) >= 23 * 3600:
                 last_run["b2b"] = now.timestamp()
                 asyncio.create_task(run_b2b_pipeline())
 
-            # Daily at 23:xx UTC (08:00 JST): AI Tips auto-post
-            if hour == 23 and (now.timestamp() - last_run["daily_tips"]) >= 23 * 3600:
-                last_run["daily_tips"] = now.timestamp()
-                asyncio.create_task(run_daily_tips())
+            # Slot 5: 16:xx UTC (01:00 JST) — Reddit #2 community
+            if hour == 16 and (now.timestamp() - last_run["slot_5"]) >= 23 * 3600:
+                last_run["slot_5"] = now.timestamp()
+                asyncio.create_task(run_content_slot(5, "reddit_community"))
+
+            # Slot 6: 20:xx UTC (05:00 JST) — LINE + Twitter #2
+            if hour == 20 and (now.timestamp() - last_run["slot_6"]) >= 23 * 3600:
+                last_run["slot_6"] = now.timestamp()
+                asyncio.create_task(run_content_slot(6, "line"))
+                asyncio.create_task(run_content_slot(6, "twitter"))
 
             # Every 10 min: Newsletter schedule check
             if (now.timestamp() - last_run["newsletter"]) >= 600:

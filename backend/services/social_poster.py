@@ -1,4 +1,4 @@
-"""Social media auto-poster — posts to Twitter/X, Threads, and LINE."""
+"""Social media auto-poster — posts to Twitter/X, Threads, LINE, and Reddit."""
 
 import logging
 from datetime import datetime, timezone
@@ -102,6 +102,55 @@ async def post_to_line(text: str) -> dict:
         return {"status": "error", "error": str(e)}
 
 
+async def post_to_reddit(text: str) -> dict:
+    """Post to Reddit using PRAW. Text format: 'TITLE: ... BODY: ...'"""
+    if not all([
+        settings.reddit_client_id,
+        settings.reddit_client_secret,
+        settings.reddit_username,
+        settings.reddit_password,
+    ]):
+        logger.warning("[REDDIT] API credentials not configured — skipping")
+        return {"status": "skipped", "reason": "not_configured"}
+
+    try:
+        import praw
+
+        reddit = praw.Reddit(
+            client_id=settings.reddit_client_id,
+            client_secret=settings.reddit_client_secret,
+            username=settings.reddit_username,
+            password=settings.reddit_password,
+            user_agent=settings.reddit_user_agent,
+        )
+
+        # Parse title and body from generated content
+        title = text
+        body = ""
+        if "TITLE:" in text and "BODY:" in text:
+            parts = text.split("BODY:", 1)
+            title = parts[0].replace("TITLE:", "").strip()
+            body = parts[1].strip()
+
+        # Rotate through subreddits (1 per day based on day-of-year)
+        subreddits = ["Matcha", "tea", "JapaneseFood", "cafe", "barista"]
+        day_of_year = datetime.now(timezone.utc).timetuple().tm_yday
+        target_sub = subreddits[day_of_year % len(subreddits)]
+
+        subreddit = reddit.subreddit(target_sub)
+        submission = subreddit.submit(title=title, selftext=body)
+        logger.info(f"[REDDIT] Posted to r/{target_sub}: {submission.id}")
+        return {
+            "status": "success",
+            "post_id": submission.id,
+            "subreddit": target_sub,
+            "url": f"https://reddit.com{submission.permalink}",
+        }
+    except Exception as e:
+        logger.error(f"[REDDIT] Post failed: {e}")
+        return {"status": "error", "error": str(e)}
+
+
 async def post_all(content: dict[str, str]) -> dict:
     """Post to all configured platforms and log results.
 
@@ -116,16 +165,23 @@ async def post_all(content: dict[str, str]) -> dict:
         "topic": content.get("topic", "unknown"),
     }
 
+    platforms = ["twitter", "threads", "line"]
     results["twitter"] = await post_to_twitter(content.get("twitter", ""))
     results["threads"] = await post_to_threads(content.get("threads", ""))
     results["line"] = await post_to_line(content.get("line", ""))
 
+    # Post to Reddit if content was generated for it
+    if "reddit" in content:
+        platforms.append("reddit")
+        results["reddit"] = await post_to_reddit(content["reddit"])
+
     # Log to Supabase
     await _log_to_supabase(results, content)
 
-    success_count = sum(1 for k in ("twitter", "threads", "line") if results[k].get("status") == "success")
-    skip_count = sum(1 for k in ("twitter", "threads", "line") if results[k].get("status") == "skipped")
-    logger.info(f"[DAILY_TIPS] Posted to {success_count}/3 platforms ({skip_count} skipped)")
+    success_count = sum(1 for k in platforms if results.get(k, {}).get("status") == "success")
+    skip_count = sum(1 for k in platforms if results.get(k, {}).get("status") == "skipped")
+    total = len(platforms)
+    logger.info(f"[SOCIAL] Posted to {success_count}/{total} platforms ({skip_count} skipped)")
 
     return results
 
