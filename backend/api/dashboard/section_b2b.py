@@ -8,18 +8,18 @@ def html() -> str:
   <button class="btn btn-primary btn-sm" id="pipeline-btn" onclick="runPipeline()"><i class="ti ti-rocket"></i> Run Pipeline</button>
 </div>
 
-<ul class="nav nav-tabs" role="tablist">
-  <li class="nav-item"><a class="nav-link active" href="#" data-tab="overview">Overview</a></li>
-  <li class="nav-item"><a class="nav-link" href="#" data-tab="leads">Leads</a></li>
-  <li class="nav-item"><a class="nav-link" href="#" data-tab="outreach">Outreach</a></li>
-  <li class="nav-item"><a class="nav-link" href="#" data-tab="analytics">Analytics</a></li>
-  <li class="nav-item"><a class="nav-link" href="#" data-tab="import">Import</a></li>
-  <li class="nav-item"><a class="nav-link" href="#" data-tab="discover">Discover</a></li>
-  <li class="nav-item"><a class="nav-link" href="#" data-tab="settings">Settings</a></li>
-</ul>
+<div class="sub-tabs">
+  <div class="sub-tab active" onclick="switchB2BTab('overview')">Overview</div>
+  <div class="sub-tab" onclick="switchB2BTab('leads')">Leads</div>
+  <div class="sub-tab" onclick="switchB2BTab('outreach')">Outreach</div>
+  <div class="sub-tab" onclick="switchB2BTab('analytics')">Analytics</div>
+  <div class="sub-tab" onclick="switchB2BTab('import')">Import</div>
+  <div class="sub-tab" onclick="switchB2BTab('discover')">Discover</div>
+  <div class="sub-tab" onclick="switchB2BTab('settings')">Settings</div>
+</div>
 
 <!-- Overview -->
-<div class="tab-pane active" id="panel-overview">
+<div class="sub-panel active" id="panel-overview">
   <div class="row row-deck row-cards mb-3" id="seg-cards"></div>
   <div class="row row-deck row-cards mb-3" id="kpi-grid"></div>
   <div class="card mb-3">
@@ -38,7 +38,7 @@ def html() -> str:
 </div>
 
 <!-- Leads -->
-<div class="tab-pane" id="panel-leads">
+<div class="sub-panel" id="panel-leads">
   <div class="row g-2 align-items-center mb-3">
     <div class="col"><input type="text" id="lead-search" class="form-control" placeholder="Search leads..." oninput="debounceLoadLeads()"></div>
     <div class="col-auto">
@@ -84,7 +84,7 @@ def html() -> str:
 </div>
 
 <!-- Outreach -->
-<div class="tab-pane" id="panel-outreach">
+<div class="sub-panel" id="panel-outreach">
   <div class="card">
     <div class="card-header"><h3 class="card-title">Sent Emails</h3></div>
     <div class="table-responsive">
@@ -97,7 +97,7 @@ def html() -> str:
 </div>
 
 <!-- Analytics -->
-<div class="tab-pane" id="panel-analytics">
+<div class="sub-panel" id="panel-analytics">
   <div class="card mb-3">
     <div class="card-header"><h3 class="card-title">Conversion Funnel</h3></div>
     <div class="card-body" id="funnel-chart"></div>
@@ -114,7 +114,7 @@ def html() -> str:
 </div>
 
 <!-- Import -->
-<div class="tab-pane" id="panel-import">
+<div class="sub-panel" id="panel-import">
   <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
     <div style="font-size:2.5rem;opacity:.3;margin-bottom:16px;">+</div>
     <h3 style="font-size:1rem;font-weight:400;color:#555;margin-bottom:8px;">Drop Excel or CSV here</h3>
@@ -125,7 +125,7 @@ def html() -> str:
 </div>
 
 <!-- Discover -->
-<div class="tab-pane" id="panel-discover">
+<div class="sub-panel" id="panel-discover">
   <div class="card">
     <div class="card-header"><h3 class="card-title">Discover New Leads</h3></div>
     <div class="card-body">
@@ -158,7 +158,7 @@ def html() -> str:
 </div>
 
 <!-- Settings -->
-<div class="tab-pane" id="panel-settings">
+<div class="sub-panel" id="panel-settings">
   <div class="card mb-3">
     <div class="card-header"><h3 class="card-title">Email Templates by Segment</h3></div>
     <div class="card-body">
@@ -245,7 +245,6 @@ def html() -> str:
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
 <script>
 var API='/api/b2b',PWD=sessionStorage.getItem('nakai-admin-pwd')||sessionStorage.getItem('nakai_admin_pw')||'',leadsOffset=0,debounceTimer=null,currentStep=1,currentSegment='cafe';
 var allTemplates={},segmentsData=[];
@@ -273,15 +272,15 @@ function hdr(){return{'X-Admin-Password':PWD,'Content-Type':'application/json'};
 function hdrF(){return{'X-Admin-Password':PWD};}
 
 // Tabs
-document.querySelectorAll('.nav-tabs .nav-link').forEach(function(tab){
-  tab.addEventListener('click',function(e){
-    e.preventDefault();var name=tab.dataset.tab;
-    document.querySelectorAll('.nav-tabs .nav-link').forEach(function(t){t.classList.toggle('active',t===tab);});
-    document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+name);});
-    if(name==='overview'){loadStats();loadSegmentCards();}if(name==='leads')loadLeads();if(name==='outreach')loadOutreach();
-    if(name==='analytics')loadAnalytics();if(name==='settings')loadSettings();
-  });
-});
+var B2B_TABS=['overview','leads','outreach','analytics','import','discover','settings'];
+window.switchB2BTab=function(name){
+  var sec=document.getElementById('sec-b2b');if(!sec)return;
+  sec.querySelectorAll('.sub-tab').forEach(function(t,i){t.classList.toggle('active',B2B_TABS[i]===name);});
+  sec.querySelectorAll('.sub-panel').forEach(function(p){p.classList.remove('active');});
+  var panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');
+  if(name==='overview'){loadStats();loadSegmentCards();}if(name==='leads')loadLeads();if(name==='outreach')loadOutreach();
+  if(name==='analytics')loadAnalytics();if(name==='settings')loadSettings();
+};
 
 // Segments
 function loadSegmentCards(){
