@@ -656,36 +656,75 @@ async def delete_schedule(schedule_id: str, _auth: bool = Depends(verify_admin))
 
 @email_router.post("/newsletter/debug-create")
 async def debug_create_schedule(_auth: bool = Depends(verify_admin)):
-    """Debug: reload PostgREST schema cache, then try to insert a row."""
+    """Debug: try multiple methods to reload PostgREST schema cache, then insert."""
     import httpx
+    results = {}
+    headers = {
+        "apikey": settings.supabase_service_key,
+        "Authorization": f"Bearer {settings.supabase_service_key}",
+        "Content-Type": "application/json",
+    }
+
     try:
         async with httpx.AsyncClient(timeout=30) as client:
-            # Reload PostgREST schema cache via NOTIFY
-            reload_resp = await client.post(
-                f"{settings.supabase_url}/rest/v1/rpc/reload_schema_cache",
-                headers={
-                    "apikey": settings.supabase_service_key,
-                    "Authorization": f"Bearer {settings.supabase_service_key}",
-                    "Content-Type": "application/json",
-                },
+            # Method 1: pg_notify built-in function
+            r1 = await client.post(
+                f"{settings.supabase_url}/rest/v1/rpc/pg_notify",
+                headers=headers,
+                json={"channel": "pgrst", "payload": "reload schema"},
+            )
+            results["pg_notify"] = {"status": r1.status_code, "body": r1.text[:500]}
+
+            # Method 2: extensions.pgrst_ddl_watch (Supabase built-in)
+            r2 = await client.post(
+                f"{settings.supabase_url}/rest/v1/rpc/pgrst_ddl_watch",
+                headers=headers,
                 json={},
             )
-            reload_status = reload_resp.status_code
+            results["pgrst_ddl_watch"] = {"status": r2.status_code, "body": r2.text[:500]}
 
+            # Method 3: notify_api_restart (some Supabase projects have this)
+            r3 = await client.post(
+                f"{settings.supabase_url}/rest/v1/rpc/notify_api_restart",
+                headers=headers,
+                json={},
+            )
+            results["notify_api_restart"] = {"status": r3.status_code, "body": r3.text[:500]}
+
+            # Method 4: Check available tables at REST root
+            r4 = await client.get(
+                f"{settings.supabase_url}/rest/v1/",
+                headers=headers,
+            )
+            results["rest_root"] = {"status": r4.status_code, "has_newsletter": "newsletter_schedules" in r4.text}
+
+            # Method 5: Try direct table access (might work if cache reloaded)
+            import asyncio
+            await asyncio.sleep(2)
             data = {"name": "debug-test", "template_key": "matcha_recipe", "days_of_week": [2, 5]}
-            resp = await client.post(
+            r5 = await client.post(
                 f"{settings.supabase_url}/rest/v1/newsletter_schedules",
-                headers={
-                    "apikey": settings.supabase_service_key,
-                    "Authorization": f"Bearer {settings.supabase_service_key}",
-                    "Content-Type": "application/json",
-                    "Prefer": "return=representation",
-                },
+                headers={**headers, "Prefer": "return=representation"},
                 json=data,
             )
-            return {"reload_status": reload_status, "insert_status": resp.status_code, "body": resp.text[:2000]}
+            results["insert"] = {"status": r5.status_code, "body": r5.text[:500]}
+
+            # If insert succeeded, clean up the test row
+            if r5.status_code < 400:
+                rows = r5.json()
+                if rows:
+                    test_id = rows[0].get("id")
+                    if test_id:
+                        await client.delete(
+                            f"{settings.supabase_url}/rest/v1/newsletter_schedules?id=eq.{test_id}",
+                            headers=headers,
+                        )
+                        results["cleanup"] = "deleted test row"
+
+            return results
     except Exception as e:
-        return {"error": str(e)}
+        results["error"] = str(e)
+        return results
 
 
 @email_router.post("/newsletter/init-table")
