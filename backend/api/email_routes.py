@@ -654,6 +654,28 @@ async def delete_schedule(schedule_id: str, _auth: bool = Depends(verify_admin))
     return {"ok": True}
 
 
+@email_router.post("/newsletter/debug-create")
+async def debug_create_schedule(_auth: bool = Depends(verify_admin)):
+    """Debug: try to insert a row and return the raw Supabase response."""
+    import httpx
+    data = {"name": "debug-test", "template_key": "matcha_recipe", "days_of_week": [2, 5]}
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                f"{settings.supabase_url}/rest/v1/newsletter_schedules",
+                headers={
+                    "apikey": settings.supabase_service_key,
+                    "Authorization": f"Bearer {settings.supabase_service_key}",
+                    "Content-Type": "application/json",
+                    "Prefer": "return=representation",
+                },
+                json=data,
+            )
+            return {"status": resp.status_code, "body": resp.text[:2000]}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @email_router.post("/newsletter/init-table")
 async def init_newsletter_table(_auth: bool = Depends(verify_admin)):
     """Create newsletter_schedules table if it doesn't exist."""
