@@ -656,11 +656,23 @@ async def delete_schedule(schedule_id: str, _auth: bool = Depends(verify_admin))
 
 @email_router.post("/newsletter/debug-create")
 async def debug_create_schedule(_auth: bool = Depends(verify_admin)):
-    """Debug: try to insert a row and return the raw Supabase response."""
+    """Debug: reload PostgREST schema cache, then try to insert a row."""
     import httpx
-    data = {"name": "debug-test", "template_key": "matcha_recipe", "days_of_week": [2, 5]}
     try:
         async with httpx.AsyncClient(timeout=30) as client:
+            # Reload PostgREST schema cache via NOTIFY
+            reload_resp = await client.post(
+                f"{settings.supabase_url}/rest/v1/rpc/reload_schema_cache",
+                headers={
+                    "apikey": settings.supabase_service_key,
+                    "Authorization": f"Bearer {settings.supabase_service_key}",
+                    "Content-Type": "application/json",
+                },
+                json={},
+            )
+            reload_status = reload_resp.status_code
+
+            data = {"name": "debug-test", "template_key": "matcha_recipe", "days_of_week": [2, 5]}
             resp = await client.post(
                 f"{settings.supabase_url}/rest/v1/newsletter_schedules",
                 headers={
@@ -671,7 +683,7 @@ async def debug_create_schedule(_auth: bool = Depends(verify_admin)):
                 },
                 json=data,
             )
-            return {"status": resp.status_code, "body": resp.text[:2000]}
+            return {"reload_status": reload_status, "insert_status": resp.status_code, "body": resp.text[:2000]}
     except Exception as e:
         return {"error": str(e)}
 
