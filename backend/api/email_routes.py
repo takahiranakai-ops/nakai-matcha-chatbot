@@ -630,7 +630,6 @@ async def list_schedules(_auth: bool = Depends(verify_admin)):
 @email_router.post("/schedules")
 async def create_schedule(body: ScheduleCreate, _auth: bool = Depends(verify_admin)):
     data = body.model_dump()
-    data["updated_at"] = datetime.now(timezone.utc).isoformat()
     result = await supabase_client.create_newsletter_schedule(data)
     if not result:
         raise HTTPException(500, "Failed to create schedule")

@@ -1031,6 +1031,8 @@ async def create_newsletter_schedule(data: dict) -> Optional[dict]:
             headers=_HEADERS,
             json=data,
         )
+        if resp.status_code >= 400:
+            logger.error(f"Supabase newsletter_schedules POST {resp.status_code}: {resp.text}")
         resp.raise_for_status()
         rows = resp.json()
         return rows[0] if rows else None
