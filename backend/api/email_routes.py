@@ -761,53 +761,48 @@ async def reload_postgrest_schema(_auth: bool = Depends(verify_admin)):
     }
 
 
-@email_router.post("/newsletter/init-table")
-async def init_newsletter_table(_auth: bool = Depends(verify_admin)):
-    """Create newsletter_schedules table if it doesn't exist."""
+@email_router.get("/newsletter/debug-table")
+async def debug_newsletter_table(_auth: bool = Depends(verify_admin)):
+    """Debug: directly test Supabase REST access to newsletter_schedules."""
     import httpx
-    sql = """
-    CREATE TABLE IF NOT EXISTS newsletter_schedules (
-        id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-        name TEXT NOT NULL,
-        description TEXT DEFAULT '',
-        template_key TEXT DEFAULT '',
-        custom_prompt TEXT DEFAULT '',
-        target_tags TEXT[] DEFAULT '{}',
-        target_language TEXT DEFAULT 'en',
-        is_active BOOLEAN DEFAULT FALSE,
-        days_of_week INT[] DEFAULT '{1,4}',
-        send_time_utc TEXT DEFAULT '14:00',
-        last_sent_at TIMESTAMPTZ,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
-    """
-    try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(
-                f"{settings.supabase_url}/rest/v1/rpc/exec_sql",
-                headers={
-                    "apikey": settings.supabase_service_key,
-                    "Authorization": f"Bearer {settings.supabase_service_key}",
-                    "Content-Type": "application/json",
-                },
-                json={"query": sql},
-            )
-            if resp.status_code >= 400:
-                # Try raw SQL via pg endpoint
-                resp2 = await client.post(
-                    f"{settings.supabase_url}/pg",
-                    headers={
-                        "apikey": settings.supabase_service_key,
-                        "Authorization": f"Bearer {settings.supabase_service_key}",
-                        "Content-Type": "application/json",
-                    },
-                    json={"query": sql},
-                )
-                return {"ok": True, "method": "pg", "note": "Table creation attempted. If this fails, run SQL manually in Supabase dashboard.", "sql": sql.strip()}
-            return {"ok": True, "method": "rpc"}
-    except Exception as e:
-        return {"ok": False, "error": str(e), "sql": sql.strip()}
+    headers = {
+        "apikey": settings.supabase_service_key,
+        "Authorization": f"Bearer {settings.supabase_service_key}",
+        "Content-Type": "application/json",
+    }
+    results = {}
+    async with httpx.AsyncClient(timeout=15) as client:
+        # Test GET
+        r1 = await client.get(
+            f"{settings.supabase_url}/rest/v1/newsletter_schedules?limit=1",
+            headers=headers,
+        )
+        results["get"] = {"status": r1.status_code, "body": r1.text[:500]}
+
+        # Test POST (insert then delete)
+        r2 = await client.post(
+            f"{settings.supabase_url}/rest/v1/newsletter_schedules",
+            headers={**headers, "Prefer": "return=representation"},
+            json={"name": "debug-test", "template_key": "matcha_recipe", "days_of_week": [2, 5]},
+        )
+        results["post"] = {"status": r2.status_code, "body": r2.text[:500]}
+        if r2.status_code < 400:
+            try:
+                rows = r2.json()
+                if rows:
+                    tid = rows[0].get("id")
+                    await client.delete(
+                        f"{settings.supabase_url}/rest/v1/newsletter_schedules?id=eq.{tid}",
+                        headers=headers,
+                    )
+                    results["cleanup"] = "ok"
+            except Exception:
+                pass
+
+        # Check REST root
+        r3 = await client.get(f"{settings.supabase_url}/rest/v1/", headers=headers)
+        results["root_has_table"] = "newsletter_schedules" in r3.text
+    return results
 
 
 @email_router.post("/schedules/{schedule_id}/trigger")
