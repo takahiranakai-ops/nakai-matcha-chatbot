@@ -47,6 +47,9 @@ _MPN_MAP = {
 
 _TARGET_COUNTRIES = ["US", "AE", "JP", "GB", "DE", "FR", "AU", "CA"]
 
+# Dynamic date for llms.txt / llms-full.txt (evaluated at server start)
+_last_updated = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
 # ---------------------------------------------------------------------------
 # /llms.txt -- AI-readable site information (summary)
 # ---------------------------------------------------------------------------
@@ -316,7 +319,7 @@ LLMS_FULL_TXT = f"""\
 # NAKAI Matcha -- Extended AI Information File
 
 > Extended version with comprehensive detail. Summary: {_BASE}/llms.txt
-> Last updated: 2026-03-03. Source: NAKAI official product data.
+> Last updated: {_last_updated}. Source: NAKAI official product data.
 
 ## Quick Answer: What is NAKAI?
 

@@ -10,6 +10,30 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
+# Patterns that indicate prompt injection attempts
+_INJECTION_PATTERNS = [
+    r"(?i)ignore\s+(all\s+)?(previous|above|prior)\s+(instructions?|prompts?|rules?)",
+    r"(?i)disregard\s+(all\s+)?(previous|above|prior)",
+    r"(?i)you\s+are\s+now\s+(a|an|the)",
+    r"(?i)new\s+instructions?:\s*",
+    r"(?i)system\s*:\s*",
+    r"(?i)forget\s+(everything|all|your)\s+(you|instructions?|rules?)",
+    r"(?i)\[INST\]|\[\/INST\]|<\|im_start\|>|<\|system\|>",
+    r"(?i)pretend\s+(you\s+are|to\s+be)",
+    r"(?i)jailbreak|DAN\s+mode",
+    r"(?i)reveal\s+(your|the)\s+(system\s+)?prompt",
+]
+
+
+def sanitize_user_input(message: str) -> str:
+    """Detect and neutralize prompt injection attempts."""
+    for pattern in _INJECTION_PATTERNS:
+        if re.search(pattern, message):
+            logger.warning("Prompt injection attempt detected and blocked")
+            return "[This message was filtered for security] Please ask me about NAKAI matcha products, recipes, or brewing techniques."
+    return message
+
+
 # Simple greetings and small talk — no RAG needed
 _GREETING_RE = re.compile(
     r"^(h[ae]llo|hi|hey|yo|sup|good\s*(morning|afternoon|evening|night)"
@@ -313,6 +337,7 @@ class RAGEngine:
         source: str = "pwa",
     ) -> dict:
         system_prompt = build_system_prompt(language=language, source=source)
+        user_message = sanitize_user_input(user_message)
         msg_stripped = user_message.strip()
 
         # For greetings / small talk — instant pre-written response, no LLM needed
@@ -481,6 +506,7 @@ class RAGEngine:
     ):
         """Yield (event_type, data) tuples for SSE streaming."""
         system_prompt = build_system_prompt(language=language, source=source)
+        user_message = sanitize_user_input(user_message)
         msg_stripped = user_message.strip()
 
         # Greetings — instant pre-written response, no LLM needed

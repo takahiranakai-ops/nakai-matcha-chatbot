@@ -5,6 +5,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response as StarletteResponse
 
 from api.routes import router, vector_store, rag_engine
 from api.widget import widget_router
@@ -29,6 +32,7 @@ from api.operations import operations_router
 from api.marketing_routes import marketing_router
 from api.design_routes import design_router
 from api.dashboard import dashboard_router
+from api.ops_chat_routes import ops_chat_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
@@ -37,11 +41,24 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Security: refuse default passwords in production
+    _defaults = {
+        "admin_password": "change-me-admin",
+        "wholesale_password": "change-me-wholesale",
+        "refresh_secret": "change-me",
+    }
+    insecure = [k for k, v in _defaults.items() if getattr(settings, k, None) == v]
+    if insecure and not settings.debug:
+        import sys
+        print(f"FATAL: Default credentials detected for: {', '.join(insecure)}")
+        print("Set proper values via environment variables before running in production.")
+        sys.exit(1)
+    elif insecure:
+        logger.warning(f"Default credentials in use: {', '.join(insecure)} — OK for development only")
+
     # Validate critical settings on startup
     if not settings.ngc_api_key:
         logger.error("CRITICAL: NVIDIA NGC API key not set — chat will fail")
-    if settings.admin_password == "change-me-admin":
-        logger.warning("Admin password is still at default — change in production")
     if not settings.supabase_url:
         logger.warning("Supabase not configured — analytics disabled")
     if not settings.mcp_api_key:
@@ -134,6 +151,21 @@ app.add_middleware(
     ],
 )
 
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: StarletteRequest, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        if request.url.scheme == "https":
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 setup_rate_limiting(app)
 
 
@@ -172,6 +204,7 @@ app.include_router(operations_router)
 app.include_router(marketing_router)
 app.include_router(design_router)
 app.include_router(dashboard_router)
+app.include_router(ops_chat_router)
 
 
 @app.get("/health")

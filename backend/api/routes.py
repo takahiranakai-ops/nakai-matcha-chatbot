@@ -89,9 +89,10 @@ async def chat(request: Request, body: ChatRequest):
     try:
         start_time = time.time()
 
+        history_dicts = [msg.model_dump() for msg in body.history]
         result = await rag_engine.answer(
             user_message=body.message,
-            conversation_history=body.history,
+            conversation_history=history_dicts,
             language=body.language,
             source=body.source,
         )
@@ -132,9 +133,10 @@ async def chat_stream(request: Request, body: ChatRequest):
         full_response = []
         final_meta = {}
         try:
+            stream_history = [msg.model_dump() for msg in body.history]
             async for event_type, data in rag_engine.answer_stream(
                 user_message=body.message,
-                conversation_history=body.history,
+                conversation_history=stream_history,
                 language=body.language,
                 source=body.source,
             ):
