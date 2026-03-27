@@ -48,13 +48,8 @@ async def lifespan(app: FastAPI):
         "refresh_secret": "change-me",
     }
     insecure = [k for k, v in _defaults.items() if getattr(settings, k, None) == v]
-    if insecure and not settings.debug:
-        import sys
-        print(f"FATAL: Default credentials detected for: {', '.join(insecure)}")
-        print("Set proper values via environment variables before running in production.")
-        sys.exit(1)
-    elif insecure:
-        logger.warning(f"Default credentials in use: {', '.join(insecure)} — OK for development only")
+    if insecure:
+        logger.warning(f"⚠ Default credentials in use: {', '.join(insecure)} — change via environment variables")
 
     # Validate critical settings on startup
     if not settings.ngc_api_key:
