@@ -303,7 +303,7 @@ body{{
     </div>
     <h2 class="success__title" id="s-title">Received.</h2>
     <p class="success__sub" id="s-sub">We'll get back to you within 1&ndash;2 business days.</p>
-    <a class="success__link" href="https://nakaimatcha.com/collections/matcha-wholesale" id="s-link">&larr; Back to Wholesale Collection</a>
+    <a class="success__link" href="https://nakaimatcha.com/collections/frontpage" id="s-link">&larr; Back to Collection</a>
   </div>
 
   <p class="note" id="note">
