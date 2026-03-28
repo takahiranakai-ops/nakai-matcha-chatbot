@@ -49,7 +49,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
 .ws-login-error{{color:#c0392b;font-size:.85rem;margin-top:8px;display:none}}
 
 /* App shell */
-#ws-app{{display:none;height:100vh;height:100dvh}}
+#ws-app{{display:flex;height:100vh;height:100dvh}}
 #ws-app.ws-active{{display:flex}}
 
 /* Brand sidebar (desktop) */
@@ -297,7 +297,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   .ws-cultivars-grid{{gap:10px}}.ws-menu-grid{{gap:10px}}
 }}
 /* Gate */
-.ws-gate{{display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;background:var(--cream);padding:24px}}
+.ws-gate{{display:none;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;background:var(--cream);padding:24px}}
 .ws-gate.ws-hidden{{display:none}}
 .ws-gate__card{{background:var(--white);border-radius:24px;padding:48px 36px;max-width:420px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06)}}
 .ws-gate__logo{{width:80px;margin:0 auto 24px}}
@@ -385,7 +385,7 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   </div>
 </div>
 <!-- APP -->
-<div id="ws-app" class="ws-hidden">
+<div id="ws-app">
   <!-- Desktop sidebar -->
   <aside class="ws-brand">
     <div class="ws-brand__top">
@@ -448,6 +448,15 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           <button class="ws-topics__pill" id="ws-t-cultivar">Cultivar Guide</button>
           <button class="ws-topics__pill" id="ws-t-contact">Contact Us</button>
         </div>
+        <!-- Sample Request CTA -->
+        <div style="width:100%;max-width:720px;padding:0 28px;margin-top:28px">
+          <div style="background:linear-gradient(135deg,#f9f6f0,#fff);border:1px solid #e8e4db;border-radius:16px;padding:32px;text-align:center">
+            <h3 style="font-size:20px;font-weight:600;color:#1d1d1f;margin:0 0 8px">Try Before You Commit</h3>
+            <p style="font-size:14px;color:#6e6e73;margin:0 0 20px;line-height:1.5">Request complimentary samples of any NAKAI grade.<br>Evaluate quality firsthand &mdash; no obligation.</p>
+            <a href="mailto:wholesale@nakaiinfo.com?subject=Sample%20Request" style="display:inline-block;background:#406546;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Request Free Samples &rarr;</a>
+          </div>
+        </div>
+
         <div class="ws-section">
           <h2 class="ws-section__title" id="ws-sec-products">Product Lineup</h2>
           <div class="ws-products-grid" id="ws-product-cards"></div>
@@ -464,6 +473,104 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
           <h2 class="ws-section__title" id="ws-sec-menu">Menu Ideas</h2>
           <div class="ws-menu-grid" id="ws-menu-cards"></div>
         </div>
+
+        <!-- Wholesale Pricing Tiers -->
+        <div class="ws-section" id="ws-sec-pricing">
+          <h2 class="ws-section__title">Wholesale Pricing</h2>
+          <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03)">
+            <table style="width:100%;border-collapse:collapse;font-family:var(--sans);font-size:.82rem">
+              <thead>
+                <tr style="background:rgba(64,101,70,.06)">
+                  <th style="text-align:left;padding:14px 16px;font-weight:500;color:var(--green);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase">Product</th>
+                  <th style="text-align:center;padding:14px 12px;font-weight:500;color:var(--green);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase">10&ndash;30 kg</th>
+                  <th style="text-align:center;padding:14px 12px;font-weight:500;color:var(--green);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase">30&ndash;100 kg</th>
+                  <th style="text-align:center;padding:14px 12px;font-weight:500;color:var(--green);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase">100+ kg</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-top:1px solid #f0ece6">
+                  <td style="padding:12px 16px;font-weight:500;color:var(--green)">SHI (4)</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$85/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$75/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$65/kg</td>
+                </tr>
+                <tr style="border-top:1px solid #f0ece6;background:rgba(64,101,70,.02)">
+                  <td style="padding:12px 16px;font-weight:500;color:var(--green)">JU-ROKU (16)</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$110/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$95/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$80/kg</td>
+                </tr>
+                <tr style="border-top:1px solid #f0ece6">
+                  <td style="padding:12px 16px;font-weight:500;color:var(--green)">JU-NANA (17)</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$130/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$110/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$95/kg</td>
+                </tr>
+                <tr style="border-top:1px solid #f0ece6;background:rgba(64,101,70,.02)">
+                  <td style="padding:12px 16px;font-weight:500;color:var(--green)">JU-HACHI (18)</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$150/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$130/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$110/kg</td>
+                </tr>
+                <tr style="border-top:1px solid #f0ece6">
+                  <td style="padding:12px 16px;font-weight:500;color:var(--green)">NIJYU-NI (22)</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$200/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$175/kg</td>
+                  <td style="text-align:center;padding:12px;color:rgba(64,101,70,.7)">$150/kg</td>
+                </tr>
+              </tbody>
+            </table>
+            <p style="font-size:.72rem;color:rgba(64,101,70,.4);padding:12px 16px;margin:0;line-height:1.5">Pricing is indicative. Final pricing based on volume commitment and contract terms. <a href="mailto:wholesale@nakaiinfo.com" style="color:var(--green);text-decoration:underline">Contact us</a> for a tailored quote.</p>
+          </div>
+        </div>
+
+        <!-- Social Proof -->
+        <div style="width:100%;max-width:720px;padding:0 28px;margin-top:48px">
+          <h3 style="font-size:13px;font-weight:500;color:#aeaeb2;text-transform:uppercase;letter-spacing:0.08em;text-align:center;margin-bottom:24px">Trusted by Partners Worldwide</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="background:#fff;border:1px solid #e8e4db;border-radius:12px;padding:20px">
+              <p style="font-size:13px;color:#555;line-height:1.6;margin:0 0 12px">&ldquo;The consistency and quality of NAKAI matcha is what sets them apart. Our customers notice the difference immediately.&rdquo;</p>
+              <p style="font-size:12px;color:#406546;font-weight:600;margin:0">Comet Over Delphi &mdash; Los Angeles</p>
+            </div>
+            <div style="background:#fff;border:1px solid #e8e4db;border-radius:12px;padding:20px">
+              <p style="font-size:13px;color:#555;line-height:1.6;margin:0 0 12px">&ldquo;The MQP grading system gives us transparency we can&rsquo;t find elsewhere. We know exactly what grade we&rsquo;re serving.&rdquo;</p>
+              <p style="font-size:12px;color:#406546;font-weight:600;margin:0">Ohill &mdash; Kyoto</p>
+            </div>
+          </div>
+          <p style="text-align:center;font-size:13px;color:#aeaeb2;margin-top:16px">Partners in US, Japan, UAE, UK, Australia &amp; more</p>
+        </div>
+
+        <!-- FAQ -->
+        <div style="width:100%;max-width:720px;padding:0 28px;margin-top:48px">
+          <h3 style="font-size:18px;font-weight:600;margin-bottom:24px;color:var(--green)">Frequently Asked</h3>
+          <div style="border-top:1px solid #e8e4db">
+            <div style="padding:16px 0;border-bottom:1px solid #e8e4db">
+              <p style="font-weight:500;margin:0 0 4px;color:var(--green)">Minimum order quantity?</p>
+              <p style="font-size:14px;color:#6e6e73;margin:0">10 kg for first orders. Flexible terms for ongoing partnerships.</p>
+            </div>
+            <div style="padding:16px 0;border-bottom:1px solid #e8e4db">
+              <p style="font-weight:500;margin:0 0 4px;color:var(--green)">Sample availability?</p>
+              <p style="font-size:14px;color:#6e6e73;margin:0">Complimentary 30g samples of any grade. Just submit an inquiry.</p>
+            </div>
+            <div style="padding:16px 0;border-bottom:1px solid #e8e4db">
+              <p style="font-weight:500;margin:0 0 4px;color:var(--green)">Shipping regions?</p>
+              <p style="font-size:14px;color:#6e6e73;margin:0">Worldwide. Primary markets: US, Canada, UK, EU, Japan, Australia, UAE, SE Asia.</p>
+            </div>
+            <div style="padding:16px 0;border-bottom:1px solid #e8e4db">
+              <p style="font-weight:500;margin:0 0 4px;color:var(--green)">Lead time?</p>
+              <p style="font-size:14px;color:#6e6e73;margin:0">Standard: 7&ndash;14 business days. Express available for urgent orders.</p>
+            </div>
+            <div style="padding:16px 0;border-bottom:1px solid #e8e4db">
+              <p style="font-weight:500;margin:0 0 4px;color:var(--green)">Payment terms?</p>
+              <p style="font-size:14px;color:#6e6e73;margin:0">Net 30 for established partners. Wire, credit card, or invoice.</p>
+            </div>
+            <div style="padding:16px 0;border-bottom:1px solid #e8e4db">
+              <p style="font-weight:500;margin:0 0 4px;color:var(--green)">Private label / white label?</p>
+              <p style="font-size:14px;color:#6e6e73;margin:0">Available for orders 100 kg+. Custom packaging and branding options.</p>
+            </div>
+          </div>
+        </div>
+
         <div class="ws-home__footer">
           <a href="/app" class="ws-home__link" id="ws-f-consumer">Consumer App</a>
           <span class="ws-home__dot"></span>
@@ -1035,31 +1142,8 @@ html,body{{height:100%;overflow:hidden;background:var(--cream);color:var(--green
   }}
 
   function initLogin(){{
-    /* Gate: check if already verified */
-    if(sessionStorage.getItem('ws_partner_verified')){{
-      enterApp();
-      return;
-    }}
-    /* Attach button handlers FIRST (before setLang which may fail) */
-    $('ws-gate-yes').addEventListener('click',function(){{
-      sessionStorage.setItem('ws_partner_verified','yes');
-      enterApp();
-    }});
-    $('ws-gate-no').addEventListener('click',function(){{
-      $('ws-gate-email').classList.add('ws-gate__email--show');
-      $('ws-gate-email-input').focus();
-    }});
-    $('ws-gate-email-form').addEventListener('submit',function(e){{
-      e.preventDefault();
-      var email=$('ws-gate-email-input').value.trim();
-      if(!email)return;
-      sessionStorage.setItem('ws_partner_verified','interested');
-      sessionStorage.setItem('ws_lead_email',email);
-      fetch('/api/admin/wholesale/leads',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{email:email,session_id:SESSION_ID}})}}).catch(function(){{}});
-      enterApp();
-    }});
-    /* Now safe to set language (won't block buttons if it throws) */
-    try{{setLang(lang)}}catch(e){{console.error('setLang error',e)}}
+    /* Gate removed — show content directly to all visitors */
+    enterApp();
   }}
 
   function initApp(){{

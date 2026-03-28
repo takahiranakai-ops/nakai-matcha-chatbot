@@ -469,6 +469,13 @@ async def submit_inquiry(body: InquiryBody):
     except Exception as e:
         logger.warning(f"Email notification skipped: {e}")
 
+    # Send auto-reply to inquirer
+    try:
+        from services.email_client import send_inquiry_auto_reply
+        await send_inquiry_auto_reply(body)
+    except Exception as e:
+        logger.warning(f"Auto-reply skipped: {e}")
+
     if not stored and not emailed:
         return JSONResponse({"status": "error"}, status_code=500)
 

@@ -515,6 +515,53 @@ async def create_wholesale_inquiry(
         return None
 
 
+async def get_wholesale_inquiries_by_age(days: int) -> list[dict]:
+    """Return wholesale inquiries created approximately *days* ago (same UTC date)."""
+    if not _is_configured():
+        return []
+    _init()
+    try:
+        target = datetime.now(timezone.utc) - timedelta(days=days)
+        date_str = target.strftime("%Y-%m-%d")
+        client = _get_client()
+        resp = await client.get(
+            f"{_BASE_URL}/wholesale_inquiries"
+            f"?created_at=gte.{date_str}T00:00:00Z"
+            f"&created_at=lt.{date_str}T23:59:59Z"
+            f"&select=*",
+            headers=_HEADERS,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logger.warning(f"Failed to fetch wholesale inquiries (age={days}d): {e}")
+        return []
+
+
+async def mark_followup_sent(inquiry_id: str, stage: str) -> bool:
+    """Mark a follow-up stage as sent by patching the inquiry row.
+
+    Sets followup_day2_sent or followup_day7_sent to current timestamp.
+    """
+    if not _is_configured():
+        return False
+    _init()
+    column = f"followup_{stage}_sent"
+    try:
+        client = _get_client()
+        resp = await client.patch(
+            f"{_BASE_URL}/wholesale_inquiries",
+            headers={**_HEADERS, "Prefer": "return=minimal"},
+            params={"id": f"eq.{inquiry_id}"},
+            json={column: datetime.now(timezone.utc).isoformat()},
+        )
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to mark followup {stage} for {inquiry_id}: {e}")
+        return False
+
+
 # ----------------------------------------------------------------
 # CONTACT INQUIRIES (Shopify contact page)
 # ----------------------------------------------------------------

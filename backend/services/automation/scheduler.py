@@ -154,6 +154,43 @@ async def run_newsletter_check():
     await _safe_run("newsletter", check_and_send_due_newsletters())
 
 
+async def run_research_agent():
+    """Daily autonomous market research (03:00 UTC / 12:00 JST)."""
+    from services.automation.research_agent import run_daily_research
+    await _safe_run("research_agent", run_daily_research())
+
+
+async def run_content_gap_analysis():
+    """Weekly content gap analysis (Sunday 05:00 UTC / 14:00 JST)."""
+    from services.automation.research_agent import run_content_gap_analysis as _run
+    await _safe_run("content_gaps", _run())
+
+
+async def _run_wholesale_followups():
+    """Check for inquiries needing follow-up emails."""
+    from services import supabase_client
+    from services.email_client import send_followup_day2, send_followup_day7
+
+    # Get inquiries from 2 days ago (for day-2 follow-up)
+    day2_inquiries = await supabase_client.get_wholesale_inquiries_by_age(days=2)
+    for inq in day2_inquiries:
+        if not inq.get("followup_day2_sent"):
+            await send_followup_day2(inq)
+            await supabase_client.mark_followup_sent(inq["id"], "day2")
+
+    # Get inquiries from 7 days ago (for day-7 follow-up)
+    day7_inquiries = await supabase_client.get_wholesale_inquiries_by_age(days=7)
+    for inq in day7_inquiries:
+        if not inq.get("followup_day7_sent"):
+            await send_followup_day7(inq)
+            await supabase_client.mark_followup_sent(inq["id"], "day7")
+
+
+async def run_wholesale_followups():
+    """Daily wholesale inquiry follow-up emails (10:00 UTC / 19:00 JST)."""
+    await _safe_run("wholesale_followups", _run_wholesale_followups())
+
+
 # ---------------------------------------------------------------------------
 # Simple asyncio-based scheduler (no external dependency needed)
 # ---------------------------------------------------------------------------
@@ -182,6 +219,9 @@ async def _scheduler_loop():
         "freshness": 0,    # weekly
         "competitor": 0,   # weekly
         "newsletter": 0,   # every 10 min
+        "research_agent": 0,  # daily 03:00 UTC
+        "content_gaps": 0,    # weekly Sunday 05:00 UTC
+        "wholesale_followups": 0,  # daily 10:00 UTC
     }
 
     while True:
@@ -267,6 +307,21 @@ async def _scheduler_loop():
                 last_run["slot_6"] = now.timestamp()
                 asyncio.create_task(run_content_slot(6, "line"))
                 asyncio.create_task(run_content_slot(6, "twitter"))
+
+            # Daily at 03:xx UTC (12:00 JST): Research agent
+            if hour == 3 and (now.timestamp() - last_run["research_agent"]) >= 23 * 3600:
+                last_run["research_agent"] = now.timestamp()
+                asyncio.create_task(run_research_agent())
+
+            # Weekly Sunday 05:xx UTC (14:00 JST): Content gap analysis
+            if weekday == 6 and hour == 5 and (now.timestamp() - last_run["content_gaps"]) >= 6 * 24 * 3600:
+                last_run["content_gaps"] = now.timestamp()
+                asyncio.create_task(run_content_gap_analysis())
+
+            # Daily at 10:xx UTC (19:00 JST): Wholesale follow-up emails
+            if hour == 10 and (now.timestamp() - last_run["wholesale_followups"]) >= 23 * 3600:
+                last_run["wholesale_followups"] = now.timestamp()
+                asyncio.create_task(run_wholesale_followups())
 
             # Every 10 min: Newsletter schedule check
             if (now.timestamp() - last_run["newsletter"]) >= 600:
