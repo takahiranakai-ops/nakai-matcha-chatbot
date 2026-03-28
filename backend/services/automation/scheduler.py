@@ -318,10 +318,10 @@ async def _scheduler_loop():
                 last_run["content_gaps"] = now.timestamp()
                 asyncio.create_task(run_content_gap_analysis())
 
-            # Daily at 10:xx UTC (19:00 JST): Wholesale follow-up emails
-            if hour == 10 and (now.timestamp() - last_run["wholesale_followups"]) >= 23 * 3600:
-                last_run["wholesale_followups"] = now.timestamp()
-                asyncio.create_task(run_wholesale_followups())
+            # Daily at 10:xx UTC (19:00 JST): Wholesale follow-up emails (disabled for now)
+            # if hour == 10 and (now.timestamp() - last_run["wholesale_followups"]) >= 23 * 3600:
+            #     last_run["wholesale_followups"] = now.timestamp()
+            #     asyncio.create_task(run_wholesale_followups())
 
             # Every 10 min: Newsletter schedule check
             if (now.timestamp() - last_run["newsletter"]) >= 600:

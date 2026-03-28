@@ -130,7 +130,7 @@ async def send_inquiry_auto_reply(inquiry) -> bool:
   </div>
   <div style="background:#fff;padding:32px;border:1px solid #e8e8e8;border-top:none;border-radius:0 0 16px 16px">
     <p style="font-size:15px;line-height:1.7;color:#333">Hi {name},</p>
-    <p style="font-size:15px;line-height:1.7;color:#333">Thank you for your interest in NAKAI Matcha wholesale partnership. We've received your inquiry and our team will review it carefully.</p>
+    <p style="font-size:15px;line-height:1.7;color:#333">Thank you for your interest in NAKAI Matcha wholesale partnership. We've received your inquiry and our team will review it carefully. Complimentary samples are available at no cost — please don't hesitate to request them.</p>
     <p style="font-size:15px;line-height:1.7;color:#333"><strong>What happens next:</strong></p>
     <ul style="font-size:14px;line-height:1.8;color:#555;padding-left:20px">
       <li>Our wholesale team will review your requirements within <strong>1-2 business days</strong></li>
@@ -144,6 +144,10 @@ async def send_inquiry_auto_reply(inquiry) -> bool:
         Volume: {inquiry.quantity} kg{(' · ' + inquiry.use_case) if inquiry.use_case else ''}
         {(' · ' + inquiry.country) if inquiry.country else ''}
       </p>
+    </div>
+    <div style="margin:28px 0;padding:20px;background:#f9f6f0;border-radius:12px;border-left:3px solid #406546">
+      <p style="margin:0 0 8px;font-size:13px;color:#7a766d;font-weight:500">PARTNER RESULTS</p>
+      <p style="margin:0;font-size:14px;color:#333;line-height:1.7">Many of our wholesale partners — even small cafes — sell over <strong>3,000 cups per month</strong>. The reason: our matcha is the same grade we use in actual tea ceremonies, so you can confidently call it <strong>ceremonial grade</strong>. We also provide recipe development support and hands-on guidance for preparing matcha-based drinks.</p>
     </div>
     <div style="text-align:center;margin:28px 0">
       <a href="https://nakaimatcha.com/collections/matcha-wholesale" style="display:inline-block;background:#406546;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Browse Our Wholesale Collection</a>
