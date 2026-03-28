@@ -11,7 +11,7 @@ from config import settings
 logger = logging.getLogger(__name__)
 
 RESEND_API = "https://api.resend.com"
-FROM_EMAIL = "NAKAI Matcha <hello@nakaimatcha.com>"
+FROM_EMAIL = "NAKAI Matcha <wholesale@nakaiinfo.com>"
 REPLY_TO = "contact@nakaiinfo.com"
 
 MAX_RETRIES = 3

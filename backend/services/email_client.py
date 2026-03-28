@@ -44,7 +44,7 @@ async def send_inquiry_notification(inquiry) -> bool:
             to=RECIPIENT,
             subject=f"New Wholesale Inquiry from {inquiry.company}",
             html=html_body,
-            from_email="NAKAI Wholesale <hello@nakaimatcha.com>",
+            from_email="NAKAI Wholesale <wholesale@nakaiinfo.com>",
             reply_to=inquiry.email,
         )
         if result:
@@ -103,7 +103,7 @@ async def send_contact_inquiry_notification(inquiry) -> bool:
             to=to_email,
             subject=subject,
             html=html_body,
-            from_email="NAKAI <hello@nakaimatcha.com>",
+            from_email="NAKAI <wholesale@nakaiinfo.com>",
             reply_to=getattr(inquiry, 'email', 'contact@nakaiinfo.com'),
         )
         if result:
@@ -165,7 +165,7 @@ async def send_inquiry_auto_reply(inquiry) -> bool:
             to=inquiry.email,
             subject="Thank you for your NAKAI wholesale inquiry",
             html=html,
-            from_email="NAKAI Wholesale <hello@nakaimatcha.com>",
+            from_email="NAKAI Wholesale <wholesale@nakaiinfo.com>",
             reply_to="wholesale@nakaiinfo.com",
         )
         if result:
