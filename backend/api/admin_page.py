@@ -249,8 +249,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
 <script>
 (function(){{
   'use strict';
-  var adminPw='';
-  function hdrs(){{return{{'Content-Type':'application/json','X-Admin-Password':adminPw}}}}
+  function hdrs(){{return{{'Content-Type':'application/json'}}}}
   function esc(s){{if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML}}
 
   var selectedFile=null;
@@ -284,10 +283,9 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
   document.getElementById('login-form').addEventListener('submit',function(e){{
     e.preventDefault();
     var pw=document.getElementById('login-pw').value;
-    fetch('/api/admin/login',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{password:pw}})}})
+    fetch('/api/admin/login',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{password:pw}}),credentials:'same-origin'}})
     .then(function(r){{if(!r.ok)throw new Error();return r.json()}})
     .then(function(){{
-      adminPw=pw;sessionStorage.setItem('nakai_admin_pw',pw);
       document.getElementById('login-gate').style.display='none';
       document.getElementById('dashboard').style.display='block';
       loadArticles();loadAnalytics();
@@ -295,10 +293,12 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
     .catch(function(){{document.getElementById('login-error').style.display='block'}});
   }});
 
-  var stored=sessionStorage.getItem('nakai_admin_pw');
-  if(stored){{adminPw=stored;document.getElementById('login-gate').style.display='none';document.getElementById('dashboard').style.display='block';loadArticles();loadAnalytics()}}
+  // Auto-login: check if session cookie is still valid
+  fetch('/api/admin/analytics',{{credentials:'same-origin'}})
+    .then(function(r){{if(r.ok){{document.getElementById('login-gate').style.display='none';document.getElementById('dashboard').style.display='block';loadArticles();loadAnalytics()}}}})
+    .catch(function(){{}});
 
-  window.logout=function(){{sessionStorage.removeItem('nakai_admin_pw');location.reload()}};
+  window.logout=function(){{document.cookie='nakai_session=;path=/;max-age=0';location.reload()}};
 
   document.querySelectorAll('.tab').forEach(function(t){{
     t.addEventListener('click',function(){{
@@ -376,7 +376,7 @@ td{{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-ali
       fd.append('title',document.getElementById('art-title').value);
       fd.append('language',document.getElementById('art-lang').value);
       fd.append('category',document.getElementById('art-cat').value);
-      fetch('/api/admin/articles/upload',{{method:'POST',headers:{{'X-Admin-Password':adminPw}},body:fd}})
+      fetch('/api/admin/articles/upload',{{method:'POST',body:fd,credentials:'same-origin'}})
       .then(function(r){{if(!r.ok)return r.json().then(function(d){{throw new Error(d.detail||'Upload failed')}});return r.json()}})
       .then(function(){{closeModal();loadArticles()}})
       .catch(function(e){{alert('Upload failed: '+e.message)}});

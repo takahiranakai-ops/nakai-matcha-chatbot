@@ -4,6 +4,7 @@ import asyncio
 import csv
 import io
 import logging
+import re
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -546,7 +547,7 @@ async def _execute_bulk_send(campaign_id: str):
 
 @email_router.get("/unsubscribe", response_class=HTMLResponse)
 async def unsubscribe_page(token: str = ""):
-    if not token:
+    if not token or not re.fullmatch(r'[a-zA-Z0-9_-]{1,128}', token):
         return HTMLResponse("<h1>Invalid unsubscribe link</h1>", status_code=400)
     return HTMLResponse(f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

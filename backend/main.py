@@ -1,10 +1,13 @@
 import asyncio
+import hashlib
 import logging
+import secrets
+import time
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response as StarletteResponse
@@ -36,7 +39,36 @@ from api.ops_chat_routes import ops_chat_router
 from api.middleware import setup_rate_limiting
 from config import settings
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# ── Session token store (in-memory, server-side only) ──
+_SESSION_TOKENS: dict[str, float] = {}  # token -> expiry timestamp
+_TOKEN_TTL = 86400  # 24 hours
+
+
+def create_session_token(password: str) -> str:
+    """Create a signed session token from admin password."""
+    raw = f"{password}:{secrets.token_hex(16)}:{time.time()}"
+    token = hashlib.sha256(raw.encode()).hexdigest()
+    _SESSION_TOKENS[token] = time.time() + _TOKEN_TTL
+    # Cleanup expired tokens
+    now = time.time()
+    expired = [t for t, exp in _SESSION_TOKENS.items() if exp < now]
+    for t in expired:
+        _SESSION_TOKENS.pop(t, None)
+    return token
+
+
+def validate_session_token(token: str) -> bool:
+    """Check if a session token is valid and not expired."""
+    expiry = _SESSION_TOKENS.get(token)
+    if not expiry:
+        return False
+    if time.time() > expiry:
+        _SESSION_TOKENS.pop(token, None)
+        return False
+    return True
 
 
 @asynccontextmanager
@@ -49,7 +81,13 @@ async def lifespan(app: FastAPI):
     }
     insecure = [k for k, v in _defaults.items() if getattr(settings, k, None) == v]
     if insecure:
-        logger.warning(f"⚠ Default credentials in use: {', '.join(insecure)} — change via environment variables")
+        if settings.debug:
+            logger.warning("Default credentials in use: %s — change via environment variables", ", ".join(insecure))
+        else:
+            raise RuntimeError(
+                f"CRITICAL: Default credentials detected: {', '.join(insecure)}. "
+                "Set secure passwords via environment variables before running in production."
+            )
 
     # Validate critical settings on startup
     if not settings.ngc_api_key:
@@ -127,14 +165,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-logging.basicConfig(level=logging.INFO)
 logger.info("NAKAI Matcha Chatbot v3.0 starting up...")
 
 origins = [origin.strip() for origin in settings.allowed_origins.split(",")]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["POST", "GET", "PATCH", "DELETE"],
     allow_headers=[
         "Content-Type",
@@ -154,6 +191,15 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; "
+            "img-src 'self' data: https:; "
+            "connect-src 'self' https://api.resend.com https://*.supabase.co; "
+            "frame-ancestors 'none'"
+        )
         if request.url.scheme == "https":
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
@@ -200,6 +246,12 @@ app.include_router(marketing_router)
 app.include_router(design_router)
 app.include_router(dashboard_router)
 app.include_router(ops_chat_router)
+
+
+@app.get("/")
+async def root_redirect():
+    """Redirect root to Barista Hub (wholesale portal)."""
+    return RedirectResponse(url="/wholesale", status_code=302)
 
 
 @app.get("/health")

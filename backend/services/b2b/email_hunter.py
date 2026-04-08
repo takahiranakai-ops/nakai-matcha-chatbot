@@ -4,8 +4,10 @@ Virtual Team Members #9-12: Email Hunters.
 Strategy: Website scraping → Hunter.io API → pattern generation.
 """
 
+import ipaddress
 import logging
 import re
+from urllib.parse import urlparse
 
 import httpx
 
@@ -77,6 +79,27 @@ async def find_emails_batch(leads: list[dict], max_leads: int = 20) -> int:
     return total
 
 
+def _is_safe_url(url: str) -> bool:
+    """Validate URL is safe to fetch (no SSRF)."""
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ("http", "https"):
+            return False
+        hostname = parsed.hostname
+        if not hostname:
+            return False
+        # Block private/internal IPs
+        try:
+            ip = ipaddress.ip_address(hostname)
+            if ip.is_private or ip.is_loopback or ip.is_link_local:
+                return False
+        except ValueError:
+            pass  # hostname is not an IP — that's fine
+        return True
+    except Exception:
+        return False
+
+
 async def _scrape_website_emails(url: str) -> list[str]:
     """Scrape emails from a website's main pages."""
     emails = set()
@@ -84,6 +107,10 @@ async def _scrape_website_emails(url: str) -> list[str]:
     # Normalize URL
     if not url.startswith("http"):
         url = f"https://{url}"
+
+    if not _is_safe_url(url):
+        logger.warning(f"[B2B] Blocked unsafe URL: {url}")
+        return []
 
     pages_to_check = [url]
     # Also check common contact pages
@@ -107,7 +134,8 @@ async def _scrape_website_emails(url: str) -> list[str]:
                             domain = email.split("@")[1]
                             if domain not in SKIP_DOMAINS:
                                 emails.add(email)
-                except Exception:
+                except Exception as e:
+                    logger.debug("[B2B] Failed to scrape %s: %s", page_url, e)
                     continue
 
     except Exception as e:
@@ -181,8 +209,9 @@ async def _save_contact(
         if resp.json():
             logger.debug(f"[B2B] Skipping unsubscribed email: {email}")
             return None
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("[B2B] Unsubscribe check failed for %s: %s", email, e)
+        return None
 
     try:
         client = supabase_client._get_client()

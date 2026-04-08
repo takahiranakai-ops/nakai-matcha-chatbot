@@ -142,8 +142,7 @@ def html() -> str:
 
 <script>
 (function(){
-  var PWD = sessionStorage.getItem('nakai-admin-pwd') || '';
-  var H = {'Content-Type':'application/json','X-Admin-Password':PWD};
+  var H = {'Content-Type':'application/json'};
 
   function esc(s){if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
   function $(id){return document.getElementById(id);}

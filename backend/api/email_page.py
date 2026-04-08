@@ -350,29 +350,33 @@ td{padding:12px 16px;border-top:1px solid #f0f0f0;font-size:.88rem;vertical-alig
 </div>
 
 <script>
-let PWD='';
 let currentCampaignId=null;
 let currentCampaign=null;
 
 // ── Auth ──
 function login(){
-  PWD=document.getElementById('pwd').value;
-  api('GET','/api/email/brand-assets').then(r=>{
-    if(r.ok){document.getElementById('login-gate').style.display='none';document.getElementById('dashboard').style.display='block';loadAll();}
-    else{document.getElementById('login-err').style.display='block';}
-  });
+  const pw=document.getElementById('pwd').value;
+  fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw}),credentials:'same-origin'})
+    .then(r=>{if(!r.ok)throw new Error();return r.json()})
+    .then(()=>{document.getElementById('login-gate').style.display='none';document.getElementById('dashboard').style.display='block';loadAll();})
+    .catch(()=>{document.getElementById('login-err').style.display='block';});
 }
-function logout(){PWD='';location.reload();}
+function logout(){document.cookie='nakai_session=;path=/;max-age=0';location.reload();}
+
+// Auto-login from session cookie
+fetch('/api/email/brand-assets',{credentials:'same-origin'})
+  .then(r=>{if(r.ok){document.getElementById('login-gate').style.display='none';document.getElementById('dashboard').style.display='block';loadAll();}})
+  .catch(()=>{});
 
 async function api(method,path,body){
-  const opts={method,headers:{'X-Admin-Password':PWD,'Content-Type':'application/json'}};
+  const opts={method,headers:{'Content-Type':'application/json'},credentials:'same-origin'};
   if(body)opts.body=JSON.stringify(body);
   const r=await fetch(path,opts);
   const data=r.ok?await r.json():null;
   return{ok:r.ok,status:r.status,data};
 }
 async function apiForm(method,path,formData){
-  const r=await fetch(path,{method,headers:{'X-Admin-Password':PWD},body:formData});
+  const r=await fetch(path,{method,body:formData,credentials:'same-origin'});
   const data=r.ok?await r.json():null;
   return{ok:r.ok,data};
 }
@@ -402,11 +406,11 @@ async function loadCampaigns(){
     const stats=c.stats||{};
     const sentCount=stats.sent||0;
     html+=`<tr>
-      <td><a href="#" onclick="openCampaign('${c.id}');return false" style="color:var(--green);text-decoration:none;font-weight:500">${esc(c.name)}</a></td>
-      <td><span class="badge badge-${c.status}">${c.status}</span></td>
+      <td><a href="#" onclick="openCampaign('${esc(c.id)}');return false" style="color:var(--green);text-decoration:none;font-weight:500">${esc(c.name)}</a></td>
+      <td><span class="badge badge-${esc(c.status)}">${esc(c.status)}</span></td>
       <td>${esc(c.subject||'—')}</td>
       <td>${sentCount>0?sentCount:'—'}</td>
-      <td><button class="btn btn-outline btn-sm" onclick="deleteCampaign('${c.id}')">Delete</button></td>
+      <td><button class="btn btn-outline btn-sm" onclick="deleteCampaign('${esc(c.id)}')">Delete</button></td>
     </tr>`;
   }
   html+='</tbody></table>';

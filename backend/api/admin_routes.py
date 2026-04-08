@@ -12,6 +12,7 @@ from fastapi import (
     APIRouter, HTTPException, Header, Depends, Request,
     UploadFile, File, Form,
 )
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
 from api.middleware import limiter
@@ -23,10 +24,17 @@ logger = logging.getLogger(__name__)
 admin_api_router = APIRouter(prefix="/api/admin")
 
 
-async def verify_admin(x_admin_password: str = Header(...)):
-    if not hmac.compare_digest(x_admin_password, settings.admin_password):
-        raise HTTPException(status_code=401, detail="Invalid admin password")
-    return True
+async def verify_admin(request: Request, x_admin_password: str = Header(default="")):
+    # Check session token in cookie first
+    token = request.cookies.get("nakai_session")
+    if token:
+        from main import validate_session_token
+        if validate_session_token(token):
+            return True
+    # Fall back to header-based password check
+    if x_admin_password and hmac.compare_digest(x_admin_password, settings.admin_password):
+        return True
+    raise HTTPException(status_code=401, detail="Invalid admin password")
 
 
 class ArticleCreate(BaseModel):
@@ -53,7 +61,18 @@ class AdminLoginRequest(BaseModel):
 @limiter.limit("5/minute")
 async def admin_login(request: Request, body: AdminLoginRequest):
     if hmac.compare_digest(body.password, settings.admin_password):
-        return {"authenticated": True}
+        from main import create_session_token
+        token = create_session_token(body.password)
+        response = JSONResponse({"authenticated": True})
+        response.set_cookie(
+            "nakai_session", token,
+            httponly=True,
+            secure=True,
+            samesite="strict",
+            max_age=86400,
+            path="/",
+        )
+        return response
     raise HTTPException(status_code=401, detail="Invalid password")
 
 
@@ -75,6 +94,7 @@ _EMAIL_RE = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 class WholesaleLeadCreate(BaseModel):
     email: str = Field(..., min_length=3, max_length=254)
     session_id: str = Field(default="", max_length=100)
+    website: str = Field(default="", max_length=500)  # honeypot — hidden field
 
     @field_validator("email")
     @classmethod
@@ -88,6 +108,9 @@ class WholesaleLeadCreate(BaseModel):
 @limiter.limit("10/minute")
 async def create_wholesale_lead(request: Request, body: WholesaleLeadCreate):
     """Public endpoint — called from the wholesale gate."""
+    # Honeypot: bots fill hidden fields — silently discard
+    if body.website:
+        return {"ok": True}
     await supabase_client.create_wholesale_lead(
         email=body.email, session_id=body.session_id,
     )
@@ -150,9 +173,17 @@ async def upload_article(
     title: str = Form(""),
     language: str = Form("en"),
     category: str = Form("general"),
-    x_admin_password: str = Header(...),
+    x_admin_password: str = Header(default=""),
 ):
-    if not hmac.compare_digest(x_admin_password, settings.admin_password):
+    # Check session token cookie first
+    token = request.cookies.get("nakai_session")
+    authenticated = False
+    if token:
+        from main import validate_session_token
+        authenticated = validate_session_token(token)
+    if not authenticated and x_admin_password:
+        authenticated = hmac.compare_digest(x_admin_password, settings.admin_password)
+    if not authenticated:
         raise HTTPException(status_code=401, detail="Invalid admin password")
 
     import os

@@ -5,6 +5,7 @@ Target competitors: Ippodo, Marukyu Koyamaen, Kettl, Matchabar, Encha.
 Runs weekly on Mondays.
 """
 
+import asyncio
 import logging
 from datetime import datetime, timezone
 
@@ -71,6 +72,7 @@ async def _check_competitor_serp(competitor: dict, serp_api_key: str) -> dict:
                         "gl": "us",
                     },
                 )
+                resp.raise_for_status()
                 data = resp.json()
 
                 # Check AI Overview
@@ -82,6 +84,7 @@ async def _check_competitor_serp(competitor: dict, serp_api_key: str) -> dict:
                 for item in data.get("organic_results", []):
                     if competitor["domain"] in item.get("link", ""):
                         result["organic_appearances"] += 1
+                await asyncio.sleep(0.5)
     except Exception as e:
         logger.error(f"Competitor check failed for {competitor['name']}: {e}")
 

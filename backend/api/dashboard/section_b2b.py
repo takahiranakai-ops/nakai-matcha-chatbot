@@ -246,7 +246,7 @@ def html() -> str:
 </div>
 
 <script>
-var API='/api/b2b',PWD=sessionStorage.getItem('nakai-admin-pwd')||sessionStorage.getItem('nakai_admin_pw')||'',leadsOffset=0,debounceTimer=null,currentStep=1,currentSegment='cafe';
+var API='/api/b2b',leadsOffset=0,debounceTimer=null,currentStep=1,currentSegment='cafe';
 var allTemplates={},segmentsData=[];
 var BADGE_CLASS={'new':'bg-green-lt','researched':'bg-azure-lt','contacted':'bg-orange-lt','replied':'bg-purple-lt','negotiating':'bg-pink-lt','won':'bg-green-lt','lost':'bg-secondary-lt','sent':'bg-azure-lt','opened':'bg-orange-lt','clicked':'bg-purple-lt','bounced':'bg-red-lt','pending':'bg-secondary-lt','unsubscribed':'bg-secondary-lt'};
 var STATUS_JA={new:'New',researched:'Researched',contacted:'Contacted',replied:'Replied',negotiating:'Negotiating',won:'Won',lost:'Lost',sent:'Sent',opened:'Opened',clicked:'Clicked',bounced:'Bounced',pending:'Pending',unsubscribed:'Unsubscribed'};
@@ -268,8 +268,8 @@ function showSkel(id,type){
   else if(type==='chart'){el.innerHTML='<div class="skeleton skeleton-chart"></div>';}
 }
 function btnL(btn,on){if(!btn)return;if(on){btn.classList.add('btn-loading');btn.disabled=true;}else{btn.classList.remove('btn-loading');btn.disabled=false;}}
-function hdr(){return{'X-Admin-Password':PWD,'Content-Type':'application/json'};}
-function hdrF(){return{'X-Admin-Password':PWD};}
+function hdr(){return{'Content-Type':'application/json'};}
+function hdrF(){return{};}
 
 // Tabs
 var B2B_TABS=['overview','leads','outreach','analytics','import','discover','settings'];

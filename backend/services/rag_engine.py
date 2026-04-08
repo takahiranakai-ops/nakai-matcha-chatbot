@@ -300,6 +300,92 @@ class RAGEngine:
     def __init__(self, vector_store: VectorStore):
         self.vector_store = vector_store
 
+    @staticmethod
+    def _sanitize_history(history: list[dict]) -> list[dict]:
+        """Filter conversation history to only allow safe roles and sanitize content."""
+        safe = []
+        for msg in history:
+            role = msg.get("role", "")
+            if role not in ("user", "assistant"):
+                continue
+            content = msg.get("content", "")
+            # Strip potential injection markers
+            content = content.replace("[SYSTEM]", "").replace("[system]", "")
+            safe.append({"role": role, "content": content[:2000]})
+        return safe[-10:]
+
+    async def _retrieve_context(
+        self,
+        query: str,
+        source: str,
+        language: str,
+        conversation_history: Optional[List[Dict]] = None,
+    ) -> tuple[List[str], List[str]]:
+        """Shared retrieval pipeline: embedding -> vector search -> relevance filter -> context assembly.
+
+        Returns (context_texts, source_urls).
+        """
+        # 1. Build enriched search query
+        search_query = self._build_search_query(query, conversation_history)
+
+        # 2. Embed the search query
+        query_embeddings = await get_embeddings([search_query], input_type="query")
+        query_embedding = query_embeddings[0]
+
+        # 3. Retrieve candidates
+        _max_chunks = 10 if "wholesale" in source else settings.max_context_chunks
+        n_retrieve = min(
+            _max_chunks * _RETRIEVAL_MULTIPLIER,
+            max(self.vector_store.count(), 1),
+        )
+        if "wholesale" in source:
+            _audience_filter = {"audience": {"$in": ["wholesale", "all"]}}
+        else:
+            _audience_filter = {"audience": {"$in": ["consumer", "all"]}}
+        try:
+            results = self.vector_store.query(
+                query_embedding=query_embedding,
+                n_results=max(n_retrieve, 1),
+                where=_audience_filter,
+            )
+        except Exception as e:
+            logger.error(f"Vector store query failed: {e}")
+            results = []
+
+        # 4. Filter by relevance
+        context_texts: List[str] = []
+        source_urls: set[str] = set()
+        for result in results:
+            if result["distance"] > _RELEVANCE_THRESHOLD:
+                continue
+            if len(context_texts) >= _max_chunks:
+                break
+            context_texts.append(result["text"])
+            url = result["metadata"].get("url")
+            if url:
+                source_urls.add(url)
+
+        logger.info(
+            "RAG retrieval [%s/%s]: %d candidates -> %d chunks (max=%d, threshold=%.2f)",
+            source, language, len(results), len(context_texts),
+            _max_chunks, _RELEVANCE_THRESHOLD,
+        )
+        if "wholesale" in source and context_texts:
+            for i, ct in enumerate(context_texts):
+                logger.info("  chunk %d (%d chars): %.80s...", i, len(ct), ct.replace("\n", " "))
+
+        # 5. Inject topic-specific context (e.g. latte -> NIJYU-NI recommendation)
+        _has_prior_product = any(
+            "[PRODUCT:" in msg.get("content", "")
+            for msg in (conversation_history or [])
+            if msg.get("role") == "assistant"
+        )
+        if _LATTE_RE.search(query) and not _has_prior_product:
+            lang_key = "ja" if language == "ja" else "en"
+            context_texts.insert(0, _TOPIC_CONTEXT["latte"][lang_key])
+
+        return context_texts, list(source_urls)
+
     def _build_search_query(
         self,
         user_message: str,
@@ -338,6 +424,7 @@ class RAGEngine:
     ) -> dict:
         system_prompt = build_system_prompt(language=language, source=source)
         user_message = sanitize_user_input(user_message)
+        conversation_history = self._sanitize_history(conversation_history or [])
         msg_stripped = user_message.strip()
 
         # For greetings / small talk — instant pre-written response, no LLM needed
@@ -377,76 +464,19 @@ class RAGEngine:
                 "suggestions": suggestions,
             }
 
-        # 1. Build enriched search query using conversation context
-        search_query = self._build_search_query(msg_stripped, conversation_history)
-
         _error_result = {
             "response": "I'm sorry, I'm having trouble processing your request right now. Please try again in a moment.",
             "sources": [], "context_chunks": 0, "suggestions": [],
         }
 
-        # 2. Embed the search query
+        # 1-5. Shared retrieval pipeline
         try:
-            query_embeddings = await get_embeddings([search_query], input_type="query")
-            query_embedding = query_embeddings[0]
-        except Exception as e:
-            logger.error(f"Embedding generation failed: {e}")
-            return _error_result
-
-        # 3. Retrieve extra candidates for better filtering
-        # Wholesale product queries need more context for comprehensive specs
-        _max_chunks = 10 if "wholesale" in source else settings.max_context_chunks
-        n_retrieve = min(
-            _max_chunks * _RETRIEVAL_MULTIPLIER,
-            max(self.vector_store.count(), 1),
-        )
-        # Audience filter: wholesale sees wholesale+all, consumer sees consumer+all
-        if "wholesale" in source:
-            _audience_filter = {"audience": {"$in": ["wholesale", "all"]}}
-        else:
-            _audience_filter = {"audience": {"$in": ["consumer", "all"]}}
-        try:
-            results = self.vector_store.query(
-                query_embedding=query_embedding,
-                n_results=max(n_retrieve, 1),
-                where=_audience_filter,
+            context_texts, source_urls = await self._retrieve_context(
+                msg_stripped, source, language, conversation_history,
             )
         except Exception as e:
-            logger.error(f"Vector store query failed: {e}")
-            results = []
-
-        # 4. Filter by relevance and limit to max_context_chunks
-        context_texts = []
-        source_urls = set()
-        for result in results:
-            if result["distance"] > _RELEVANCE_THRESHOLD:
-                continue
-            if len(context_texts) >= _max_chunks:
-                break
-            context_texts.append(result["text"])
-            url = result["metadata"].get("url")
-            if url:
-                source_urls.add(url)
-
-        logger.info(
-            "RAG retrieval [%s/%s]: %d candidates -> %d chunks (max=%d, threshold=%.2f)",
-            source, language, len(results), len(context_texts),
-            _max_chunks, _RELEVANCE_THRESHOLD,
-        )
-        if "wholesale" in source and context_texts:
-            for i, ct in enumerate(context_texts):
-                logger.info("  chunk %d (%d chars): %.80s...", i, len(ct), ct.replace("\n", " "))
-
-        # 5. Inject topic-specific context (e.g. latte → 二十二 recommendation)
-        # Skip if a product was already recommended in this conversation
-        _has_prior_product = any(
-            "[PRODUCT:" in msg.get("content", "")
-            for msg in (conversation_history or [])
-            if msg.get("role") == "assistant"
-        )
-        if _LATTE_RE.search(msg_stripped) and not _has_prior_product:
-            lang_key = "ja" if language == "ja" else "en"
-            context_texts.insert(0, _TOPIC_CONTEXT["latte"][lang_key])
+            logger.error(f"RAG retrieval failed: {e}")
+            return _error_result
 
         # 6. Build messages — always use RAG prompt format
         mf_step = _matcha_finder_step(conversation_history, msg_stripped)
@@ -507,6 +537,7 @@ class RAGEngine:
         """Yield (event_type, data) tuples for SSE streaming."""
         system_prompt = build_system_prompt(language=language, source=source)
         user_message = sanitize_user_input(user_message)
+        conversation_history = self._sanitize_history(conversation_history or [])
         msg_stripped = user_message.strip()
 
         # Greetings — instant pre-written response, no LLM needed
@@ -543,64 +574,16 @@ class RAGEngine:
             yield ("done", {"sources": [], "suggestions": suggestions})
             return
 
-        # 1-4: Same RAG retrieval as non-streaming
-        search_query = self._build_search_query(msg_stripped, conversation_history)
+        # 1-5. Shared retrieval pipeline
         try:
-            query_embeddings = await get_embeddings([search_query], input_type="query")
-            query_embedding = query_embeddings[0]
+            context_texts, source_urls = await self._retrieve_context(
+                msg_stripped, source, language, conversation_history,
+            )
         except Exception as e:
-            logger.error(f"Streaming embedding failed: {e}")
+            logger.error(f"Streaming RAG retrieval failed: {e}")
             yield ("text", "I'm sorry, I'm having trouble right now. Please try again.")
             yield ("done", {"sources": [], "suggestions": []})
             return
-
-        _max_chunks = 10 if "wholesale" in source else settings.max_context_chunks
-        n_retrieve = min(
-            _max_chunks * _RETRIEVAL_MULTIPLIER,
-            max(self.vector_store.count(), 1),
-        )
-        # Audience filter: wholesale sees wholesale+all, consumer sees consumer+all
-        if "wholesale" in source:
-            _audience_filter = {"audience": {"$in": ["wholesale", "all"]}}
-        else:
-            _audience_filter = {"audience": {"$in": ["consumer", "all"]}}
-        try:
-            results = self.vector_store.query(
-                query_embedding=query_embedding,
-                n_results=max(n_retrieve, 1),
-                where=_audience_filter,
-            )
-        except Exception as e:
-            logger.error(f"Streaming vector query failed: {e}")
-            results = []
-
-        context_texts = []
-        source_urls = set()
-        for result in results:
-            if result["distance"] > _RELEVANCE_THRESHOLD:
-                continue
-            if len(context_texts) >= _max_chunks:
-                break
-            context_texts.append(result["text"])
-            url = result["metadata"].get("url")
-            if url:
-                source_urls.add(url)
-
-        logger.info(
-            "RAG stream [%s/%s]: %d candidates -> %d chunks (max=%d)",
-            source, language, len(results), len(context_texts), _max_chunks,
-        )
-
-        # Inject topic-specific context (e.g. latte → 二十二 recommendation)
-        # Skip if a product was already recommended in this conversation
-        _has_prior_product = any(
-            "[PRODUCT:" in msg.get("content", "")
-            for msg in (conversation_history or [])
-            if msg.get("role") == "assistant"
-        )
-        if _LATTE_RE.search(msg_stripped) and not _has_prior_product:
-            lang_key = "ja" if language == "ja" else "en"
-            context_texts.insert(0, _TOPIC_CONTEXT["latte"][lang_key])
 
         mf_step = _matcha_finder_step(conversation_history, msg_stripped)
         if context_texts:

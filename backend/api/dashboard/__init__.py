@@ -66,10 +66,17 @@ async def serve_dashboard():
 
 @dashboard_router.get("/api/dashboard/section/{name}", response_class=HTMLResponse)
 async def get_section(name: str, request: Request):
-    # Check auth
-    pw = request.headers.get("X-Admin-Password", "")
+    # Check auth — session token cookie or header password
     from config import settings
-    if pw != settings.admin_password:
+    authenticated = False
+    token = request.cookies.get("nakai_session")
+    if token:
+        from main import validate_session_token
+        authenticated = validate_session_token(token)
+    if not authenticated:
+        pw = request.headers.get("X-Admin-Password", "")
+        authenticated = pw == settings.admin_password
+    if not authenticated:
         return HTMLResponse(
             content='<div class="section-loading" style="color:#c0392b">Unauthorized</div>',
             status_code=401,

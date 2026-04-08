@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import re
 
@@ -11,13 +12,15 @@ BASE_URL = f"https://{settings.shopify_store_url}"
 
 # ── Shared HTTP client ──────────────────────────────────────
 _client: httpx.AsyncClient | None = None
+_client_lock = asyncio.Lock()
 
 
-def _get_client() -> httpx.AsyncClient:
+async def _get_client() -> httpx.AsyncClient:
     global _client
-    if _client is None or _client.is_closed:
-        _client = httpx.AsyncClient(timeout=30.0, follow_redirects=True)
-    return _client
+    async with _client_lock:
+        if _client is None or _client.is_closed:
+            _client = httpx.AsyncClient(timeout=30.0, follow_redirects=True)
+        return _client
 
 
 async def close():
@@ -29,7 +32,7 @@ async def close():
 
 async def _public_get(path: str) -> dict:
     """Fetch data from Shopify's public JSON endpoints (no auth needed)."""
-    client = _get_client()
+    client = await _get_client()
     response = await client.get(
         f"{BASE_URL}{path}",
         headers={"Accept": "application/json"},
@@ -40,7 +43,7 @@ async def _public_get(path: str) -> dict:
 
 async def _public_get_text(path: str) -> str:
     """Fetch raw HTML from a public Shopify page."""
-    client = _get_client()
+    client = await _get_client()
     response = await client.get(
         f"{BASE_URL}{path}",
         headers={"Accept": "text/html"},
@@ -51,7 +54,7 @@ async def _public_get_text(path: str) -> str:
 
 async def _admin_get(endpoint: str) -> dict:
     """Execute an Admin API GET request."""
-    client = _get_client()
+    client = await _get_client()
     response = await client.get(
         f"{BASE_URL}/admin/api/2024-10{endpoint}",
         headers={
@@ -140,7 +143,7 @@ async def fetch_blog_articles() -> list:
     articles = []
     try:
         # Get sitemap to find blog URLs
-        client = _get_client()
+        client = await _get_client()
         resp = await client.get(f"{BASE_URL}/sitemap.xml")
         sitemap_text = resp.text
 

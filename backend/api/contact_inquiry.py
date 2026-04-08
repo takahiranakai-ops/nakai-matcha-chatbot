@@ -1,11 +1,13 @@
 """NAKAI Contact Inquiry — Receives form data from Shopify contact page via sendBeacon."""
 import logging
+import re
 from typing import Optional
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
+from api.middleware import limiter
 from services import supabase_client
 
 logger = logging.getLogger(__name__)
@@ -14,18 +16,26 @@ contact_inquiry_router = APIRouter()
 
 
 class ContactInquiryBody(BaseModel):
-    inquiry_type: str = "General"
-    name: str = ""
-    email: str = ""
-    company: str = ""
-    phone: str = ""
-    business_type: str = ""
-    monthly_volume: str = ""
+    inquiry_type: str = Field(default="General", max_length=100)
+    name: str = Field(default="", max_length=200)
+    email: str = Field(default="", max_length=254)
+    company: str = Field(default="", max_length=200)
+    phone: str = Field(default="", max_length=50)
+    business_type: str = Field(default="", max_length=100)
+    monthly_volume: str = Field(default="", max_length=100)
     preferred_dates: Optional[list[str]] = None
-    message: str = ""
+    message: str = Field(default="", max_length=5000)
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        if v and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", v):
+            raise ValueError("Invalid email format")
+        return v
 
 
 @contact_inquiry_router.post("/api/contact-inquiry")
+@limiter.limit("10/minute")
 async def submit_contact_inquiry(request: Request):
     """Store contact inquiry in Supabase. Accepts JSON via sendBeacon (text/plain or application/json)."""
     try:

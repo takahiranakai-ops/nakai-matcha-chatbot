@@ -1,5 +1,6 @@
 """Social media auto-poster — posts to Twitter/X, Threads, LINE, and Reddit."""
 
+import asyncio
 import logging
 from datetime import datetime, timezone
 
@@ -30,7 +31,10 @@ async def post_to_twitter(text: str) -> dict:
             access_token=settings.twitter_access_token,
             access_token_secret=settings.twitter_access_secret,
         )
-        response = client.create_tweet(text=text)
+        loop = asyncio.get_running_loop()
+        response = await loop.run_in_executor(
+            None, lambda: client.create_tweet(text=text)
+        )
         tweet_id = response.data["id"]
         logger.info(f"[TWITTER] Posted tweet: {tweet_id}")
         return {"status": "success", "tweet_id": tweet_id}
@@ -138,7 +142,10 @@ async def post_to_reddit(text: str) -> dict:
         target_sub = subreddits[day_of_year % len(subreddits)]
 
         subreddit = reddit.subreddit(target_sub)
-        submission = subreddit.submit(title=title, selftext=body)
+        loop = asyncio.get_running_loop()
+        submission = await loop.run_in_executor(
+            None, lambda: subreddit.submit(title=title, selftext=body)
+        )
         logger.info(f"[REDDIT] Posted to r/{target_sub}: {submission.id}")
         return {
             "status": "success",

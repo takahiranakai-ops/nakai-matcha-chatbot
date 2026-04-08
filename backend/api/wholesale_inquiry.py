@@ -1,11 +1,12 @@
 """NAKAI Wholesale Inquiry — Minimalist contact form for bulk orders."""
 import base64
 import logging
+import re
 from pathlib import Path
 
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse, JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 from services import supabase_client
 
@@ -20,15 +21,22 @@ _LOGO_WM_BLACK_B64 = base64.b64encode(
 
 
 class InquiryBody(BaseModel):
-    company: str
-    name: str
-    email: str
-    phone: str = ""
-    country: str = ""
-    quantity: str = ""
-    use_case: str = ""
-    message: str = ""
-    language: str = "en"
+    company: str = Field(max_length=200)
+    name: str = Field(max_length=200)
+    email: str = Field(max_length=254)
+    phone: str = Field(default="", max_length=50)
+    country: str = Field(default="", max_length=100)
+    quantity: str = Field(default="", max_length=100)
+    use_case: str = Field(default="", max_length=200)
+    message: str = Field(default="", max_length=5000)
+    language: str = Field(default="en", max_length=10)
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", v):
+            raise ValueError("Invalid email format")
+        return v
 
 
 INQUIRY_HTML = f"""<!DOCTYPE html>

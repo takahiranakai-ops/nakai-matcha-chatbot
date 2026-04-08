@@ -1,10 +1,8 @@
-import os
-
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    debug: bool = os.getenv("DEBUG", "false").lower() == "true"
+    debug: bool = False
     ngc_api_key: str = ""
     shopify_store_url: str = "nakaimatcha.com"
     shopify_storefront_token: str = ""

@@ -178,8 +178,7 @@ def html() -> str:
 
 <script>
 (function(){
-  var PWD = sessionStorage.getItem('nakai-admin-pwd') || sessionStorage.getItem('nakai_admin_pw') || '';
-  var H = {'X-Admin-Password': PWD, 'Content-Type': 'application/json'};
+  var H = {'Content-Type': 'application/json'};
   var SEG_JA = {cafe:'Cafe',luxury_hotel:'Luxury Hotel',fine_dining:'Fine Dining'};
   var SEG_COLOR = {cafe:'#406546',luxury_hotel:'#2c3e50',fine_dining:'#8e3b2e'};
   var STATUS_JA = {new:'New',researched:'Researched',contacted:'Contacted',replied:'Replied',negotiating:'Negotiating',won:'Won',lost:'Lost'};

@@ -12,13 +12,18 @@ design_router = APIRouter(prefix="/api/design", tags=["design"])
 
 
 def _verify_admin(request: Request):
+    token = request.cookies.get("nakai_session")
+    if token:
+        from main import validate_session_token
+        if validate_session_token(token):
+            return
     pw = (
         request.headers.get("X-Admin-Password")
         or request.query_params.get("pw")
-        or request.cookies.get("nakai_admin")
     )
-    if pw != settings.admin_password:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+    if pw and pw == settings.admin_password:
+        return
+    raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 @design_router.get("/guidelines")

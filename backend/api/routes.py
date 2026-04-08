@@ -119,8 +119,14 @@ async def chat(request: Request, body: ChatRequest):
             sources=result["sources"],
             suggestions=result.get("suggestions", []),
         )
+    except httpx.HTTPError as e:
+        logger.error(f"Chat upstream error: {e}")
+        raise HTTPException(status_code=502, detail="AI service temporarily unavailable. Please try again.")
+    except (KeyError, ValueError, TypeError) as e:
+        logger.error(f"Chat data error: {e}")
+        raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
     except Exception as e:
-        logger.error(f"Chat error: {e}")
+        logger.error(f"Chat unexpected error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
 
 
@@ -191,7 +197,9 @@ async def health():
 @router.get("/health/nvidia")
 @limiter.limit("10/minute")
 async def health_nvidia(request: Request):
-    """Diagnose NVIDIA NIM API connectivity — tests embedding + chat."""
+    """Diagnose NVIDIA NIM API connectivity — tests embedding + chat. Requires admin auth."""
+    from api.admin_routes import verify_admin
+    await verify_admin(request)
     diag: dict = {"api_key_set": bool(settings.ngc_api_key)}
     headers = {"Authorization": f"Bearer {settings.ngc_api_key}", "Content-Type": "application/json"}
 

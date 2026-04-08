@@ -1,3 +1,4 @@
+import asyncio
 import json as _json
 import logging
 import re
@@ -17,33 +18,35 @@ _THINK_UNCLOSED_RE = re.compile(r"<think>.*", re.DOTALL)
 _client: httpx.AsyncClient | None = None
 _client_created_at: float = 0.0
 _CLIENT_MAX_AGE = 300.0  # Recreate client every 5 minutes to avoid stale connections
+_client_lock = asyncio.Lock()
 
 
-def _get_client() -> httpx.AsyncClient:
+async def _get_client() -> httpx.AsyncClient:
     global _client, _client_created_at
-    now = time.monotonic()
-    if (
-        _client is None
-        or _client.is_closed
-        or (now - _client_created_at) > _CLIENT_MAX_AGE
-    ):
-        # Close old client if still open
-        if _client and not _client.is_closed:
-            import asyncio
-            try:
-                asyncio.get_event_loop().create_task(_client.aclose())
-            except Exception:
-                pass
-        _client = httpx.AsyncClient(
-            timeout=httpx.Timeout(120.0, connect=10.0),
-            limits=httpx.Limits(
-                max_connections=20,
-                max_keepalive_connections=5,
-                keepalive_expiry=60.0,
-            ),
-        )
-        _client_created_at = now
-    return _client
+    async with _client_lock:
+        now = time.monotonic()
+        if (
+            _client is None
+            or _client.is_closed
+            or (now - _client_created_at) > _CLIENT_MAX_AGE
+        ):
+            # Close old client if still open
+            if _client and not _client.is_closed:
+                old_client = _client
+                try:
+                    asyncio.get_running_loop().create_task(old_client.aclose())
+                except RuntimeError:
+                    pass  # No running loop
+            _client = httpx.AsyncClient(
+                timeout=httpx.Timeout(120.0, connect=10.0),
+                limits=httpx.Limits(
+                    max_connections=20,
+                    max_keepalive_connections=5,
+                    keepalive_expiry=60.0,
+                ),
+            )
+            _client_created_at = now
+        return _client
 
 
 async def close():
@@ -66,7 +69,7 @@ async def get_embeddings(
     """Get embeddings from NVIDIA NIM embedding model."""
     results = []
     batch_size = 50
-    client = _get_client()
+    client = await _get_client()
     for i in range(0, len(texts), batch_size):
         batch = texts[i : i + batch_size]
         try:
@@ -118,7 +121,7 @@ async def chat_completion(
     language: str = "en",
 ) -> str:
     """Get chat completion from NVIDIA NIM model."""
-    client = _get_client()
+    client = await _get_client()
     try:
         response = await client.post(
             f"{settings.nvidia_base_url}/chat/completions",
@@ -156,7 +159,7 @@ async def chat_completion_stream(
     language: str = "en",
 ):
     """Yield text chunks from NVIDIA NIM model via streaming."""
-    client = _get_client()
+    client = await _get_client()
     try:
         async with client.stream(
             "POST",

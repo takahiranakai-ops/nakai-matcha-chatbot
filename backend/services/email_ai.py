@@ -7,6 +7,27 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
+
+def _sanitize_email_html(html_content: str) -> str:
+    """Remove dangerous tags from LLM-generated HTML content."""
+    html_content = re.sub(
+        r'<(script|iframe|object|embed|form)[^>]*>.*?</\1>',
+        '', html_content, flags=re.DOTALL | re.IGNORECASE,
+    )
+    html_content = re.sub(
+        r'<(script|iframe|object|embed|form)[^>]*/>',
+        '', html_content, flags=re.IGNORECASE,
+    )
+    html_content = re.sub(
+        r'\s+on\w+\s*=\s*["\'][^"\']*["\']',
+        '', html_content, flags=re.IGNORECASE,
+    )
+    html_content = re.sub(
+        r'href\s*=\s*["\']javascript:[^"\']*["\']',
+        'href="#"', html_content, flags=re.IGNORECASE,
+    )
+    return html_content
+
 SYSTEM_PROMPT = """You are the creative director for NAKAI, a Japanese luxury matcha maison.
 Your email designs channel Hermès editorial restraint and Apple spatial clarity.
 
@@ -123,7 +144,7 @@ async def generate_email_design(
         html = response.content[0].text
         html = re.sub(r'^```html?\s*\n?', '', html)
         html = re.sub(r'\n?```\s*$', '', html)
-        return html.strip()
+        return _sanitize_email_html(html.strip())
     except Exception as e:
         logger.error(f"Claude email generation failed: {e}")
         return _fallback_template(brand_assets, campaign_photos)
@@ -170,6 +191,8 @@ def apply_editable_text(html: str, edits: dict[str, str]) -> str:
 def apply_editable_links(html: str, link_edits: dict[str, str]) -> str:
     """Replace editable link hrefs with user-provided URLs."""
     for name, url in link_edits.items():
+        if not url or not re.match(r'^https?://', url):
+            continue  # Skip non-HTTP URLs
         pattern = (
             r'(data-editable-link="' + re.escape(name) + r'"[^>]*)'
             r'href="[^"]*"'

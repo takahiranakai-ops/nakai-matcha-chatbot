@@ -1,3 +1,5 @@
+import uuid
+
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 
@@ -22,8 +24,7 @@ class VectorStore:
         """Add documents with pre-computed embeddings."""
         if not documents:
             return
-        existing = self.collection.count()
-        ids = [f"doc_{existing + i}" for i in range(len(documents))]
+        ids = [f"doc_{uuid.uuid4().hex}" for _ in documents]
         self.collection.add(
             ids=ids,
             embeddings=embeddings,

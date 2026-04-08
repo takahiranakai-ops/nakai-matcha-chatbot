@@ -13,6 +13,9 @@ import json
 import logging
 from datetime import datetime, timezone
 
+import anthropic
+import httpx
+
 from config import settings
 from services import supabase_client
 
@@ -87,7 +90,6 @@ async def _search_serp(query: str) -> list[dict]:
     if not settings.serp_api_key:
         return []
 
-    import httpx
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             resp = await client.get(
@@ -116,7 +118,6 @@ async def _search_serp(query: str) -> list[dict]:
 
 async def _search_reddit(subreddit: str, query: str) -> list[dict]:
     """Search Reddit for relevant posts."""
-    import httpx
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             resp = await client.get(
@@ -145,7 +146,6 @@ async def _analyze_with_claude(raw_data: list, prompt: str) -> dict:
     if not settings.anthropic_api_key:
         return {"error": "Anthropic API key not configured", "raw_count": len(raw_data)}
 
-    import anthropic
     client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
 
     data_str = json.dumps(raw_data[:30], ensure_ascii=False, default=str)
@@ -163,7 +163,7 @@ async def _analyze_with_claude(raw_data: list, prompt: str) -> dict:
             text = text.split("\n", 1)[-1].rsplit("```", 1)[0]
         return json.loads(text)
     except json.JSONDecodeError:
-        return {"summary": text[:500] if 'text' in dir() else "Parse error", "raw_count": len(raw_data)}
+        return {"summary": text[:500] if 'text' in locals() else "Parse error", "raw_count": len(raw_data)}
     except Exception as e:
         logger.error(f"[RESEARCH] Claude analysis error: {e}")
         return {"error": str(e), "raw_count": len(raw_data)}

@@ -50,8 +50,7 @@ def html() -> str:
 
 <script>
 (function(){
-  var PWD = sessionStorage.getItem('nakai-admin-pwd') || '';
-  var H = {'Content-Type':'application/json','X-Admin-Password':PWD};
+  var H = {'Content-Type':'application/json'};
   var opsHistory = [];
   var sending = false;
 

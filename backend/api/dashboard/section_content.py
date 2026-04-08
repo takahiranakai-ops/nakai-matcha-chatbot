@@ -134,8 +134,7 @@ def html() -> str:
 
 <script>
 (function(){
-  var PWD = sessionStorage.getItem('nakai-admin-pwd') || '';
-  var H = {'Content-Type':'application/json','X-Admin-Password':PWD};
+  var H = {'Content-Type':'application/json'};
   var selectedFile = null;
 
   function esc(s){if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
@@ -220,7 +219,7 @@ def html() -> str:
       fd.append('title',$('ct-art-title').value);
       fd.append('language',$('ct-art-lang').value);
       fd.append('category',$('ct-art-cat').value);
-      fetch('/api/admin/articles/upload',{method:'POST',headers:{'X-Admin-Password':PWD},body:fd})
+      fetch('/api/admin/articles/upload',{method:'POST',body:fd,credentials:'same-origin'})
       .then(function(r){if(!r.ok)return r.json().then(function(d){throw new Error(d.detail||'Upload failed')});return r.json()})
       .then(function(){ctModal('ct-article-modal',false);ctLoadArticles()})
       .catch(function(e){alert('Upload failed: '+e.message)});

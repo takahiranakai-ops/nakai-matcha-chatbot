@@ -1,6 +1,7 @@
 """Shopify Analytics — pulls order data and generates marketing insights."""
 
 import logging
+import re
 from datetime import datetime, timezone, timedelta
 
 import httpx
@@ -11,46 +12,63 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = f"https://{settings.shopify_store_url}"
 
+_ADMIN_HEADERS = {
+    "X-Shopify-Access-Token": settings.shopify_admin_token or "",
+    "Content-Type": "application/json",
+}
 
-async def _admin_get(endpoint: str) -> dict:
-    """Execute an Admin API GET request."""
-    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
-        response = await client.get(
-            f"{BASE_URL}/admin/api/2024-10{endpoint}",
-            headers={
-                "X-Shopify-Access-Token": settings.shopify_admin_token,
-                "Content-Type": "application/json",
-            },
-        )
-        response.raise_for_status()
-        return response.json()
+# Reusable client — created once, not per call
+_shared_client: httpx.AsyncClient | None = None
+
+
+def _get_client() -> httpx.AsyncClient:
+    """Return a shared async HTTP client for Shopify Admin API."""
+    global _shared_client
+    if _shared_client is None or _shared_client.is_closed:
+        _shared_client = httpx.AsyncClient(timeout=30, follow_redirects=True)
+    return _shared_client
+
+
+async def _admin_get(url: str, *, params: dict | None = None) -> httpx.Response:
+    """Execute an Admin API GET request, returning the full response."""
+    client = _get_client()
+    response = await client.get(
+        url,
+        params=params,
+        headers=_ADMIN_HEADERS,
+    )
+    response.raise_for_status()
+    return response
 
 
 async def fetch_orders(days: int = 30) -> list[dict]:
-    """Fetch recent orders from Shopify Admin API."""
+    """Fetch recent orders from Shopify Admin API with cursor-based pagination."""
     if not settings.shopify_admin_token:
         logger.warning("[SHOPIFY] Admin token not configured")
         return []
 
     since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
-    all_orders = []
-    page_info = None
+    all_orders: list[dict] = []
+    url: str | None = f"{BASE_URL}/admin/api/2024-10/orders.json"
+    params: dict | None = {"limit": 250, "status": "any", "created_at_min": since}
 
     try:
-        while True:
-            if page_info:
-                endpoint = f"/orders.json?limit=250&page_info={page_info}"
-            else:
-                endpoint = f"/orders.json?limit=250&status=any&created_at_min={since}"
+        while url:
+            resp = await _admin_get(url, params=params)
+            data = resp.json()
+            all_orders.extend(data.get("orders", []))
 
-            data = await _admin_get(endpoint)
-            orders = data.get("orders", [])
-            all_orders.extend(orders)
+            # Parse Link header for next page (cursor-based pagination)
+            link_header = resp.headers.get("link", "")
+            url = None
+            params = None  # params are embedded in the URL for subsequent pages
+            if 'rel="next"' in link_header:
+                match = re.search(r'<([^>]+)>;\s*rel="next"', link_header)
+                if match:
+                    url = match.group(1)
 
-            if len(orders) < 250:
+            if len(all_orders) >= 10000:  # Safety cap
                 break
-            # Shopify pagination would need Link header parsing
-            break
 
         logger.info(f"[SHOPIFY] Fetched {len(all_orders)} orders (last {days} days)")
     except Exception as e:

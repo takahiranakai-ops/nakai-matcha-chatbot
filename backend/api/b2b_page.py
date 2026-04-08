@@ -10,8 +10,10 @@ GET /b2b → Tabler Dashboard（7タブ）:
   7. 設定 - セグメント別テンプレート・パイプライン設定
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
+
+from api.admin_routes import verify_admin
 
 b2b_page_router = APIRouter()
 
@@ -389,18 +391,20 @@ function btnL(btn,on){
 function enterApp(d){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';try{cp('stats',d,60000);renderOverview(d);loadSegmentCards();}catch(e){console.error('enterApp',e);}}
 function doLogin(){
   var btn=document.getElementById('login-btn');
-  PWD=document.getElementById('pw').value;
-  if(!PWD){document.getElementById('login-err').style.display='block';return;}
+  var pw=document.getElementById('pw').value;
+  if(!pw){document.getElementById('login-err').style.display='block';return;}
   btnL(btn,true);
-  fetch(API+'/stats',{headers:{'X-Admin-Password':PWD}})
-    .then(function(r){if(!r.ok)throw new Error('パスワードが正しくありません');sessionStorage.setItem('nakai_admin_pw',PWD);return r.json();})
+  fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw}),credentials:'same-origin'})
+    .then(function(r){if(!r.ok)throw new Error('パスワードが正しくありません');return r.json();})
+    .then(function(){return fetch(API+'/stats',{credentials:'same-origin'});})
+    .then(function(r){if(!r.ok)throw new Error('Stats failed');return r.json();})
     .then(function(d){btnL(btn,false);enterApp(d);})
     .catch(function(e){btnL(btn,false);document.getElementById('login-err').textContent=e.message;document.getElementById('login-err').style.display='block';});
 }
-(function(){var s=sessionStorage.getItem('nakai_admin_pw');if(s){PWD=s;fetch(API+'/stats',{headers:{'X-Admin-Password':PWD}}).then(function(r){if(!r.ok)throw new Error();return r.json();}).then(function(d){enterApp(d);}).catch(function(){});}})();
+(function(){fetch(API+'/stats',{credentials:'same-origin'}).then(function(r){if(!r.ok)throw new Error();return r.json();}).then(function(d){enterApp(d);}).catch(function(){});})();
 
-function hdr(){return{'X-Admin-Password':PWD,'Content-Type':'application/json'};}
-function hdrF(){return{'X-Admin-Password':PWD};}
+function hdr(){return{'Content-Type':'application/json'};}
+function hdrF(){return{};}
 
 // ── タブ ──
 document.querySelectorAll('.nav-tabs .nav-link').forEach(function(tab){
@@ -478,7 +482,7 @@ function renderLeads(data){
   var tb=document.getElementById('leads-body'),leads=data.leads||[];
   document.getElementById('leads-count').textContent=(leadsOffset+1)+'-'+(leadsOffset+leads.length)+' / '+(data.total||0)+' 件';
   if(!leads.length){tb.innerHTML='<tr><td colspan="8"><div class="text-center text-muted py-5"><div style="font-size:3rem;opacity:.2;margin-bottom:16px;">&#9749;</div><h3 style="font-weight:400;margin-bottom:8px;">リードが見つかりません</h3></div></td></tr>';return;}
-  tb.innerHTML=leads.map(function(l){return '<tr onclick="showLeadDetail(\\\''+l.id+'\\\')" style="cursor:pointer"><td><strong>'+esc(l.name)+'</strong></td><td>'+esc(l.city||'')+'</td><td>'+esc(l.country||'')+'</td><td><span class="badge" style="background:'+(SEG_COLOR[l.cafe_type]||'#888')+';color:#fff;font-size:.65rem;">'+(SEG_JA[l.cafe_type]||l.cafe_type||'')+'</span></td><td><span class="badge '+(BADGE_CLASS[l.status]||'bg-secondary-lt')+'">'+(STATUS_JA[l.status]||l.status)+'</span></td><td>'+(l.lead_score||0)+'</td><td>'+(l.website?'<a href="'+esc(l.website)+'" target="_blank" style="color:#406546;">開く</a>':'-')+'</td><td><button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation();deleteLead(\\\''+l.id+'\\\')">削除</button></td></tr>';}).join('');
+  tb.innerHTML=leads.map(function(l){return '<tr onclick="showLeadDetail(\\\''+l.id+'\\\')" style="cursor:pointer"><td><strong>'+esc(l.name)+'</strong></td><td>'+esc(l.city||'')+'</td><td>'+esc(l.country||'')+'</td><td><span class="badge" style="background:'+(SEG_COLOR[l.cafe_type]||'#888')+';color:#fff;font-size:.65rem;">'+(SEG_JA[l.cafe_type]||l.cafe_type||'')+'</span></td><td><span class="badge '+(BADGE_CLASS[l.status]||'bg-secondary-lt')+'">'+(STATUS_JA[l.status]||l.status)+'</span></td><td>'+(l.lead_score||0)+'</td><td>'+(l.website?'<a href="'+safeHref(l.website)+'" target="_blank" style="color:#406546;">開く</a>':'-')+'</td><td><button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation();deleteLead(\\\''+l.id+'\\\')">削除</button></td></tr>';}).join('');
 }
 function deleteLead(id){if(!confirm('このリードを削除しますか？'))return;ci('leads_');ci('segments');fetch(API+'/leads/'+id,{method:'DELETE',headers:hdr()}).then(function(){loadLeads(leadsOffset);});}
 function exportLeads(){
@@ -711,6 +715,7 @@ function checkResendDomain(){
 
 // ── ヘルパー ──
 function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';}
+function safeHref(url){if(!url)return'#';if(/^https?:\/\//i.test(url))return esc(url);return'#';}
 function timeAgo(ts){if(!ts)return'-';var d=new Date(ts),df=(Date.now()-d.getTime())/1000;if(df<60)return'たった今';if(df<3600)return Math.floor(df/60)+'分前';if(df<86400)return Math.floor(df/3600)+'時間前';if(df<2592000)return Math.floor(df/86400)+'日前';return Math.floor(df/2592000)+'ヶ月前';}
 
 setTimeout(loadSettings,100);
@@ -720,5 +725,5 @@ setTimeout(loadSettings,100);
 
 
 @b2b_page_router.get("/b2b", response_class=HTMLResponse)
-async def b2b_dashboard():
+async def b2b_dashboard(request: Request, _: str = Depends(verify_admin)):
     return B2B_HTML

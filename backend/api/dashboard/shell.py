@@ -211,13 +211,12 @@ var sectionLoaded = {};
 function dashLogin() {
   var pw = document.getElementById('dash-pw').value;
   if (!pw) { document.getElementById('dash-err').style.display = 'block'; return; }
-  fetch('/api/b2b/stats', {headers: {'X-Admin-Password': pw}})
+  fetch('/api/admin/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw}),credentials:'same-origin'})
     .then(function(r) {
       if (!r.ok) throw new Error();
-      DASH_PWD = pw;
-      sessionStorage.setItem('nakai-admin-pwd', pw);
-      // Also set the old key for backward compat
-      sessionStorage.setItem('nakai_admin_pw', pw);
+      return r.json();
+    })
+    .then(function() {
       document.getElementById('dash-login').style.display = 'none';
       document.getElementById('dash-app').style.display = 'block';
       showSection(location.hash.replace('#','') || 'home');
@@ -227,20 +226,16 @@ function dashLogin() {
     });
 }
 
-// Auto-login from session
+// Auto-login from session cookie
 (function() {
-  var pw = sessionStorage.getItem('nakai-admin-pwd') || sessionStorage.getItem('nakai_admin_pw');
-  if (pw) {
-    DASH_PWD = pw;
-    fetch('/api/b2b/stats', {headers: {'X-Admin-Password': pw}})
-      .then(function(r) {
-        if (!r.ok) throw new Error();
-        document.getElementById('dash-login').style.display = 'none';
-        document.getElementById('dash-app').style.display = 'block';
-        showSection(location.hash.replace('#','') || 'home');
-      })
-      .catch(function() {});
-  }
+  fetch('/api/b2b/stats', {credentials:'same-origin'})
+    .then(function(r) {
+      if (!r.ok) throw new Error();
+      document.getElementById('dash-login').style.display = 'none';
+      document.getElementById('dash-app').style.display = 'block';
+      showSection(location.hash.replace('#','') || 'home');
+    })
+    .catch(function() {});
 })();
 
 function showSection(name) {
@@ -277,7 +272,7 @@ function showSection(name) {
   container.style.display = 'block';
 
   fetch('/api/dashboard/section/' + name, {
-    headers: {'X-Admin-Password': DASH_PWD}
+    credentials: 'same-origin'
   })
     .then(function(r) { return r.text(); })
     .then(function(html) {

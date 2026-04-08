@@ -9,8 +9,10 @@ Receives Shopify product webhooks (create/update/delete), then:
 Webhook verification uses HMAC-SHA256 with the Shopify webhook secret.
 """
 
+import base64
 import hashlib
 import hmac
+import json
 import logging
 from typing import Optional
 
@@ -26,12 +28,17 @@ webhook_router = APIRouter(prefix="/webhooks")
 def _verify_shopify_hmac(body: bytes, hmac_header: Optional[str]) -> bool:
     """Verify Shopify webhook HMAC-SHA256 signature."""
     secret = getattr(settings, "shopify_webhook_secret", "")
-    if not secret or not hmac_header:
-        logger.warning("Webhook secret or HMAC header missing — skipping verification")
-        return True  # Allow in dev; enforce in production by setting the secret
-    computed = hmac.new(
-        secret.encode("utf-8"), body, hashlib.sha256
-    ).hexdigest()
+    if not secret:
+        if settings.debug:
+            logger.warning("Webhook secret not set — skipping verification (debug mode)")
+            return True
+        logger.error("shopify_webhook_secret not configured — rejecting webhook")
+        return False
+    if not hmac_header:
+        return False
+    computed = base64.b64encode(
+        hmac.new(secret.encode("utf-8"), body, hashlib.sha256).digest()
+    ).decode("utf-8")
     return hmac.compare_digest(computed, hmac_header)
 
 
@@ -68,7 +75,6 @@ async def shopify_product_webhook(request: Request, background_tasks: Background
     if not _verify_shopify_hmac(body, hmac_header):
         raise HTTPException(status_code=401, detail="Invalid HMAC signature")
 
-    import json
     try:
         product_data = json.loads(body)
     except json.JSONDecodeError:

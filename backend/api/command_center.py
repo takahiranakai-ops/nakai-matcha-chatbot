@@ -1,5 +1,6 @@
 """NAKAI × OpenFang Command Center — Ultra-futuristic agent management dashboard."""
 
+import asyncio
 import logging
 from typing import Optional
 
@@ -15,21 +16,24 @@ logger = logging.getLogger(__name__)
 command_center_router = APIRouter(tags=["Command Center"])
 
 _of_client: Optional[httpx.AsyncClient] = None
+_client_lock = asyncio.Lock()
 
 
-def _get_client() -> httpx.AsyncClient:
+async def _get_client() -> httpx.AsyncClient:
     global _of_client
-    if _of_client is None or _of_client.is_closed:
-        _of_client = httpx.AsyncClient(
-            base_url=settings.openfang_base_url,
-            timeout=httpx.Timeout(15.0, connect=5.0),
-        )
-    return _of_client
+    async with _client_lock:
+        if _of_client is None or _of_client.is_closed:
+            _of_client = httpx.AsyncClient(
+                base_url=settings.openfang_base_url,
+                timeout=httpx.Timeout(15.0, connect=5.0),
+            )
+        return _of_client
 
 
 async def _proxy(path: str, params: dict = None) -> dict:
     try:
-        r = await _get_client().get(path, params=params)
+        client = await _get_client()
+        r = await client.get(path, params=params)
         r.raise_for_status()
         return r.json()
     except httpx.ConnectError:
@@ -335,6 +339,7 @@ document.getElementById('cc-logout').addEventListener('click',doLogout);
 
 // Polling
 function F(u){return fetch(u,{headers:hd()}).then(function(r){return r.json()}).catch(function(){return{error:'fetch failed'}})}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 function startPoll(){pollAll();timer=setInterval(pollAll,PT);loadSkills()}
 function pollAll(){
@@ -383,13 +388,13 @@ function renderAgents(agents){
       +'<div class="cc-card-top">'
       +'<div class="cc-card-name">'
       +'<div class="cc-card-icon">'+meta.icon+'</div>'
-      +'<h3>'+capitalize(hand)+' Hand<small>'+meta.ja+'</small></h3>'
+      +'<h3>'+esc(capitalize(hand))+' Hand<small>'+esc(meta.ja)+'</small></h3>'
       +'</div>'
       +'<div class="cc-dot '+dotCls+'"></div>'
       +'</div>'
       +'<div class="cc-card-metrics">'
       +'<div class="cc-metric"><span>Status</span><span class="cc-metric-val">'+(isOn?'Active':'Stopped')+'</span></div>'
-      +'<div class="cc-metric"><span>Model</span><span class="cc-metric-val">'+(a.model||'default').split('/').pop()+'</span></div>'
+      +'<div class="cc-metric"><span>Model</span><span class="cc-metric-val">'+esc((a.model||'default').split('/').pop())+'</span></div>'
       +'</div>'
       +'<div class="cc-card-time">'+relTime(a.last_activity||a.created_at)+'</div>'
       +'</div>';
@@ -411,9 +416,9 @@ function renderEvents(data){
     var src=ev.source_agent_name||ev.source||'system';
     var time=formatTime(ev.timestamp);
     newHtml+='<div class="'+cls+'">'
-      +'<span class="cc-ev-time">'+time+'</span>'
-      +'<span class="cc-ev-src">'+src+'</span>'
-      +'<span class="cc-ev-msg">'+(ev.detail||ev.kind||'')+'</span>'
+      +'<span class="cc-ev-time">'+esc(time)+'</span>'
+      +'<span class="cc-ev-src">'+esc(src)+'</span>'
+      +'<span class="cc-ev-msg">'+esc(ev.detail||ev.kind||'')+'</span>'
       +'</div>';
   });
   if(newHtml)el.innerHTML=newHtml+el.innerHTML;
@@ -449,7 +454,7 @@ function loadSkills(){
       var tc=0;if(s.tools&&s.tools.provided)tc=s.tools.provided.length;
       else if(s.tools_count)tc=s.tools_count;
       html+='<div class="cc-skill">'
-        +'<span class="cc-skill-name">'+s.name+'</span>'
+        +'<span class="cc-skill-name">'+esc(s.name)+'</span>'
         +'<span class="cc-skill-badge">'+tc+' tools</span>'
         +'</div>';
     });
@@ -637,7 +642,7 @@ _HTML = f"""<!DOCTYPE html>
 
 
 @command_center_router.get("/command-center", response_class=HTMLResponse)
-async def serve_command_center():
+async def serve_command_center(_: str = Depends(verify_admin)):
     return HTMLResponse(
         content=_HTML,
         headers={"Cache-Control": "no-cache, no-store, must-revalidate"},

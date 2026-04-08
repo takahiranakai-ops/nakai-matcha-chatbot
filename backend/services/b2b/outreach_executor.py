@@ -5,8 +5,10 @@ Handles sending, tracking, and CAN-SPAM compliance.
 """
 
 import asyncio
+import hashlib
 import logging
 import random
+import urllib.parse
 from datetime import datetime, timezone
 
 from config import settings
@@ -16,6 +18,16 @@ from services.b2b import cache
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://matcha-sensei.onrender.com"
+
+_send_lock = asyncio.Lock()
+
+
+def _make_unsubscribe_url(email: str) -> str:
+    """Generate a signed unsubscribe URL."""
+    secret = getattr(settings, "admin_password", "fallback-secret")
+    token = hashlib.sha256(f"{email}:{secret}".encode()).hexdigest()[:32]
+    params = urllib.parse.urlencode({"email": email, "token": token})
+    return f"{BASE_URL}/api/b2b/unsubscribe?{params}"
 
 
 async def send_outreach(
@@ -33,34 +45,35 @@ async def send_outreach(
     if not email:
         return None
 
-    # Check daily send limit (cached 30s)
-    today_count = await _get_today_send_count()
-    if today_count >= settings.b2b_daily_send_limit:
-        logger.warning(f"[B2B] Daily send limit ({settings.b2b_daily_send_limit}) reached")
-        return None
-
     # Check unsubscribe list
     if await _is_unsubscribed(email):
         logger.debug(f"[B2B] Skipping unsubscribed: {email}")
         return None
 
-    # Add unsubscribe link
-    unsub_url = f"{BASE_URL}/api/b2b/unsubscribe?email={email}"
+    # Add unsubscribe link (signed)
+    unsub_url = _make_unsubscribe_url(email)
     html_with_unsub = html.replace("{{unsubscribe_link}}", unsub_url)
 
     # Get PDF attachment if available (cached 5min)
     attachments = await _get_cached_attachment()
 
-    # Send via Resend
-    from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
-    result = await resend_client.send_email(
-        to=email,
-        subject=subject,
-        html=html_with_unsub,
-        from_email=from_email,
-        reply_to=settings.b2b_reply_to,
-        attachments=attachments,
-    )
+    # Lock to prevent race condition on daily send limit
+    async with _send_lock:
+        today_count = await _get_today_send_count()
+        if today_count >= settings.b2b_daily_send_limit:
+            logger.warning(f"[B2B] Daily send limit ({settings.b2b_daily_send_limit}) reached")
+            return None
+
+        # Send via Resend
+        from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
+        result = await resend_client.send_email(
+            to=email,
+            subject=subject,
+            html=html_with_unsub,
+            from_email=from_email,
+            reply_to=settings.b2b_reply_to,
+            attachments=attachments,
+        )
 
     if not result:
         logger.error(f"[B2B] Failed to send to {email}")
@@ -138,7 +151,7 @@ async def send_batch_optimized(items: list[dict]) -> int:
             if not email or email in unsub_set:
                 continue
 
-            unsub_url = f"{BASE_URL}/api/b2b/unsubscribe?email={email}"
+            unsub_url = _make_unsubscribe_url(email)
             html = item["html"].replace("{{unsubscribe_link}}", unsub_url)
             from_email = f"Takahiro from NAKAI <{settings.b2b_from_email}>"
 
@@ -272,8 +285,8 @@ async def _update_lead_status(lead_id: str, status: str) -> None:
             params={"id": f"eq.{lead_id}"},
             json={"status": status, "updated_at": datetime.now(timezone.utc).isoformat()},
         )
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Lead status update failed: %s", e)
 
 
 async def _get_today_send_count() -> int:
@@ -300,7 +313,8 @@ async def _get_today_send_count() -> int:
         count = int(resp.headers.get("content-range", "0/0").split("/")[-1])
         cache.put("b2b_today_count", count, ttl=30.0)
         return count
-    except Exception:
+    except Exception as e:
+        logger.warning("Failed to get today send count: %s", e)
         return 0
 
 
@@ -328,8 +342,9 @@ async def _is_unsubscribed(email: str) -> bool:
             params={"email": f"eq.{email}", "limit": "1"},
         )
         return bool(resp.json())
-    except Exception:
-        return False
+    except Exception as e:
+        logger.warning("Unsubscribe check failed for %s, skipping contact: %s", email, e)
+        return True
 
 
 async def _get_unsubscribe_set() -> set[str]:
@@ -345,7 +360,8 @@ async def _get_unsubscribe_set() -> set[str]:
             params={"select": "email", "limit": "10000"},
         )
         return {r["email"] for r in resp.json()}
-    except Exception:
+    except Exception as e:
+        logger.warning("Failed to fetch unsubscribe set: %s", e)
         return set()
 
 
@@ -363,5 +379,5 @@ async def _add_unsubscribe(email: str) -> None:
             },
             json={"email": email},
         )
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Failed to add unsubscribe for %s: %s", email, e)

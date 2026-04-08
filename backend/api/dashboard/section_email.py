@@ -208,8 +208,7 @@ def html() -> str:
 
 <script>
 (function(){
-  var PWD = sessionStorage.getItem('nakai-admin-pwd') || '';
-  var H = {'X-Admin-Password': PWD, 'Content-Type': 'application/json'};
+  var H = {'Content-Type': 'application/json'};
   var currentCampaignId = null;
   var currentCampaign = null;
   var nlTemplates = {};
@@ -225,7 +224,7 @@ def html() -> str:
     return {ok: r.ok, status: r.status, data: data};
   }
   async function apiForm(method, path, formData){
-    var r = await fetch(path, {method: method, headers: {'X-Admin-Password': PWD}, body: formData});
+    var r = await fetch(path, {method: method, body: formData, credentials: 'same-origin'});
     var data = r.ok ? await r.json() : null;
     return {ok: r.ok, data: data};
   }

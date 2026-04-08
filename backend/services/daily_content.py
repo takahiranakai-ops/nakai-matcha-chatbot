@@ -410,8 +410,8 @@ async def _build_context_block() -> str:
             parts.append("=== BRAND CONTEXT (use these themes/messages when relevant) ===")
             for s in sources[:10]:
                 parts.append(f"[{s['type']}] {s['title']}: {s['content'][:300]}")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Context fetch failed (content sources): %s", e)
 
     # Latest research brief
     try:
@@ -429,8 +429,8 @@ async def _build_context_block() -> str:
                 briefs = resp.json()
                 if briefs and briefs[0].get("insights"):
                     parts.append(f"\n=== TODAY'S MATCHA TRENDS ===\n{briefs[0]['insights']}")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Context fetch failed (research brief): %s", e)
 
     return "\n".join(parts)
 
@@ -466,7 +466,7 @@ async def generate_daily_content(
     results = {"topic": topic}
 
     try:
-        import anthropic
+        import anthropic  # noqa: E402 — deferred import to avoid startup cost when API key absent
         client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
 
         for platform in platforms:

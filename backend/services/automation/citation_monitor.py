@@ -147,6 +147,7 @@ async def check_serp_citations(
                     "hl": "en",
                 },
             )
+            resp.raise_for_status()
             data = resp.json()
 
         # Check AI Overview with position and competitor tracking
@@ -212,9 +213,11 @@ async def check_ai_citations() -> list[dict]:
     serp_key = getattr(settings, "serp_api_key", "")
     results = []
 
+    import asyncio
     for query in MONITOR_QUERIES:
         result = await check_serp_citations(query, serp_key)
         results.append(result)
+        await asyncio.sleep(0.5)
 
     # Store results in Supabase
     try:

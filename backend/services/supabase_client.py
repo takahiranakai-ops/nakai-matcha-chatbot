@@ -5,6 +5,7 @@ lightweight. All operations use the service_role key for full access.
 """
 
 import logging
+import re
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
@@ -13,6 +14,14 @@ import httpx
 from config import settings
 
 logger = logging.getLogger(__name__)
+
+
+def _validate_id(value: str) -> str:
+    """Validate that a value is safe for PostgREST filter parameters."""
+    if not value or not re.fullmatch(r'[a-zA-Z0-9_-]{1,128}', str(value)):
+        raise ValueError(f"Invalid ID format: {value!r}")
+    return str(value)
+
 
 _HEADERS: dict = {}
 _BASE_URL: str = ""
@@ -36,11 +45,12 @@ async def close():
 
 
 _config_warned = False
+_initialized: bool = False
 
 
 def _init():
-    global _HEADERS, _BASE_URL, _config_warned
-    if _HEADERS:
+    global _HEADERS, _BASE_URL, _config_warned, _initialized
+    if _initialized:
         return
     if not _is_configured():
         if not _config_warned:
@@ -54,6 +64,7 @@ def _init():
         "Content-Type": "application/json",
         "Prefer": "return=representation",
     }
+    _initialized = True
 
 
 def _is_configured() -> bool:
@@ -205,7 +216,7 @@ async def get_article(article_id: str) -> Optional[dict]:
         resp = await client.get(
             f"{_BASE_URL}/knowledge_articles",
             headers=_HEADERS,
-            params={"id": f"eq.{article_id}", "limit": "1"},
+            params={"id": f"eq.{_validate_id(article_id)}", "limit": "1"},
         )
         resp.raise_for_status()
         rows = resp.json()
@@ -260,7 +271,7 @@ async def update_article(article_id: str, updates: dict) -> Optional[dict]:
         resp = await client.patch(
             f"{_BASE_URL}/knowledge_articles",
             headers={**_HEADERS, "Prefer": "return=representation"},
-            params={"id": f"eq.{article_id}"},
+            params={"id": f"eq.{_validate_id(article_id)}"},
             json=updates,
         )
         resp.raise_for_status()
@@ -280,7 +291,7 @@ async def delete_article(article_id: str) -> bool:
         resp = await client.delete(
             f"{_BASE_URL}/knowledge_articles",
             headers=_HEADERS,
-            params={"id": f"eq.{article_id}"},
+            params={"id": f"eq.{_validate_id(article_id)}"},
         )
         resp.raise_for_status()
         return True
@@ -335,7 +346,7 @@ async def get_conversation_messages(conversation_id: str) -> list[dict]:
             f"{_BASE_URL}/messages",
             headers=_HEADERS,
             params={
-                "conversation_id": f"eq.{conversation_id}",
+                "conversation_id": f"eq.{_validate_id(conversation_id)}",
                 "order": "created_at.asc",
             },
         )
@@ -360,6 +371,7 @@ async def get_analytics_summary() -> dict:
             headers={**_HEADERS, "Prefer": "count=exact"},
             params={"select": "id", "limit": "0"},
         )
+        resp.raise_for_status()
         summary["total_conversations"] = int(
             resp.headers.get("content-range", "0/0").split("/")[-1]
         )
@@ -370,6 +382,7 @@ async def get_analytics_summary() -> dict:
             headers={**_HEADERS, "Prefer": "count=exact"},
             params={"select": "id", "limit": "0"},
         )
+        resp.raise_for_status()
         summary["total_messages"] = int(
             resp.headers.get("content-range", "0/0").split("/")[-1]
         )
@@ -380,6 +393,7 @@ async def get_analytics_summary() -> dict:
             headers=_HEADERS,
             params={"select": "source", "limit": "10000"},
         )
+        resp.raise_for_status()
         sources: dict = {}
         for row in resp.json():
             s = row.get("source", "unknown")
@@ -392,6 +406,7 @@ async def get_analytics_summary() -> dict:
             headers=_HEADERS,
             params={"select": "language", "limit": "10000"},
         )
+        resp.raise_for_status()
         langs: dict = {}
         for row in resp.json():
             la = row.get("language", "unknown")
@@ -412,6 +427,7 @@ async def get_analytics_summary() -> dict:
                 "limit": "10000",
             },
         )
+        resp.raise_for_status()
         daily: dict = {}
         for row in resp.json():
             day = row["started_at"][:10]
@@ -474,7 +490,7 @@ async def delete_wholesale_lead(lead_id: str) -> bool:
         resp = await client.delete(
             f"{_BASE_URL}/wholesale_leads",
             headers=_HEADERS,
-            params={"id": f"eq.{lead_id}"},
+            params={"id": f"eq.{_validate_id(lead_id)}"},
         )
         resp.raise_for_status()
         return True
@@ -552,7 +568,7 @@ async def mark_followup_sent(inquiry_id: str, stage: str) -> bool:
         resp = await client.patch(
             f"{_BASE_URL}/wholesale_inquiries",
             headers={**_HEADERS, "Prefer": "return=minimal"},
-            params={"id": f"eq.{inquiry_id}"},
+            params={"id": f"eq.{_validate_id(inquiry_id)}"},
             json={column: datetime.now(timezone.utc).isoformat()},
         )
         resp.raise_for_status()
@@ -795,7 +811,7 @@ async def upsert_email_brand_assets(data: dict) -> Optional[dict]:
             resp = await client.patch(
                 f"{_BASE_URL}/email_brand_assets",
                 headers={**_HEADERS, "Prefer": "return=representation"},
-                params={"id": f"eq.{existing['id']}"},
+                params={"id": f"eq.{_validate_id(existing['id'])}"},
                 json=data,
             )
         else:
@@ -875,7 +891,7 @@ async def update_email_subscriber(sub_id: str, updates: dict) -> Optional[dict]:
         resp = await client.patch(
             f"{_BASE_URL}/email_subscribers",
             headers={**_HEADERS, "Prefer": "return=representation"},
-            params={"id": f"eq.{sub_id}"},
+            params={"id": f"eq.{_validate_id(sub_id)}"},
             json=updates,
         )
         resp.raise_for_status()
@@ -895,7 +911,7 @@ async def delete_email_subscriber(sub_id: str) -> bool:
         resp = await client.delete(
             f"{_BASE_URL}/email_subscribers",
             headers=_HEADERS,
-            params={"id": f"eq.{sub_id}"},
+            params={"id": f"eq.{_validate_id(sub_id)}"},
         )
         resp.raise_for_status()
         return True
@@ -914,7 +930,7 @@ async def unsubscribe_by_token(token: str) -> bool:
         resp = await client.patch(
             f"{_BASE_URL}/email_subscribers",
             headers={**_HEADERS, "Prefer": "return=representation"},
-            params={"unsubscribe_token": f"eq.{token}", "is_active": "eq.true"},
+            params={"unsubscribe_token": f"eq.{_validate_id(token)}", "is_active": "eq.true"},
             json={"is_active": False, "unsubscribed_at": datetime.now(timezone.utc).isoformat()},
         )
         resp.raise_for_status()
@@ -956,7 +972,7 @@ async def get_email_campaign(campaign_id: str) -> Optional[dict]:
         resp = await client.get(
             f"{_BASE_URL}/email_campaigns",
             headers=_HEADERS,
-            params={"id": f"eq.{campaign_id}", "limit": "1"},
+            params={"id": f"eq.{_validate_id(campaign_id)}", "limit": "1"},
         )
         resp.raise_for_status()
         rows = resp.json()
@@ -994,7 +1010,7 @@ async def update_email_campaign(campaign_id: str, updates: dict) -> Optional[dic
         resp = await client.patch(
             f"{_BASE_URL}/email_campaigns",
             headers={**_HEADERS, "Prefer": "return=representation"},
-            params={"id": f"eq.{campaign_id}"},
+            params={"id": f"eq.{_validate_id(campaign_id)}"},
             json=updates,
         )
         resp.raise_for_status()
@@ -1014,7 +1030,7 @@ async def delete_email_campaign(campaign_id: str) -> bool:
         resp = await client.delete(
             f"{_BASE_URL}/email_campaigns",
             headers=_HEADERS,
-            params={"id": f"eq.{campaign_id}"},
+            params={"id": f"eq.{_validate_id(campaign_id)}"},
         )
         resp.raise_for_status()
         return True
@@ -1057,7 +1073,7 @@ async def get_newsletter_schedule(schedule_id: str) -> Optional[dict]:
         resp = await client.get(
             f"{_BASE_URL}/newsletter_schedules",
             headers=_HEADERS,
-            params={"id": f"eq.{schedule_id}", "limit": "1"},
+            params={"id": f"eq.{_validate_id(schedule_id)}", "limit": "1"},
         )
         resp.raise_for_status()
         rows = resp.json()
@@ -1097,7 +1113,7 @@ async def update_newsletter_schedule(schedule_id: str, updates: dict) -> Optiona
         resp = await client.patch(
             f"{_BASE_URL}/newsletter_schedules",
             headers={**_HEADERS, "Prefer": "return=representation"},
-            params={"id": f"eq.{schedule_id}"},
+            params={"id": f"eq.{_validate_id(schedule_id)}"},
             json=updates,
         )
         resp.raise_for_status()
@@ -1117,7 +1133,7 @@ async def delete_newsletter_schedule(schedule_id: str) -> bool:
         resp = await client.delete(
             f"{_BASE_URL}/newsletter_schedules",
             headers=_HEADERS,
-            params={"id": f"eq.{schedule_id}"},
+            params={"id": f"eq.{_validate_id(schedule_id)}"},
         )
         resp.raise_for_status()
         return True
@@ -1180,7 +1196,7 @@ async def update_content_source(source_id: str, updates: dict) -> Optional[dict]
         resp = await client.patch(
             f"{_BASE_URL}/content_sources",
             headers={**_HEADERS, "Prefer": "return=representation"},
-            params={"id": f"eq.{source_id}"},
+            params={"id": f"eq.{_validate_id(source_id)}"},
             json=updates,
         )
         resp.raise_for_status()
@@ -1200,7 +1216,7 @@ async def delete_content_source(source_id: str) -> bool:
         resp = await client.delete(
             f"{_BASE_URL}/content_sources",
             headers=_HEADERS,
-            params={"id": f"eq.{source_id}"},
+            params={"id": f"eq.{_validate_id(source_id)}"},
         )
         resp.raise_for_status()
         return True

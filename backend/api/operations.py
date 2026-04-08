@@ -8,19 +8,21 @@ from config import settings
 operations_router = APIRouter()
 
 
-def verify_admin(request: Request):
-    pw = (
-        request.headers.get("X-Admin-Password")
-        or request.query_params.get("pw")
-        or request.cookies.get("nakai_admin")
-    )
-    if pw != settings.admin_password:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    return pw
+def verify_admin(request: Request) -> str:
+    # Check session token in cookie first
+    token = request.cookies.get("nakai_session")
+    if token:
+        from main import validate_session_token
+        if validate_session_token(token):
+            return "authenticated"
+    pw = request.headers.get("X-Admin-Password", "")
+    if pw and pw == settings.admin_password:
+        return pw
+    raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 @operations_router.get("/ops", response_class=HTMLResponse)
-async def operations_page(request: Request):
+async def operations_page(request: Request, _: str = Depends(verify_admin)):
     return HTMLResponse(content=_build_html(), headers={"Cache-Control": "no-store"})
 
 
@@ -758,11 +760,12 @@ let AUTH = '';
 /* ─── Auth ─── */
 function doLogin() {{
   const pw = document.getElementById('login-pw').value;
-  fetch(BASE+'/api/admin/analytics', {{headers:{{'X-Admin-Password':pw}}}})
+  fetch(BASE+'/api/admin/login', {{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{password:pw}}),credentials:'same-origin'}})
     .then(r => {{
       if (!r.ok) throw new Error('Invalid password');
-      AUTH = pw;
-      document.cookie = 'nakai_admin='+pw+';path=/;max-age=86400';
+      return r.json();
+    }})
+    .then(() => {{
       document.getElementById('login-screen').classList.add('hidden');
       loadDashboard();
     }})
@@ -771,22 +774,19 @@ function doLogin() {{
     }});
 }}
 
-// Auto-login from cookie
+// Auto-login from session cookie
 (function() {{
-  const c = document.cookie.match(/nakai_admin=([^;]+)/);
-  if (c) {{
-    AUTH = c[1];
-    fetch(BASE+'/api/admin/analytics', {{headers:{{'X-Admin-Password':AUTH}}}})
-      .then(r => {{
-        if (r.ok) {{
-          document.getElementById('login-screen').classList.add('hidden');
-          loadDashboard();
-        }}
-      }});
-  }}
+  fetch(BASE+'/api/admin/analytics', {{credentials:'same-origin'}})
+    .then(r => {{
+      if (r.ok) {{
+        document.getElementById('login-screen').classList.add('hidden');
+        loadDashboard();
+      }}
+    }})
+    .catch(() => {{}});
 }})();
 
-function headers() {{ return {{'X-Admin-Password': AUTH, 'Content-Type': 'application/json'}}; }}
+function headers() {{ return {{'Content-Type': 'application/json'}}; }}
 
 /* ─── Navigation ─── */
 function showPage(page) {{

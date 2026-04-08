@@ -33,24 +33,29 @@ logger = logging.getLogger(__name__)
 
 # Track running state to avoid overlapping jobs
 _running_jobs: set[str] = set()
+_jobs_lock = asyncio.Lock()
 
 
 async def _safe_run(name: str, coro):
     """Run a job safely with logging and overlap prevention."""
-    if name in _running_jobs:
-        logger.warning(f"Job '{name}' already running — skipping")
-        return
+    async with _jobs_lock:
+        if name in _running_jobs:
+            logger.info("Job %s already running, skipping", name)
+            return
+        _running_jobs.add(name)
 
-    _running_jobs.add(name)
     start = datetime.now(timezone.utc)
     logger.info(f"[SCHEDULER] Starting: {name}")
 
     try:
         await coro
+    except asyncio.CancelledError:
+        raise
     except Exception as e:
         logger.error(f"[SCHEDULER] {name} failed: {e}", exc_info=True)
     finally:
-        _running_jobs.discard(name)
+        async with _jobs_lock:
+            _running_jobs.discard(name)
         elapsed = (datetime.now(timezone.utc) - start).total_seconds()
         logger.info(f"[SCHEDULER] Finished: {name} ({elapsed:.1f}s)")
 
@@ -328,6 +333,8 @@ async def _scheduler_loop():
                 last_run["newsletter"] = now.timestamp()
                 asyncio.create_task(run_newsletter_check())
 
+        except asyncio.CancelledError:
+            raise
         except Exception as e:
             logger.error(f"[SCHEDULER] Loop error: {e}")
 

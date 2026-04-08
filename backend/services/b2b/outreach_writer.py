@@ -7,11 +7,46 @@ Priority: DB templates > Claude AI > fallback.
 
 import logging
 import re
+from typing import Optional
 
 from config import settings
 from services import supabase_client
 
 logger = logging.getLogger(__name__)
+
+_anthropic_client: Optional["anthropic.AsyncAnthropic"] = None
+
+
+def _get_anthropic_client() -> "anthropic.AsyncAnthropic":
+    """Return a module-level Anthropic client (created once)."""
+    global _anthropic_client
+    if _anthropic_client is None:
+        import anthropic
+        _anthropic_client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+    return _anthropic_client
+
+
+def _sanitize_email_html(html_content: str) -> str:
+    """Remove dangerous tags from LLM-generated HTML content."""
+    html_content = re.sub(
+        r'<(script|iframe|object|embed|form)[^>]*>.*?</\1>',
+        '', html_content, flags=re.DOTALL | re.IGNORECASE,
+    )
+    html_content = re.sub(
+        r'<(script|iframe|object|embed|form)[^>]*/>',
+        '', html_content, flags=re.IGNORECASE,
+    )
+    # Remove event handlers
+    html_content = re.sub(
+        r'\s+on\w+\s*=\s*["\'][^"\']*["\']',
+        '', html_content, flags=re.IGNORECASE,
+    )
+    # Remove javascript: URLs
+    html_content = re.sub(
+        r'href\s*=\s*["\']javascript:[^"\']*["\']',
+        'href="#"', html_content, flags=re.IGNORECASE,
+    )
+    return html_content
 
 # ── Fallback Templates (per segment × step) ────────────────
 
@@ -270,8 +305,7 @@ async def generate_outreach_email(lead: dict, step: int = 1) -> dict:
     # 2. Try Claude AI
     if settings.anthropic_api_key:
         try:
-            import anthropic
-            client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+            client = _get_anthropic_client()
 
             from services.b2b.segments import SEGMENTS
             seg_def = SEGMENTS.get(segment, SEGMENTS["cafe"])
@@ -316,7 +350,7 @@ async def generate_outreach_email(lead: dict, step: int = 1) -> dict:
                 },
             }
             seg_subjects = subjects.get(segment, subjects["cafe"])
-            return {"subject": seg_subjects.get(step, seg_subjects[1]), "html": html.strip()}
+            return {"subject": seg_subjects.get(step, seg_subjects[1]), "html": _sanitize_email_html(html.strip())}
         except Exception as e:
             logger.error(f"[B2B] Claude generation failed: {e}")
 

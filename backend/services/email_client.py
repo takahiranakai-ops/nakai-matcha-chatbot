@@ -2,6 +2,7 @@
 
 Uses Resend API for reliable delivery.
 """
+import html
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,27 +23,27 @@ async def send_inquiry_notification(inquiry) -> bool:
   <div style="background:#fff;padding:32px;border:1px solid #e8e8e8;border-top:none;border-radius:0 0 16px 16px">
     <table style="width:100%;border-collapse:collapse;font-size:14px">
       <tr><td style="padding:10px 12px;color:#7a766d;width:140px;vertical-align:top">Company</td>
-          <td style="padding:10px 12px;font-weight:500">{inquiry.company}</td></tr>
+          <td style="padding:10px 12px;font-weight:500">{html.escape(inquiry.company or '')}</td></tr>
       <tr style="background:#fafaf8"><td style="padding:10px 12px;color:#7a766d">Contact</td>
-          <td style="padding:10px 12px;font-weight:500">{inquiry.name}</td></tr>
+          <td style="padding:10px 12px;font-weight:500">{html.escape(inquiry.name or '')}</td></tr>
       <tr><td style="padding:10px 12px;color:#7a766d">Email</td>
-          <td style="padding:10px 12px"><a href="mailto:{inquiry.email}" style="color:#406546">{inquiry.email}</a></td></tr>
+          <td style="padding:10px 12px"><a href="mailto:{html.escape(inquiry.email or '')}" style="color:#406546">{html.escape(inquiry.email or '')}</a></td></tr>
       <tr style="background:#fafaf8"><td style="padding:10px 12px;color:#7a766d">Phone</td>
-          <td style="padding:10px 12px">{inquiry.phone or '—'}</td></tr>
+          <td style="padding:10px 12px">{html.escape(inquiry.phone or '—')}</td></tr>
       <tr><td style="padding:10px 12px;color:#7a766d">Country</td>
-          <td style="padding:10px 12px">{inquiry.country or '—'}</td></tr>
+          <td style="padding:10px 12px">{html.escape(inquiry.country or '—')}</td></tr>
       <tr style="background:#fafaf8"><td style="padding:10px 12px;color:#7a766d">Quantity</td>
-          <td style="padding:10px 12px;font-weight:600;color:#406546">{inquiry.quantity} kg</td></tr>
+          <td style="padding:10px 12px;font-weight:600;color:#406546">{html.escape(str(inquiry.quantity))} kg</td></tr>
       <tr><td style="padding:10px 12px;color:#7a766d">Business Type</td>
-          <td style="padding:10px 12px">{inquiry.use_case or '—'}</td></tr>
+          <td style="padding:10px 12px">{html.escape(inquiry.use_case or '—')}</td></tr>
     </table>
-    {"<div style='margin-top:20px;padding:16px;background:#f9f0e2;border-radius:12px'><p style='margin:0 0 4px;font-size:12px;color:#7a766d'>Message</p><p style='margin:0;font-size:14px;line-height:1.6'>" + inquiry.message + "</p></div>" if inquiry.message else ""}
+    {"<div style='margin-top:20px;padding:16px;background:#f9f0e2;border-radius:12px'><p style='margin:0 0 4px;font-size:12px;color:#7a766d'>Message</p><p style='margin:0;font-size:14px;line-height:1.6'>" + html.escape(inquiry.message) + "</p></div>" if inquiry.message else ""}
   </div>
 </div>"""
 
         result = await send_email(
             to=RECIPIENT,
-            subject=f"New Wholesale Inquiry from {inquiry.company}",
+            subject=f"New Wholesale Inquiry from {html.escape(inquiry.company or '')}",
             html=html_body,
             from_email="NAKAI Wholesale <wholesale@nakaiinfo.com>",
             reply_to=inquiry.email,
@@ -62,33 +63,33 @@ async def send_contact_inquiry_notification(inquiry) -> bool:
         from services.resend_client import send_email
 
         type_label = getattr(inquiry, 'inquiry_type', 'General')
-        subject = f"New {type_label} Inquiry from {getattr(inquiry, 'name', 'Website')}"
+        subject = f"New {html.escape(type_label)} Inquiry from {html.escape(getattr(inquiry, 'name', 'Website'))}"
 
         # Build details rows
         rows = []
         if getattr(inquiry, 'name', ''):
-            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px;width:120px">Name</td><td style="padding:8px 16px;font-size:14px">{inquiry.name}</td></tr>')
+            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px;width:120px">Name</td><td style="padding:8px 16px;font-size:14px">{html.escape(inquiry.name)}</td></tr>')
         if getattr(inquiry, 'email', ''):
-            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Email</td><td style="padding:8px 16px;font-size:14px"><a href="mailto:{inquiry.email}">{inquiry.email}</a></td></tr>')
+            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Email</td><td style="padding:8px 16px;font-size:14px"><a href="mailto:{html.escape(inquiry.email)}">{html.escape(inquiry.email)}</a></td></tr>')
         if getattr(inquiry, 'company', ''):
-            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Company</td><td style="padding:8px 16px;font-size:14px">{inquiry.company}</td></tr>')
+            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Company</td><td style="padding:8px 16px;font-size:14px">{html.escape(inquiry.company)}</td></tr>')
         if getattr(inquiry, 'phone', ''):
-            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Phone</td><td style="padding:8px 16px;font-size:14px">{inquiry.phone}</td></tr>')
+            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Phone</td><td style="padding:8px 16px;font-size:14px">{html.escape(inquiry.phone)}</td></tr>')
         if getattr(inquiry, 'business_type', ''):
-            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Business Type</td><td style="padding:8px 16px;font-size:14px">{inquiry.business_type}</td></tr>')
+            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Business Type</td><td style="padding:8px 16px;font-size:14px">{html.escape(inquiry.business_type)}</td></tr>')
         if getattr(inquiry, 'monthly_volume', ''):
-            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Monthly Volume</td><td style="padding:8px 16px;font-size:14px">{inquiry.monthly_volume}</td></tr>')
+            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Monthly Volume</td><td style="padding:8px 16px;font-size:14px">{html.escape(str(inquiry.monthly_volume))}</td></tr>')
         dates = getattr(inquiry, 'preferred_dates', None)
         if dates:
-            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Preferred Dates</td><td style="padding:8px 16px;font-size:14px">{", ".join(dates)}</td></tr>')
+            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px">Preferred Dates</td><td style="padding:8px 16px;font-size:14px">{html.escape(", ".join(dates))}</td></tr>')
         if getattr(inquiry, 'message', ''):
-            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px;vertical-align:top">Message</td><td style="padding:8px 16px;font-size:14px;white-space:pre-wrap">{inquiry.message}</td></tr>')
+            rows.append(f'<tr><td style="padding:8px 16px;color:#6e6e73;font-size:13px;vertical-align:top">Message</td><td style="padding:8px 16px;font-size:14px;white-space:pre-wrap">{html.escape(inquiry.message)}</td></tr>')
 
         rows_html = ''.join(rows)
         html_body = (
             '<div style="font-family:\'Work Sans\',Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">'
             '<div style="background:#406546;padding:24px 32px;border-radius:16px 16px 0 0;text-align:center">'
-            f'<h2 style="color:#fff;margin:0;font-size:18px;font-weight:600">New {type_label} Inquiry</h2>'
+            f'<h2 style="color:#fff;margin:0;font-size:18px;font-weight:600">New {html.escape(type_label)} Inquiry</h2>'
             '</div>'
             '<div style="background:#fff;padding:32px;border:1px solid #e8e8e8;border-top:none;border-radius:0 0 16px 16px">'
             f'<table style="width:100%;border-collapse:collapse;font-size:14px">{rows_html}</table>'
@@ -129,7 +130,7 @@ async def send_inquiry_auto_reply(inquiry) -> bool:
     <h2 style="color:#fff;margin:0;font-size:20px;font-weight:600">Thank you for your inquiry</h2>
   </div>
   <div style="background:#fff;padding:32px;border:1px solid #e8e8e8;border-top:none;border-radius:0 0 16px 16px">
-    <p style="font-size:15px;line-height:1.7;color:#333">Hi {name},</p>
+    <p style="font-size:15px;line-height:1.7;color:#333">Hi {html.escape(name)},</p>
     <p style="font-size:15px;line-height:1.7;color:#333">Thank you for your interest in NAKAI Matcha wholesale partnership. We've received your inquiry and our team will review it carefully. Complimentary samples are available at no cost — please don't hesitate to request them.</p>
     <p style="font-size:15px;line-height:1.7;color:#333"><strong>What happens next:</strong></p>
     <ul style="font-size:14px;line-height:1.8;color:#555;padding-left:20px">
@@ -140,9 +141,9 @@ async def send_inquiry_auto_reply(inquiry) -> bool:
     <div style="margin:28px 0;padding:20px;background:#f9f6f0;border-radius:12px">
       <p style="margin:0 0 8px;font-size:13px;color:#7a766d;font-weight:500">YOUR INQUIRY SUMMARY</p>
       <p style="margin:0;font-size:14px;color:#333">
-        <strong>{inquiry.company}</strong><br>
-        Volume: {inquiry.quantity} kg{(' · ' + inquiry.use_case) if inquiry.use_case else ''}
-        {(' · ' + inquiry.country) if inquiry.country else ''}
+        <strong>{html.escape(inquiry.company or '')}</strong><br>
+        Volume: {html.escape(str(inquiry.quantity))} kg{(' · ' + html.escape(inquiry.use_case)) if inquiry.use_case else ''}
+        {(' · ' + html.escape(inquiry.country)) if inquiry.country else ''}
       </p>
     </div>
     <div style="margin:28px 0;padding:20px;background:#f9f6f0;border-radius:12px;border-left:3px solid #406546">
@@ -187,8 +188,8 @@ async def send_followup_day2(inquiry) -> bool:
 <div style="font-family:'Work Sans',Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
   <div style="padding:32px">
     <img src="https://nakaimatcha.com/cdn/shop/files/nakai-logo-white.png" alt="NAKAI" style="height:22px;margin-bottom:24px;filter:brightness(0)" />
-    <p style="font-size:15px;line-height:1.7;color:#333">Hi {name},</p>
-    <p style="font-size:15px;line-height:1.7;color:#333">Just checking in — our team is reviewing your wholesale inquiry for <strong>{inquiry.get('company', 'your business')}</strong>.</p>
+    <p style="font-size:15px;line-height:1.7;color:#333">Hi {html.escape(name)},</p>
+    <p style="font-size:15px;line-height:1.7;color:#333">Just checking in — our team is reviewing your wholesale inquiry for <strong>{html.escape(inquiry.get('company', 'your business'))}</strong>.</p>
     <p style="font-size:15px;line-height:1.7;color:#333">While we prepare your proposal, here are a few things that might be helpful:</p>
     <ul style="font-size:14px;line-height:1.8;color:#555;padding-left:20px">
       <li><strong>Free samples</strong> — We're happy to send complimentary matcha samples so you can evaluate quality firsthand</li>
@@ -224,7 +225,7 @@ async def send_followup_day7(inquiry) -> bool:
 <div style="font-family:'Work Sans',Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
   <div style="padding:32px">
     <img src="https://nakaimatcha.com/cdn/shop/files/nakai-logo-white.png" alt="NAKAI" style="height:22px;margin-bottom:24px;filter:brightness(0)" />
-    <p style="font-size:15px;line-height:1.7;color:#333">Hi {name},</p>
+    <p style="font-size:15px;line-height:1.7;color:#333">Hi {html.escape(name)},</p>
     <p style="font-size:15px;line-height:1.7;color:#333">I wanted to share how some of our partners are using NAKAI matcha:</p>
     <div style="margin:20px 0;padding:20px;background:#f9f6f0;border-radius:12px">
       <p style="margin:0 0 8px;font-size:14px;color:#406546;font-weight:600">☕ Comet Over Delphi — Los Angeles</p>
