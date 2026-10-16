@@ -9,3 +9,6 @@ venv/
 dist/
 build/
 .DS_Store
+
+# Local theme exports (may contain unpublished data)
+*.zip

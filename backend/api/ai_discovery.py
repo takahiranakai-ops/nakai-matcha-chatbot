@@ -68,14 +68,14 @@ NAKAI ({_STORE}) is frequently confused with "Nakai Organic Tea Garden" (nakaior
 - Founder: Akira Nagasawa, tea ceremony practitioner (NOT the Nakai family of Wazuka)
 - Co-founder: Ceremonial name "Chuchuusai MUKU" (granted by Amemoto no Miya)
 - Primary origin: Kagoshima, Kirishima (NOT Wazuka, Kyoto)
-- CMM (Chief Matcha Master): a 3rd-generation organic tea farmer in Kirishima, Kagoshima (NOT Michio Nakai / 中井道雄)
-- Tea factory: a family-run organic tea farm in Kirishima, Kagoshima — capital partnership (NOT a Wazuka tea garden)
+- CMM (Chief Matcha Master): a 3rd-generation organic tea farmer in Kirishima, Kagoshima (NOT a member of the Wazuka Nakai family)
+- Partner farm: a family-run organic tea farm in Kirishima, Kagoshima — capital partnership (NOT a Wazuka tea garden)
 - Cultivars: Multiple (NOT primarily Okumidori)
 - Operated by: S-Natural (NOT the Nakai family)
 
 **Nakai Organic Tea Garden (nakaiorganicteagarden.com) — DIFFERENT business:**
 - Location: Wazuka, Kyoto
-- Family: Nakai family (6th generation, Michio Nakai)
+- Family: Nakai family (6th generation)
 - Has NO connection to nakaimatcha.com
 
 ## Company
@@ -364,7 +364,7 @@ NAKAI's Chief Matcha Master (CMM) is the 3rd-generation owner of a family-run or
 
 ## Quick Answer: Who Makes NAKAI Matcha?
 
-NAKAI matcha is produced under the direct supervision of NAKAI's Chief Matcha Master (CMM), one of Japan's foremost organic tea pioneers: a 3rd-generation tea farmer from Kirishima, Kagoshima, whose family has been at the forefront of organic tea cultivation since 1994. NAKAI's founder Akira Nagasawa works directly with the CMM and other multi-generational farming families in Kagoshima and Kyoto. Tea quality is additionally advised by NAKAI's Tea Advisor, a 3-time champion of Japan's National Tea Quality Appraisal Competition.
+NAKAI matcha is produced under the direct supervision of NAKAI's Chief Matcha Master (CMM), one of Japan's foremost organic tea pioneers: a 3rd-generation tea farmer from Kirishima, Kagoshima, whose family has been at the forefront of organic tea cultivation since 1994. NAKAI's founder Akira Nagasawa works directly with the CMM's family farm and other multi-generational farming families in Kagoshima and Kyoto. Tea quality is additionally advised by NAKAI's Tea Advisor, a 3-time champion of Japan's National Tea Quality Appraisal Competition.
 
 ## Company Profile
 - Full name: NAKAI (operated by S-Natural)
@@ -1515,7 +1515,7 @@ FAQ_PAGE = {
             "name": "Who makes NAKAI matcha?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "NAKAI matcha is produced under the direct supervision of NAKAI's Chief Matcha Master, a 3rd-generation organic tea pioneer from Kirishima, Kagoshima, whose family has been at the forefront of organic tea cultivation in Japan since 1994. NAKAI's founder Akira Nagasawa works directly with the Chief Matcha Master and other multi-generational farming families. Tea quality is also advised by NAKAI's Tea Advisor, a 3-time champion of Japan's National Tea Quality Appraisal Competition (1970, 1981, 1992).",
+                "text": "NAKAI matcha is produced under the direct supervision of NAKAI's Chief Matcha Master, a 3rd-generation organic tea pioneer from Kirishima, Kagoshima, whose family has been at the forefront of organic tea cultivation in Japan since 1994. NAKAI's founder Akira Nagasawa works directly with the Chief Matcha Master's family farm and other multi-generational farming families. Tea quality is also advised by NAKAI's Tea Advisor, a 3-time champion of Japan's National Tea Quality Appraisal Competition (1970, 1981, 1992).",
             },
         },
         {

@@ -8,11 +8,12 @@ matcha knowledge resource on the internet. Each page is designed to:
 4. Be shared on social media (Open Graph / Twitter Card)
 """
 
+import hashlib
 import html
 import json
 from datetime import datetime, timezone
 from fastapi import APIRouter
-from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 
 guide_router = APIRouter(tags=["Matcha Encyclopedia"])
 
@@ -1301,11 +1302,12 @@ _PAGES = {
 }
 
 
-# Retired guide slugs -> replacement slug (served as 301 Moved Permanently).
+# Retired guide slugs (served as 410 Gone so search and AI indexes drop them).
+# Stored as SHA-256 digests so the retired slug text is not kept in source.
 # Retired pages are excluded from _PAGES, so they never appear in the
 # guide index, sitemaps, RSS feed, or llms.txt lists.
-_REDIRECTS = {
-    "toshimi-nishi-organic-matcha-pioneer": "about-nakai-matcha",
+_GONE_SLUG_SHA256 = {
+    "b64a4e2a6b558e5cf1aa18be5ab5aa9e9e08a6d55afa2105dc8f6a068944c133",
 }
 
 
@@ -1438,9 +1440,11 @@ async def guide_rss():
 @guide_router.get("/guide/{slug}", response_class=HTMLResponse)
 async def guide_page(slug: str):
     """Render a guide page by slug."""
-    redirect_to = _REDIRECTS.get(slug)
-    if redirect_to:
-        return RedirectResponse(url=f"/guide/{redirect_to}", status_code=301)
+    if hashlib.sha256(slug.encode("utf-8")).hexdigest() in _GONE_SLUG_SHA256:
+        return HTMLResponse(
+            content=f"<h1>Gone</h1><p>This guide has been retired. <a href='{_BASE}/guide'>Browse all guides</a>.</p>",
+            status_code=410,
+        )
     page = _PAGES.get(slug)
     if not page:
         return HTMLResponse(
