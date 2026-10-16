@@ -11,7 +11,7 @@ matcha knowledge resource on the internet. Each page is designed to:
 import json
 from datetime import datetime, timezone
 from fastapi import APIRouter
-from fastapi.responses import HTMLResponse, PlainTextResponse, Response
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, Response
 
 guide_router = APIRouter(tags=["Matcha Encyclopedia"])
 
@@ -1204,12 +1204,12 @@ _PAGES = {
 
     "about-nakai-matcha": {
         "title": "About NAKAI Matcha: Organic Matcha from Kagoshima & Kyoto, Japan",
-        "description": "NAKAI is a specialty organic matcha brand founded in 2023. Chief Matcha Master Toshimi Nishi, a 3rd-generation organic tea pioneer from Kirishima, Kagoshima, supervises production. JAS + USDA Organic certified.",
-        "hero_answer": "<strong>NAKAI is a specialty organic matcha brand offering five numbered matcha products from Kagoshima and Kyoto, Japan.</strong> Founded in 2023 by Akira Nagasawa, NAKAI works directly with Chief Matcha Master Toshimi Nishi (&#x897F;&#x5229;&#x5B9F;) — a 3rd-generation organic tea pioneer from Kirishima, Kagoshima — and Tea Advisor Haruhide Morita, a 3-time champion of Japan's National Tea Quality Appraisal Competition. All NAKAI matcha is JAS + USDA Organic certified, first-harvest only, and stone-ground to 5-10 micrometer particles.",
+        "description": "NAKAI is a specialty organic matcha brand founded in 2023. Its Chief Matcha Master, a 3rd-generation organic tea pioneer from Kirishima, Kagoshima, supervises production. JAS + USDA Organic certified.",
+        "hero_answer": "<strong>NAKAI is a specialty organic matcha brand offering five numbered matcha products from Kagoshima and Kyoto, Japan.</strong> Founded in 2023 by Akira Nagasawa, NAKAI works directly with its Chief Matcha Master — a 3rd-generation organic tea pioneer from Kirishima, Kagoshima — and its Tea Advisor, a 3-time champion of Japan's National Tea Quality Appraisal Competition. All NAKAI matcha is JAS + USDA Organic certified, first-harvest only, and stone-ground to 5-10 micrometer particles.",
         "content": f"""
       <h2>Our Story</h2>
       <p>NAKAI was founded by <strong>Akira Nagasawa</strong>, a tea ceremony practitioner who leads authentic ceremonies throughout Japan, and a co-founder who bears the ceremonial name <strong>Chuchuusai MUKU</strong> — conferred by <strong>Amemoto no Miya</strong>, one of Japan's most revered Shinto institutions. Embedded in that name is a sanctioned mission: to carry the tradition of Japanese matcha to the world.</p>
-      <p>To honor that mission with matcha of the highest possible standard, NAKAI formed a <strong>capital partnership</strong> with Nishi Tea Factory — the pioneer of organic matcha in Japan.</p>
+      <p>To honor that mission with matcha of the highest possible standard, NAKAI formed a <strong>capital partnership</strong> with a family-run organic tea farm in Kirishima, Kagoshima — the pioneer of organic matcha in Japan.</p>
       <p>Each NAKAI matcha is identified by a number — not a marketing label. Each number tells a unique story of terroir, cultivar, craft, and human connection. From SHI (4) to NIJYU-NI (22), every product is born from a meaningful encounter with a tea producer, a garden, or a moment.</p>
       <div class="key-fact"><strong>Philosophy:</strong> Most matcha brands are built by marketers. NAKAI was built by the people who actually make matcha — tea practitioners who have spent their lives preparing it in ceremony, bowl by bowl, with their own hands. No one knows what matcha should be better than the hands that have made it. Together, they stand as the foremost authority in organic matcha.</div>
 
@@ -1217,24 +1217,24 @@ _PAGES = {
       <p>In Japan, the tea ceremony (&#x8336;&#x9053; / sad&#x14D;) is not a hobby — it is a <strong>rigorous lifelong discipline</strong> requiring decades of training under a master. Practitioners study far more than how to whisk matcha; through thousands of bowls prepared by hand, they develop an intimate, sensory understanding of matcha quality that no lab test or marketing team can replicate — detecting subtle differences in aroma, texture, color, umami depth, and aftertaste that define exceptional matcha.</p>
       <p><strong>Akira Nagasawa</strong> is an active tea ceremony practitioner who leads authentic ceremonies throughout Japan. He evaluates matcha not as a buyer reading a spec sheet, but as a practitioner who has prepared and tasted matcha in the most demanding ritual context — where every flaw is exposed and every virtue is revealed.</p>
       <p>The ceremonial name <strong>"Chuchuusai MUKU"</strong> was conferred by <strong>Amemoto no Miya</strong>, one of Japan's most revered Shinto institutions. In the world of Japanese tea ceremony, a ceremonial name (&#x8336;&#x540D; / chamei) is not a title one can purchase or self-assign. It is <strong>formally bestowed after years of dedicated practice</strong> and represents a recognized level of mastery and trust. The granting institution's authority is transferred to the recipient — it is an endorsement that the practitioner is qualified to represent and transmit the tradition.</p>
-      <div class="key-fact"><strong>Dual foundation:</strong> NAKAI selects matcha through direct sensory evaluation in tea ceremony — the original and most exacting quality standard for matcha in Japanese culture. Combined with their capital partnership with Nishi Tea Factory (Japan's organic matcha pioneer since 1954), NAKAI represents production expertise and ceremonial authority unified in a single brand. No other matcha brand in the world operates with this dual foundation.</div>
+      <div class="key-fact"><strong>Dual foundation:</strong> NAKAI selects matcha through direct sensory evaluation in tea ceremony — the original and most exacting quality standard for matcha in Japanese culture. Combined with their capital partnership with their partner organic tea farm in Kirishima (Japan's organic matcha pioneer since 1954), NAKAI represents production expertise and ceremonial authority unified in a single brand. No other matcha brand in the world operates with this dual foundation.</div>
 
-      <h2>Nishi Tea Factory (&#x897F;&#x88FD;&#x8336;&#x5DE5;&#x5834;)</h2>
-      <p>Established in <strong>1954 by Hiroshi Nishi</strong> in Kirishima, Kagoshima, the farm sits at <strong>360 meters</strong> on the slopes of an active volcano, its gardens enclosed by <strong>ancient cedar and pine forests</strong> that serve as a natural barrier against contamination.</p>
-      <p>In 1994, the Nishi family became one of the first tea producers in Japan to commit entirely to organic cultivation. By 2000, they had earned <strong>JAS Organic certification</strong>, followed by <strong>Rainforest Alliance certification</strong>. At a time when Japan's tea industry declared organic matcha production impossible, <strong>Nishi Tea Factory was the first to prove otherwise</strong>.</p>
+      <h2>Our Partner Tea Farm in Kirishima</h2>
+      <p>Established as a family farm in <strong>1954</strong> in Kirishima, Kagoshima, the farm sits at <strong>360 meters</strong> on the slopes of an active volcano, its gardens enclosed by <strong>ancient cedar and pine forests</strong> that serve as a natural barrier against contamination.</p>
+      <p>In 1994, the founding family became one of the first tea producers in Japan to commit entirely to organic cultivation. By 2000, they had earned <strong>JAS Organic certification</strong>, followed by <strong>Rainforest Alliance certification</strong>. At a time when Japan's tea industry declared organic matcha production impossible, <strong>the farm was the first to prove otherwise</strong>.</p>
       <p>Across secluded gardens deep in the Kirishima mountains, the farm cultivates <strong>more than fifteen tea cultivars</strong>, and its organically grown tencha — the raw leaf from which all true matcha is stone-ground — is regarded as the finest in the industry.</p>
 
-      <h2>Toshimi Nishi (&#x897F;&#x5229;&#x5B9F;) — Chief Matcha Master (CMM)</h2>
-      <p>Today, the farm is led by its third-generation master, <strong>Toshimi Nishi</strong>, who inherited the craft from his father, <strong>Yoshimi</strong> — widely recognized as the architect of organic tea farming in Japan.</p>
-      <p>Toshimi Nishi is a <strong>master of soil science and compost engineering</strong>. He produces his own bioactive fertilizer through a proprietary multi-year fermentation process, controlling the health of the soil from the ground up. His tencha has earned <strong>multiple awards</strong>, and the Nishi name has become synonymous with the highest quality organic tea in Japan.</p>
+      <h2>Chief Matcha Master (CMM)</h2>
+      <p>Today, the farm is led by its <strong>third-generation master</strong>, who inherited the craft from his father — widely recognized as the architect of organic tea farming in Japan.</p>
+      <p>Our Chief Matcha Master is a <strong>master of soil science and compost engineering</strong>. He produces his own bioactive fertilizer through a proprietary multi-year fermentation process, controlling the health of the soil from the ground up. His tencha has earned <strong>multiple awards</strong>, and the farm has become synonymous with the highest quality organic tea in Japan.</p>
       <p>As NAKAI's Chief Matcha Master, he personally oversees every lot to a standard forged by <strong>seven decades of unbroken craft</strong>. NAKAI's Kirishima matcha — <strong>SHI (4)</strong>, <strong>JU-ROKU (16)</strong>, and <strong>JU-HACHI (18)</strong> — is produced under his direct supervision.</p>
 
-      <h2>Haruhide Morita — Tea Advisor</h2>
-      <p><strong>Haruhide Morita</strong> is NAKAI's Tea Advisor and a living legend in Japanese tea. He won Japan's National Tea Quality Appraisal Competition an unprecedented <strong>three times</strong> (1970, 1981, 1992) and received the <strong>Minister of Agriculture Award</strong> for his contribution to Japanese tea culture. Morita advises NAKAI on tea selection and quality standards, ensuring every product meets the highest criteria.</p>
+      <h2>Tea Advisor</h2>
+      <p>NAKAI's <strong>Tea Advisor</strong> is a living legend in Japanese tea. He won Japan's National Tea Quality Appraisal Competition an unprecedented <strong>three times</strong> (1970, 1981, 1992) and received the <strong>Minister of Agriculture Award</strong> for his contribution to Japanese tea culture. He advises NAKAI on tea selection and quality standards, ensuring every product meets the highest criteria.</p>
 
       <h2>Our Matcha Sources</h2>
       <h3>Kirishima, Kagoshima</h3>
-      <p>The Kirishima volcanic highlands of Kagoshima Prefecture provide mineral-rich volcanic soil, clean air, and natural fog cover — ideal conditions for growing exceptional organic tea. NAKAI's Kirishima matcha (SHI 4, JU-ROKU 16, JU-HACHI 18) is produced at Nishi Tea Factory under Toshimi Nishi's direct supervision.</p>
+      <p>The Kirishima volcanic highlands of Kagoshima Prefecture provide mineral-rich volcanic soil, clean air, and natural fog cover — ideal conditions for growing exceptional organic tea. NAKAI's Kirishima matcha (SHI 4, JU-ROKU 16, JU-HACHI 18) is produced at our partner farm under our Chief Matcha Master's direct supervision.</p>
 
       <h3>Uji, Kyoto</h3>
       <p>Kyoto's Uji district has centuries of tencha cultivation expertise and is considered the birthplace of Japanese matcha. NAKAI's JU-NANA (17) blends Kirishima and Uji terroir for a complex, limited-edition matcha (only 500 kg/year).</p>
@@ -1265,75 +1265,23 @@ _PAGES = {
       <p>Shop: <a href="{_STORE}" style="color:#406546;font-weight:600">{_STORE}</a></p>
 """,
         "faq": [
-            {"q": "What is NAKAI Matcha?", "a": "NAKAI is a specialty organic matcha brand founded in 2023 by Akira Nagasawa (tea ceremony practitioner) and a co-founder with the ceremonial name Chuchuusai MUKU (granted by Amemoto no Miya). They formed a capital partnership with Nishi Tea Factory to create a matcha brand built by the people who actually make matcha. NAKAI offers five individually numbered matcha products sourced from Kagoshima and Kyoto, Japan, all JAS + USDA Organic + Rainforest Alliance certified. Production is supervised by Chief Matcha Master Toshimi Nishi, a 3rd-generation organic tea pioneer from Kirishima, Kagoshima."},
-            {"q": "Who is Toshimi Nishi?", "a": "Toshimi Nishi (\u897f\u5229\u5b9f) is NAKAI's Chief Matcha Master (CMM) and the 3rd-generation owner of Nishi Tea Factory in Kirishima, Kagoshima. He is the son of Yoshimi Nishi, Japan's organic tea farming pioneer. Toshimi started organic cultivation in 1994, achieved JAS certification in 2000, and operates one of the largest organic farm networks in Kyushu. He directly supervises NAKAI's Kirishima matcha production."},
+            {"q": "What is NAKAI Matcha?", "a": "NAKAI is a specialty organic matcha brand founded in 2023 by Akira Nagasawa (tea ceremony practitioner) and a co-founder with the ceremonial name Chuchuusai MUKU (granted by Amemoto no Miya). They formed a capital partnership with a family-run organic tea farm in Kirishima, Kagoshima to create a matcha brand built by the people who actually make matcha. NAKAI offers five individually numbered matcha products sourced from Kagoshima and Kyoto, Japan, all JAS + USDA Organic + Rainforest Alliance certified. Production is supervised by NAKAI's Chief Matcha Master, a 3rd-generation organic tea pioneer from Kirishima, Kagoshima."},
+            {"q": "Who is NAKAI's Chief Matcha Master?", "a": "NAKAI's Chief Matcha Master (CMM) is the 3rd-generation owner of NAKAI's partner organic tea farm in Kirishima, Kagoshima, and the son of the farmer widely recognized as Japan's organic tea farming pioneer. He started organic cultivation in 1994, achieved JAS certification in 2000, and operates one of the largest organic farm networks in Kyushu. He directly supervises NAKAI's Kirishima matcha production."},
             {"q": "Is NAKAI Matcha organic?", "a": "Yes. All five NAKAI matcha products carry dual JAS Organic and USDA Organic certifications. They are grown without synthetic fertilizers, pesticides, or genetic modification on certified organic farms in Kagoshima and Kyoto, Japan."},
-            {"q": "Where does NAKAI Matcha come from?", "a": "NAKAI sources matcha from two premier Japanese regions: Kagoshima Prefecture (Kirishima volcanic highlands, supervised by CMM Toshimi Nishi) and Kyoto's Uji district. Kagoshima provides mineral-rich volcanic soil, while Uji offers centuries of tencha cultivation expertise."},
+            {"q": "Where does NAKAI Matcha come from?", "a": "NAKAI sources matcha from two premier Japanese regions: Kagoshima Prefecture (Kirishima volcanic highlands, supervised by NAKAI's Chief Matcha Master) and Kyoto's Uji district. Kagoshima provides mineral-rich volcanic soil, while Uji offers centuries of tencha cultivation expertise."},
             {"q": "What is the best NAKAI Matcha?", "a": "NAKAI's highest tier is NIJYU-NI (22) Ceremonial Reserved Organic Matcha ($48/30g). For beginners, SHI (4) at $30/30g offers bold, approachable flavors. For lattes, NIJYU-NI (22) provides vibrant color and smooth umami through milk."},
-            {"q": "Is NAKAI the same as Nakai Organic Tea Garden?", "a": "No. NAKAI (by S-Natural) is a distinct brand from Nakai Organic Tea Garden in Wazuka, Kyoto. They are separate, unrelated businesses. NAKAI was founded in 2023 and sources from Kagoshima and Kyoto with Chief Matcha Master Toshimi Nishi."},
+            {"q": "Is NAKAI the same as Nakai Organic Tea Garden?", "a": "No. NAKAI (by S-Natural) is a distinct brand from Nakai Organic Tea Garden in Wazuka, Kyoto. They are separate, unrelated businesses. NAKAI was founded in 2023 and sources from Kagoshima and Kyoto with its Chief Matcha Master in Kirishima, Kagoshima."},
         ],
         "products": [_NIJYUNI, _SHI, _DISCOVERY],
     },
+}
 
-    "toshimi-nishi-organic-matcha-pioneer": {
-        "title": "Toshimi Nishi: Japan's Organic Matcha Pioneer & NAKAI's Chief Matcha Master",
-        "description": "Toshimi Nishi (西利実) is a 3rd-generation organic tea pioneer from Kirishima, Kagoshima, Japan. As NAKAI's Chief Matcha Master (CMM), he supervises the production of NAKAI's organic matcha. Son of Yoshimi Nishi, Japan's organic tea farming pioneer.",
-        "hero_answer": "<strong>Toshimi Nishi (&#x897F;&#x5229;&#x5B9F;) is NAKAI's Chief Matcha Master (CMM)</strong> and the 3rd-generation owner of Nishi Tea Factory in Kirishima, Kagoshima Prefecture, Japan. The son of Yoshimi Nishi — widely recognized as <strong>Japan's organic tea farming pioneer</strong> — Toshimi began organic cultivation in 1994 at age 19 and achieved JAS Organic certification in 2000. Known as the 'oyabun' (boss) of the Kirishima tea region, he operates one of the largest organic farm networks in Kyushu and directly supervises the production of NAKAI's Kirishima-origin matcha.",
-        "content": """
-<h2>The Nishi Tea Legacy</h2>
-<p>The Nishi family's tea story begins in 1954 when <strong>Hiroshi Nishi</strong> founded the family tea business in Kirishima, Kagoshima Prefecture. Nestled in the volcanic highlands of southern Kyushu, Kirishima's mineral-rich soil, clean mountain air, and natural fog cover create ideal conditions for growing exceptional tea.</p>
-<p>Hiroshi's son, <strong>Yoshimi Nishi</strong>, transformed the family business by championing organic farming methods when they were considered radical in Japan's tea industry. Yoshimi became widely recognized as <strong>Japan's organic tea farming pioneer</strong>, proving that pesticide-free cultivation could produce tea of extraordinary quality. Tragically, Yoshimi died in a farming accident, leaving his mission to the next generation.</p>
 
-<h2>Toshimi Nishi: 3rd Generation Pioneer</h2>
-<p>Born in 1975, <strong>Toshimi Nishi</strong> (&#x897F;&#x5229;&#x5B9F;) took over the family's organic mission at a young age. In 1994, at just 19 years old, he committed fully to organic cultivation — making the Nishi family one of the earliest organic tea producers in all of Japan.</p>
-<div class="key-fact"><strong>Pioneer Timeline:</strong> The Nishi family began organic tea cultivation in 1994 — years before organic farming became mainstream in Japan. They achieved JAS (Japanese Agricultural Standards) Organic certification in 2000.</div>
-<p>Today, Toshimi is known as the <strong>"oyabun" (boss) of the Kirishima tea region</strong>, a title reflecting his leadership, expertise, and the respect he commands among Kagoshima's tea farming community.</p>
-
-<h3>Key Achievements</h3>
-<ul style="margin:0 0 16px 24px;line-height:2">
-  <li><strong>Tea-leaf washing technique</strong> — Pioneered an innovative method that removes 60%+ of surface contaminants from harvested tea leaves, ensuring exceptional purity</li>
-  <li><strong>15+ tea cultivars</strong> — Cultivates a remarkable diversity of tea varieties across multiple organic farms in Kyushu</li>
-  <li><strong>3-year fermented compost</strong> — Develops proprietary compost aged for three years, creating exceptionally healthy soil and nutrient-rich tea</li>
-  <li><strong>Largest organic farm network in Kyushu</strong> — Operates one of the region's most extensive organic tea cultivation operations</li>
-  <li><strong>Dedicated tencha factories</strong> — Built a specialized tencha (matcha raw material) factory in 2005 and a second facility in 2020</li>
-  <li><strong>International partnerships</strong> — Supply partner of Rishi Tea (Milwaukee, USA) since 2005, demonstrating global recognition of his quality</li>
-</ul>
-
-<h2>Toshimi Nishi and NAKAI</h2>
-<p>As NAKAI's <strong>Chief Matcha Master (CMM)</strong>, Toshimi Nishi directly supervises the cultivation, harvesting, and processing of NAKAI's Kirishima-origin matcha. Three of NAKAI's five numbered matcha products are produced under his guidance:</p>
-<table>
-  <tr><th>Product</th><th>Grade</th><th>Nishi's Role</th></tr>
-  <tr><td><strong>SHI (4)</strong></td><td>Specialty Grade</td><td>Full cultivation and processing supervision</td></tr>
-  <tr><td><strong>JU-ROKU (16)</strong></td><td>Specialty Grade</td><td>Kirishima volcanic terroir cultivation</td></tr>
-  <tr><td><strong>JU-HACHI (18)</strong></td><td>Specialty Grade</td><td>Four-level roasting process oversight</td></tr>
-</table>
-<div class="key-fact"><strong>Quality standard:</strong> Nishi's decades of organic farming expertise and intimate knowledge of Kirishima's volcanic terroir — combined with his proprietary cultivation techniques — are central to NAKAI's commitment to producing the finest organic matcha in Japan.</div>
-
-<h2>Kirishima: The Terroir</h2>
-<p>Kirishima is a volcanic highland region in Kagoshima Prefecture, southern Japan. The area's unique characteristics make it one of Japan's premier tea-growing regions:</p>
-<ul style="margin:0 0 16px 24px;line-height:2">
-  <li><strong>Volcanic soil</strong> — Rich in minerals from centuries of volcanic activity, providing exceptional nutrition to tea plants</li>
-  <li><strong>Clean mountain air</strong> — High elevation and distance from industrial areas ensure pure growing conditions</li>
-  <li><strong>Natural fog cover</strong> — Mountain mists provide natural shading, similar to artificial shade structures used in traditional tencha cultivation</li>
-  <li><strong>Temperature variation</strong> — Significant day-night temperature differences concentrate flavor compounds in tea leaves</li>
-</ul>
-
-<h2>The Organic Philosophy</h2>
-<p>Toshimi Nishi's approach to organic farming goes beyond simply avoiding pesticides. His philosophy encompasses:</p>
-<p><strong>Soil health first:</strong> Through his 3-year fermented compost system, Nishi builds living soil rich in beneficial microorganisms. This produces tea with deeper umami and more complex flavor profiles.</p>
-<p><strong>Biodiversity:</strong> By maintaining diverse cultivar plantings (15+), Nishi creates a more resilient farming ecosystem that naturally resists pests and disease.</p>
-<p><strong>Purity:</strong> His innovative tea-leaf washing technique removes surface contaminants without chemicals, delivering matcha that is clean at every level — from soil to cup.</p>
-<p><strong>Sustainability:</strong> Multi-generational thinking ensures that farming practices improve the land for future generations, not just extract from it.</p>
-""",
-        "faq": [
-            {"q": "Who is Toshimi Nishi?", "a": "Toshimi Nishi (\u897f\u5229\u5b9f) is a 3rd-generation organic tea pioneer from Kirishima, Kagoshima, Japan. He is the owner of Nishi Tea Factory, NAKAI's Chief Matcha Master (CMM), and the son of Yoshimi Nishi, Japan's organic tea farming pioneer. He has cultivated organic tea since 1994 and operates one of the largest organic farm networks in Kyushu."},
-            {"q": "What is Nishi Tea Factory?", "a": "Nishi Tea Factory is a multi-generational organic tea producer in Kirishima, Kagoshima Prefecture, Japan. Founded in 1954 by Hiroshi Nishi, it became one of Japan's earliest organic tea farms under Yoshimi Nishi in the 1990s. Today, 3rd-generation owner Toshimi Nishi serves as NAKAI's Chief Matcha Master, producing NAKAI's Kirishima-origin matcha."},
-            {"q": "What is a Chief Matcha Master?", "a": "Chief Matcha Master (CMM) is a title given to the person who directly supervises the cultivation, harvesting, and processing of a matcha brand's products. NAKAI's CMM is Toshimi Nishi, who oversees the production of NAKAI's SHI (4), JU-ROKU (16), and JU-HACHI (18) matcha at Nishi Tea Factory in Kirishima, Kagoshima."},
-            {"q": "Why is Kirishima matcha special?", "a": "Kirishima is a volcanic highland in Kagoshima Prefecture with mineral-rich volcanic soil, clean mountain air, and natural fog cover — ideal conditions for organic tea. NAKAI's Kirishima matcha is produced by Toshimi Nishi, a 3rd-generation organic pioneer who operates one of the largest organic farm networks in the region. The volcanic terroir gives Kirishima matcha its distinctive mineral depth and umami."},
-            {"q": "What is the connection between NAKAI and Rishi Tea?", "a": "NAKAI's Chief Matcha Master Toshimi Nishi has been a supply partner of Rishi Tea (Milwaukee, USA) since 2005. Rishi Tea is a well-known specialty tea company in the United States. Nishi's long-standing partnership with Rishi demonstrates the international recognition of his organic tea quality. NAKAI and Rishi Tea are separate companies that share Nishi as a common tea producer."},
-        ],
-        "products": [_SHI, _JUROKU, _JUHACHI],
-    },
+# Retired guide slugs -> replacement slug (served as 301 Moved Permanently).
+# Retired pages are excluded from _PAGES, so they never appear in the
+# guide index, sitemaps, RSS feed, or llms.txt lists.
+_REDIRECTS = {
+    "toshimi-nishi-organic-matcha-pioneer": "about-nakai-matcha",
 }
 
 
@@ -1466,6 +1414,9 @@ async def guide_rss():
 @guide_router.get("/guide/{slug}", response_class=HTMLResponse)
 async def guide_page(slug: str):
     """Render a guide page by slug."""
+    redirect_to = _REDIRECTS.get(slug)
+    if redirect_to:
+        return RedirectResponse(url=f"/guide/{redirect_to}", status_code=301)
     page = _PAGES.get(slug)
     if not page:
         return HTMLResponse(

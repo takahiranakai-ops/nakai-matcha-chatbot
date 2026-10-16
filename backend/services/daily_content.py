@@ -14,7 +14,7 @@ TOPIC_CATEGORIES = [
     "Kagoshima vs Uji: two terroirs, two personalities",
     "What volcanic soil does for matcha flavor",
     "Single-origin matcha: why it matters",
-    "The journey from Nishi Tea Factory to your cup",
+    "The journey from our partner tea farm in Kirishima to your cup",
     "Spring first flush (ichibancha): the most prized harvest",
     "How altitude affects matcha sweetness",
     "Organic farming in Kagoshima: JAS + USDA certified",
@@ -284,7 +284,7 @@ TOPIC_CATEGORIES = [
 
     # NAKAI Brand Stories (20 topics)
     "Meet NAKAI: our mission to share authentic Kagoshima matcha",
-    "The Nishi Tea Factory: three generations of tea craftsmanship",
+    "Our partner tea farm in Kirishima: three generations of tea craftsmanship",
     "Why we chose single-origin over blended matcha",
     "Our organic certification journey: JAS and USDA",
     "Behind the scenes: a day at the tea factory",
@@ -319,7 +319,7 @@ Rules:
 - Never make unsubstantiated health claims — cite "research suggests" not "matcha cures"
 - End with something actionable the reader can try today
 - Weave in Japanese terms naturally with brief explanations
-- Reference the Nishi Tea Factory, Kagoshima, or NAKAI heritage when relevant"""
+- Reference our partner organic tea farm in Kirishima, Kagoshima, or NAKAI heritage when relevant"""
 
 PLATFORM_PROMPTS = {
     "twitter": """Create a Twitter/X post about this matcha topic.
